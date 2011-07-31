@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2011, FuseSource Corp.  All rights reserved.
+
+      http://fusesource.com
+
+  The software in this package is published under the terms of the
+  CDDL license a copy of which has been included with this distribution
+  in the license.txt file.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.fusesource</groupId>
+    <artifactId>fusesource-pom</artifactId>
+    <version>1.7</version>
+  </parent>
+
+  <groupId>org.fusesource.leveldbjni</groupId>
+  <artifactId>leveldbjni</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  
+  <name>${project.artifactId}</name>
+  <description>leveldbjni is a jni library for acessing leveldb.</description>
+  
+  <properties>
+    <forge-project-id>leveldbjni</forge-project-id>
+    <forge-project-id-uc>LEVELDBJNI</forge-project-id-uc>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <hawtjni-version>1.3-SNAPSHOT</hawtjni-version>
+  </properties>
+  
+  <url>http://${forge-project-id}.fusesource.org</url>
+  <inceptionYear>2009</inceptionYear>
+
+  <issueManagement>
+    <system>github</system>
+    <url>https://github.com/fusesource/leveldbjni/issues</url>
+  </issueManagement>
+  
+  <mailingLists>
+    <mailingList>
+      <name>${forge-project-id} dev</name>
+      <post>${forge-project-id}-dev@fusesource.org</post>
+      <subscribe>${forge-project-id}-dev-subscribe@fusesource.org</subscribe>
+    </mailingList>
+    <mailingList>
+      <name>${forge-project-id} commits</name>
+      <post>${forge-project-id}-commits@fusesource.org</post>
+      <subscribe>${forge-project-id}-commits-subscribe@fusesource.org</subscribe>
+    </mailingList>
+  </mailingLists>
+
+  <licenses>
+      <license>
+          <name>Common Development and Distribution License (CDDL)</name>
+          <url>http://www.opensource.org/licenses/cddl1</url>
+          <distribution>repo</distribution>
+      </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:git:git://github.com/fusesource/leveldbjni.git</connection>
+    <developerConnection>scm:git:git@github.com:fusesource/leveldbjni.git</developerConnection>
+    <url>https://github.com/fusesource/leveldbjni</url>
+  </scm>
+
+  <distributionManagement>
+    <site>
+      <id>website.fusesource.org</id>
+      <name>website</name>
+      <url>dav:http://fusesource.com/forge/dav/${forge-project-id}/maven/${project.version}</url>
+    </site>
+  </distributionManagement> 
+  
+  <developers>
+    <developer>
+      <id>chirino</id>
+      <name>Hiram Chirino</name>
+      <email>hiram@hiramchirino.com</email>
+      <url>http://hiramchirino.com</url>
+      <timezone>GMT-5</timezone>
+    </developer>
+  </developers>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.fusesource.hawtjni</groupId>
+      <artifactId>hawtjni-runtime</artifactId>
+      <version>${hawtjni-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.7</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+    
+      <!-- the older clean plugin has trouble deleting directories with symlinks in them -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.3</version>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.fusesource.hawtjni</groupId>
+        <artifactId>maven-hawtjni-plugin</artifactId>
+        <version>${hawtjni-version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+              <goal>build</goal>
+              <goal>package-jar</goal>
+              <goal>package-source</goal>
+            </goals>
+            <configuration>
+              <name>leveldbjni</name>
+              <callbacks>false</callbacks>
+              <copyright><![CDATA[
+/*******************************************************************************
+ * Copyright (C) 2011, FuseSource Corp.  All rights reserved.
+ *
+ *     http://fusesource.com
+ *
+ * The software in this package is published under the terms of the
+ * CDDL license a copy of which has been included with this distribution
+ * in the license.txt file.
+ *******************************************************************************/
+              ]]></copyright>
+              <configureArgs>
+                <arg>--with-leveldb=${leveldb}</arg>
+              </configureArgs>
+            </configuration>
+          </execution>
+        </executions>        
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.4.3</version>
+        <configuration>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <forkMode>once</forkMode>
+            <argLine>-ea</argLine>
+            <failIfNoTests>false</failIfNoTests>
+            <workingDirectory>${project.build.directory}</workingDirectory>
+            <excludes>
+                <exclude>**/Abstract*.java</exclude>
+                <exclude>**/Test*.java</exclude>
+            </excludes>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>2.0.1</version>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>    
+              <goal>manifest</goal>
+            </goals>   
+            <configuration>
+              <instructions>
+                  <Import-Package>!org.fusesource.leveldbjni*,!org.fusesource.hawtjni*,sun.reflect;resolution:=optional,*</Import-Package>
+              </instructions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>  
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+          </archive> 
+        </configuration>
+      </plugin>  
+      
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jxr-maven-plugin</artifactId>
+        <version>2.0-beta-1</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <excludePackageNames>*.internal</excludePackageNames>
+          <linksource>true</linksource>
+          <links>
+            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+          </links>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.1.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+              <report>sumary</report>
+              <report>plugins</report>
+              <report>dependencies</report>
+              <report>mailing-list</report>
+              <report>issue-tracking</report>
+              <report>license</report>
+              <report>scm</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>surefire-report-maven-plugin</artifactId>
+        <version>2.0-beta-1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <profiles>
+    
+    <!-- Profile which enables Universal binaries on OS X -->
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os><family>mac</family></os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.fusesource.hawtjni</groupId>
+            <artifactId>maven-hawtjni-plugin</artifactId>
+            <configuration>
+              <osgiPlatforms>
+                <osgiPlatform>osname=MacOS;processor=x86-64</osgiPlatform>
+                <osgiPlatform>osname=MacOS;processor=x86</osgiPlatform>
+                <osgiPlatform>*</osgiPlatform>
+              </osgiPlatforms>
+              <configureArgs>
+                <arg>--with-universal</arg>
+                <arg>--with-leveldb=${leveldb}</arg>
+              </configureArgs>
+              <platform>osx</platform>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <profile>
+      <id>download</id>
+      <repositories>
+        <repository>
+          <id>fusesource.nexus.snapshot</id>
+          <name>FuseSource Community Snapshot Repository</name>
+          <url>http://repo.fusesource.com/nexus/content/groups/public-snapshots</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>fusesource.nexus.snapshot</id>
+          <name>FuseSource Community Snapshot Repository</name>
+          <url>http://repo.fusesource.com/nexus/content/groups/public-snapshots</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+    
+  </profiles>
+</project>
