@@ -12,6 +12,9 @@ package org.fusesource.leveldbjni;
 import org.fusesource.hawtjni.runtime.*;
 
 /**
+ * Provides a java interface to the C++ leveldb::Status class.
+ *
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 class Status extends NativeObject{
 

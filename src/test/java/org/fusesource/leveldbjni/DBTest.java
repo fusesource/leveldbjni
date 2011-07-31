@@ -16,6 +16,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * A Unit test for the DB class implementation.
+ *
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ */
 public class DBTest extends TestCase {
 
     File getTestDirectory(String name) {

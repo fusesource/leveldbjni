@@ -17,7 +17,7 @@ import java.io.IOException;
 import static org.fusesource.hawtjni.runtime.ArgFlag.*;
 
 /**
- * JNI Interface to access low level LevelDB functions.
+ * The DB object provides the main interface to acessing LevelDB
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */

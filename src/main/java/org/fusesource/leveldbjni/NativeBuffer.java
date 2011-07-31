@@ -18,6 +18,12 @@ import static org.fusesource.hawtjni.runtime.ArgFlag.NO_IN;
 import static org.fusesource.hawtjni.runtime.ArgFlag.NO_OUT;
 
 /**
+ * A NativeBuffer allocates a native buffer on the heap.  It supports
+ * creating sub slices/views of that buffer and manages reference tracking
+ * so that the the native buffer is freed once all NativeBuffer views
+ * are deleted.
+ *
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class NativeBuffer extends NativeObject {
 

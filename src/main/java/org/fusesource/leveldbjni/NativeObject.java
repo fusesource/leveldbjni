@@ -10,11 +10,10 @@
 package org.fusesource.leveldbjni;
 
 /**
- * Created by IntelliJ IDEA.
- * User: chirino
- * Date: 7/31/11
- * Time: 2:40 PM
- * To change this template use File | Settings | File Templates.
+ * A helper base class which is used to track a pointer to a native
+ * structure or class.
+ *
+ * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public abstract class NativeObject {
 
