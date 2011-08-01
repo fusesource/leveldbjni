@@ -29,7 +29,7 @@ Compile the leveldb project.  This produces a static library.
 Now use maven to build the leveldbjni project.    
     
     cd ../leveldbjni
-    mvn install -Dleveldb=`cd ../leveldb; pwd`
+    mvn install -P download -Dleveldb=`cd ../leveldb; pwd`
 
 The above will produce:
 
