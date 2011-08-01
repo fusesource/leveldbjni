@@ -12,113 +12,154 @@ package org.fusesource.leveldbjni;
 import org.fusesource.hawtjni.runtime.*;
 
 /**
- * Provides a java interface to the C++ leveldb::ReadOptions class.
+ * Provides a java interface to the C++ leveldb::Iterator class.
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class Iterator extends NativeObject {
 
-    @JniClass(name="leveldb::WriteBatch", flags={ClassFlag.CPP})
-    private static class WriteBatchJNI {
+    @JniClass(name="leveldb::Iterator", flags={ClassFlag.CPP})
+    private static class IteratorJNI {
         static {
             DB.LIBRARY.load();
         }
 
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="leveldb::WriteBatch *")
-        public static final native long create();
         @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::WriteBatch *") long ptr);
+        public static final native void delete(@JniArg(cast="leveldb::Iterator *") long self);
 
         @JniMethod(flags={MethodFlag.CPP})
-        static final native void Put(
-                @JniArg(cast="leveldb::WriteBatch *") long ptr,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long key,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long value
+        static final native boolean Valid(
+                @JniArg(cast="leveldb::Iterator *") long self
                 );
 
         @JniMethod(flags={MethodFlag.CPP})
-        static final native void Delete(
-                @JniArg(cast="leveldb::WriteBatch *") long ptr,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long key
+        static final native void SeekToFirst(
+                @JniArg(cast="leveldb::Iterator *") long self
                 );
 
         @JniMethod(flags={MethodFlag.CPP})
-        static final native void Clear(
-                @JniArg(cast="leveldb::WriteBatch *") long ptr
+        static final native void SeekToLast(
+                @JniArg(cast="leveldb::Iterator *") long self
                 );
 
+        @JniMethod(flags={MethodFlag.CPP})
+        static final native void Seek(
+                @JniArg(cast="leveldb::Iterator *") long self,
+                @JniArg(cast="leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long target
+                );
+
+        @JniMethod(flags={MethodFlag.CPP})
+        static final native void Next(
+                @JniArg(cast="leveldb::Iterator *") long self
+                );
+
+        @JniMethod(flags={MethodFlag.CPP})
+        static final native void Prev(
+                @JniArg(cast="leveldb::Iterator *") long self
+                );
+
+        @JniMethod(copy="leveldb::Slice", flags={MethodFlag.CPP})
+        static final native long key(
+                @JniArg(cast="leveldb::Iterator *") long self
+                );
+
+        @JniMethod(copy="leveldb::Slice", flags={MethodFlag.CPP})
+        static final native long value(
+                @JniArg(cast="leveldb::Iterator *") long self
+                );
+
+        @JniMethod(copy="leveldb::Status", flags={MethodFlag.CPP})
+        static final native long status(
+                @JniArg(cast="leveldb::Iterator *") long self
+                );
     }
 
-    public Iterator() {
-        super(WriteBatchJNI.create());
+    Iterator(long self) {
+        super(self);
     }
 
     public void delete() {
         assertAllocated();
-        WriteBatchJNI.delete(ptr);
-        ptr = 0;
+        IteratorJNI.delete(self);
+        self = 0;
     }
 
-    public void put(byte[] key, byte[] value) {
+    public boolean isValid() {
+        assertAllocated();
+        return IteratorJNI.Valid(self);
+    }
+
+    private void checkStatus() throws DB.DBException {
+        DB.checkStatus(IteratorJNI.status(self));
+    }
+
+    public void seekToFirst() {
+        assertAllocated();
+        IteratorJNI.SeekToFirst(self);
+    }
+
+    public void seekToLast() {
+        assertAllocated();
+        IteratorJNI.SeekToLast(self);
+    }
+
+    public void seek(byte[] key) throws DB.DBException {
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
-            NativeBuffer valueBuffer = new NativeBuffer(value);
-            try {
-                put(keyBuffer, valueBuffer);
-            } finally {
-                valueBuffer.delete();
-            }
+            seek(keyBuffer);
         } finally {
             keyBuffer.delete();
         }
     }
 
-    private void put(NativeBuffer keyBuffer, NativeBuffer valueBuffer) {
+    private void seek(NativeBuffer keyBuffer) throws DB.DBException {
         Slice keySlice = new Slice(keyBuffer);
         try {
-            Slice valueSlice = new Slice(valueBuffer);
-            try {
-                put(keySlice, valueSlice);
-            } finally {
-                valueSlice.delete();
-            }
+            seek(keySlice);
         } finally {
             keySlice.delete();
         }
     }
 
-    private void put(Slice keySlice, Slice valueSlice) {
+    private void seek(Slice keySlice) throws DB.DBException {
         assertAllocated();
-        WriteBatchJNI.Put(ptr, keySlice.pointer(), valueSlice.pointer());
+        IteratorJNI.Seek(self, keySlice.pointer());
+        checkStatus();
     }
 
+    public void next() throws DB.DBException {
+        assertAllocated();
+        IteratorJNI.Next(self);
+        checkStatus();
+    }
 
-    public void delete(byte[] key) {
-        NativeBuffer keyBuffer = new NativeBuffer(key);
+    public void prev() throws DB.DBException {
+        assertAllocated();
+        IteratorJNI.Prev(self);
+        checkStatus();
+    }
+
+    public byte[] key() throws DB.DBException {
+        assertAllocated();
+        long slice_ptr = IteratorJNI.key(self);
+        checkStatus();
+        Slice slice = new Slice(slice_ptr);
         try {
-            delete(keyBuffer);
+            return slice.toByteArray();
         } finally {
-            keyBuffer.delete();
+            slice.delete();
         }
     }
 
-    private void delete(NativeBuffer keyBuffer) {
-        Slice keySlice = new Slice(keyBuffer);
+    public byte[] value() throws DB.DBException {
+        assertAllocated();
+        long slice_ptr = IteratorJNI.value(self);
+        checkStatus();
+        Slice slice = new Slice(slice_ptr);
         try {
-            delete(keySlice);
+            return slice.toByteArray();
         } finally {
-            keySlice.delete();
+            slice.delete();
         }
     }
-
-    private void delete(Slice keySlice) {
-        assertAllocated();
-        WriteBatchJNI.Delete(ptr, keySlice.pointer());
-    }
-
-    public void clear() {
-        assertAllocated();
-        WriteBatchJNI.Clear(ptr);
-    }
-
 }
