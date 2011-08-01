@@ -79,9 +79,9 @@ Opening and closing the database.
     try {
       // Use the db in here....
     } finally {
-      // Make sure you delete the db and options to avoid resource leaks.
+      // Make sure you delete the db to shutdown the 
+      // database and avoid resource leaks.
       db.delete();
-      options.delete();
     }
 
 Putting, Getting, and Deleting key/values.
