@@ -38,6 +38,9 @@
 #include "leveldb/db.h"
 #include "leveldb/options.h"
 #include "leveldb/write_batch.h"
+#include "leveldb/cache.h"
+#include "leveldb/comparator.h"
+#include "leveldb/env.h"
 #endif
 
 #ifdef __cplusplus

@@ -50,7 +50,6 @@ public class DBTest extends TestCase {
         File path = getTestDirectory(getName());
         DB db = DB.open(options, path);
 
-        options.delete();
         db.delete();
 
         // Try again.. this time we expect a failure since it exists.
@@ -61,7 +60,6 @@ public class DBTest extends TestCase {
             fail("Expected exception.");
         } catch (DB.DBException e) {
         }
-        options.delete();
 
     }
 
@@ -100,8 +98,6 @@ public class DBTest extends TestCase {
         // leveldb does not consider deleting something that does not exist an error.
         db.delete(wo, bytes("New York"));
 
-
-        options.delete();
         db.delete();
     }
 
@@ -135,7 +131,6 @@ public class DBTest extends TestCase {
         iterator.delete();
         assertEquals(expecting, actual);
 
-        options.delete();
         db.delete();
     }
 
@@ -176,7 +171,6 @@ public class DBTest extends TestCase {
         ro.setSnapshot(null);
         assertEquals(db.get(ro, bytes("New York")), bytes("blue"));
 
-        options.delete();
         db.delete();
     }
 
@@ -215,7 +209,6 @@ public class DBTest extends TestCase {
         iterator.delete();
         assertEquals(expecting, actual);
 
-        options.delete();
         db.delete();
     }
 

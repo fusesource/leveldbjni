@@ -34,7 +34,7 @@ public class DB extends NativeObject {
 
         @JniMethod(copy="leveldb::Status", accessor = "leveldb::DB::Open")
         static final native long Open(
-                @JniArg(cast="leveldb::Options *", flags={ArgFlag.BY_VALUE}) long options,
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Options options,
                 @JniArg(cast="const char*") String path,
                 @JniArg(cast="leveldb::DB**") long[] self);
 
@@ -124,7 +124,7 @@ public class DB extends NativeObject {
 
     public static DB open(Options options, File path) throws IOException, DBException {
         long rc[] = new long[1];
-        checkStatus(DBJNI.Open(options.pointer(), path.getCanonicalPath(), rc));
+        checkStatus(DBJNI.Open(options, path.getCanonicalPath(), rc));
         return new DB(rc[0]);
     }
 
