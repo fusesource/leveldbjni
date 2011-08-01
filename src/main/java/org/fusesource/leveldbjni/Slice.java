@@ -30,17 +30,21 @@ public class Slice extends NativeObject {
                 @JniArg(cast="size_t") long n);
 
         @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::Slice *") long ptr);
+        public static final native void delete(@JniArg(cast="leveldb::Slice *") long self);
 
         @JniMethod(flags={MethodFlag.CPP}, cast="const char*")
-        public static final native long data(@JniArg(cast="leveldb::Slice *") long ptr);
+        public static final native long data(@JniArg(cast="leveldb::Slice *") long self);
 
         @JniMethod(flags={MethodFlag.CPP}, cast="size_t")
-        public static final native long size(@JniArg(cast="leveldb::Slice *") long ptr);
+        public static final native long size(@JniArg(cast="leveldb::Slice *") long self);
     }
 
-    public Slice(long ptr, long length) {
-        super(SliceJNI.create(ptr, length));
+    public Slice(long self) {
+        super(self);
+    }
+
+    public Slice(long self, long length) {
+        super(SliceJNI.create(self, length));
     }
 
     public Slice(NativeBuffer buffer) {
@@ -49,18 +53,28 @@ public class Slice extends NativeObject {
 
     public void delete() {
         assertAllocated();
-        SliceJNI.delete(ptr);
-        ptr = 0;
+        SliceJNI.delete(self);
+        self = 0;
     }
 
-    long getData() {
+    long data() {
         assertAllocated();
-        return SliceJNI.data(ptr);
+        return SliceJNI.data(self);
     }
 
-    long getSize() {
+    long length() {
         assertAllocated();
-        return SliceJNI.size(ptr);
+        return SliceJNI.size(self);
+    }
+
+    public byte[] toByteArray() {
+        long l = length();
+        if( l > Integer.MAX_VALUE ) {
+            throw new ArrayIndexOutOfBoundsException("Native slice is larger than the maximum Java array");
+        }
+        byte []rc = new byte[(int) l];
+        NativeBuffer.NativeBufferJNI.buffer_copy(SliceJNI.data(self), 0, rc, 0, rc.length);
+        return rc;
     }
 
 }

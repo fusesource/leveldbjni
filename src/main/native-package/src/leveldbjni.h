@@ -36,6 +36,8 @@
 
 #ifdef __cplusplus
 #include "leveldb/db.h"
+#include "leveldb/options.h"
+#include "leveldb/write_batch.h"
 #endif
 
 #ifdef __cplusplus

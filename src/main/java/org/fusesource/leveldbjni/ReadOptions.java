@@ -16,57 +16,47 @@ import org.fusesource.hawtjni.runtime.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class ReadOptions extends NativeObject {
+@JniClass(name="leveldb::ReadOptions", flags={ClassFlag.STRUCT, ClassFlag.CPP})
+public class ReadOptions {
 
-    @JniClass(name="leveldb::ReadOptions", flags={ClassFlag.CPP})
-    private static class ReadOptionsJNI {
-        static {
-            DB.LIBRARY.load();
+    @JniField
+    private boolean verify_checksums = false;
+
+    @JniField
+    private boolean fill_cache = true;
+
+    @JniField(cast="const leveldb::Snapshot*")
+    private long snapshot=0;
+
+    public boolean isFillCache() {
+        return fill_cache;
+    }
+
+    public void setFillCache(boolean fill_cache) {
+        this.fill_cache = fill_cache;
+    }
+
+    public Snapshot getSnapshot() {
+        if( snapshot == 0 ) {
+            return null;
+        } else {
+            return new Snapshot(snapshot);
         }
-
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="leveldb::ReadOptions *")
-        public static final native long create();
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::ReadOptions *") long ptr);
-
-        @JniMethod(flags = {MethodFlag.CPP, MethodFlag.GETTER})
-        public static final native boolean verify_checksums(@JniArg(cast="leveldb::ReadOptions *") long ptr);
-        @JniMethod(flags = {MethodFlag.CPP, MethodFlag.SETTER})
-        public static final native void verify_checksums(@JniArg(cast="leveldb::ReadOptions *") long ptr, boolean value);
-
-        @JniMethod(flags = {MethodFlag.CPP, MethodFlag.GETTER})
-        public static final native boolean fill_cache(@JniArg(cast="leveldb::ReadOptions *") long ptr);
-        @JniMethod(flags = {MethodFlag.CPP, MethodFlag.SETTER})
-        public static final native void fill_cache(@JniArg(cast="leveldb::ReadOptions *") long ptr, boolean value);
     }
 
-    public ReadOptions() {
-        super(ReadOptionsJNI.create());
+    public void setSnapshot(Snapshot snapshot) {
+        if( snapshot==null ) {
+            this.snapshot = 0;
+        } else {
+            this.snapshot = snapshot.pointer();
+        }
     }
 
-    public void delete() {
-        assertAllocated();
-        ReadOptionsJNI.delete(ptr);
-        ptr = 0;
+    public boolean isVerifyChecksums() {
+        return verify_checksums;
     }
 
-    public void setVerifyChecksums(boolean value) {
-        assertAllocated();
-        ReadOptionsJNI.verify_checksums(ptr, value);
+    public void setVerifyChecksums(boolean verify_checksums) {
+        this.verify_checksums = verify_checksums;
     }
-    public boolean getVerifyChecksums() {
-        assertAllocated();
-        return ReadOptionsJNI.verify_checksums(ptr);
-    }
-
-    public void setFillCache(boolean value) {
-        assertAllocated();
-        ReadOptionsJNI.fill_cache(ptr, value);
-    }
-    public boolean getFillCache() {
-        assertAllocated();
-        return ReadOptionsJNI.fill_cache(ptr);
-    }
-
-
 }

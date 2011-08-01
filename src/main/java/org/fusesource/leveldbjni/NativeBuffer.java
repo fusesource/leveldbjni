@@ -38,7 +38,7 @@ public class NativeBuffer extends NativeObject {
                 @JniArg(cast="size_t") long size);
 
         public static final native void free(
-                @JniArg(cast="void *") long ptr);
+                @JniArg(cast="void *") long self);
 
         public static final native void buffer_copy (
                 @JniArg(cast="const void *") long src,
@@ -91,7 +91,7 @@ public class NativeBuffer extends NativeObject {
     }
 
     private NativeBuffer(NativeBuffer other, long offset, long capacity) {
-        super(PointerMath.add(other.ptr, offset));
+        super(PointerMath.add(other.self, offset));
         this.retained = other.retained;
         this.capacity = capacity;
         retained.incrementAndGet();
@@ -120,9 +120,9 @@ public class NativeBuffer extends NativeObject {
         if( r < 0 ) {
             throw new Error("The object has already been deleted.");
         } else if( r==0 ) {
-            NativeBufferJNI.free(ptr);
+            NativeBufferJNI.free(self);
         }
-        ptr = 0;
+        self = 0;
     }
 
     public long capacity() {
@@ -136,7 +136,7 @@ public class NativeBuffer extends NativeObject {
         if( at < 0 ) throw new IllegalArgumentException("at cannot be negative");
         if( at+length > capacity ) throw new ArrayIndexOutOfBoundsException("at + length exceeds the capacity of this object");
         if( offset+length > source.length) throw new ArrayIndexOutOfBoundsException("offset + length exceed the length of the source buffer");
-        NativeBufferJNI.buffer_copy(source, offset, ptr, at, length);
+        NativeBufferJNI.buffer_copy(source, offset, self, at, length);
     }
 
     public void read(long at, byte []target, int offset, int length) {
@@ -146,7 +146,7 @@ public class NativeBuffer extends NativeObject {
         if( at < 0 ) throw new IllegalArgumentException("at cannot be negative");
         if( at+length > capacity ) throw new ArrayIndexOutOfBoundsException("at + length exceeds the capacity of this object");
         if( offset+length > target.length) throw new ArrayIndexOutOfBoundsException("offset + length exceed the length of the target buffer");
-        NativeBufferJNI.buffer_copy(ptr, at, target, offset, length);
+        NativeBufferJNI.buffer_copy(self, at, target, offset, length);
     }
 
     public byte[] toByteArray() {

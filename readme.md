@@ -48,6 +48,7 @@ You just nee to add the following repositories and dependencies to your Maven po
         <url>http://repo.fusesource.com/nexus/content/groups/public-snapshots</url>
       </repository>
     </repositories>
+    
     <dependencies>
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
@@ -64,41 +65,77 @@ You just nee to add the following repositories and dependencies to your Maven po
 
 ## API Usage:
 
+Recommended Package imports:
+
     import org.fusesource.leveldbjni.*;
+    import static org.fusesource.leveldbjni.DB.*;
     import java.io.*;
-    ....
+
+Opening and closing the database.
+
     Options options = new Options();
     options.setCreateIfMissing(true);
+    DB db = DB.open(options, new File("example"));
+    try {
+      // Use the db in here....
+    } finally {
+      // Make sure you delete the db and options to avoid resource leaks.
+      db.delete();
+      options.delete();
+    }
+
+Putting, Getting, and Deleting key/values.
 
     WriteOptions wo = new WriteOptions();
-    wo.setSync(false);
+    ReadOptions ro = new ReadOptions();
+
+    db.put(wo, bytes("Tampa"), bytes("rocks"));
+    String value = asString(db.get(ro, bytes("Tampa")));
+    db.delete(wo, bytes("Tampa"));
+
+Performing Batch/Bulk/Atomic Updates.
+
+    WriteBatch batch = new WriteBatch();
+    try {
+      batch.delete(bytes("Denver"));
+      batch.put(bytes("Tampa"), bytes("green"));
+      batch.put(bytes("London"), bytes("red"));
+
+      WriteOptions wo = new WriteOptions();
+      db.write(wo, batch);
+    } finally {
+      // Make sure you delete the batch to avoid resource leaks.
+      batch.delete();
+    }
+
+Iterating key/values.
 
     ReadOptions ro = new ReadOptions();
-    ro.setFillCache(true);
-    ro.setVerifyChecksums(true);
-
-    DB db = DB.open(options, new File("example"));
-
-    byte [] red = "red".getBytes("UTF-8");
-    byte [] blue = "blue".getBytes("UTF-8");
-    byte [] green = "green".getBytes("UTF-8");
-    byte [] tampa = "Tampa".getBytes("UTF-8");
-    byte [] london = "London".getBytes("UTF-8");
-    byte [] newyork = "New York".getBytes("UTF-8");
-
-    db.put(wo, tampa, green);
-    db.put(wo, london, red);
-    db.put(wo, newyork, blue);
-
-    byte [] result = db.get(ro, london);
-    
-    db.delete(wo, newyork);
+    Iterator iterator = db.iterator(ro);
     try {
-        db.get(ro, newyork);
-    } catch( DB.DBException expeted) {
+      for(iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+        String key = asString(iterator.key());
+        String value = asString(iterator.value());
+        System.out.println(key+" = "+value);
+      }
+    } finally {
+      // Make sure you delete the iterator to avoid resource leaks.
+      iterator.delete();
     }
-    
-    db.delete();
-    ro.delete();
-    wo.delete();
-    options.delete();
+
+Working against a Snapshot view of the Database.
+
+    ReadOptions ro = new ReadOptions();
+    ro.setSnapshot(db.getSnapshot());
+    try {
+      
+      // All read operations will now use the same 
+      // consistent view of the data.
+      ... = db.iterator(ro);
+      ... = db.get(ro, bytes("Tampa"));
+
+    } finally {
+      // Make sure you release the snapshot to avoid resource leaks.
+      db.releaseSnapshot(ro.getSnapshot());
+      ro.setSnapshot(null);
+    }

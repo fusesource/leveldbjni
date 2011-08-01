@@ -15,30 +15,27 @@ package org.fusesource.leveldbjni;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public abstract class NativeObject {
+public class NativeObject {
 
-    protected long ptr;
+    protected long self;
 
-    protected NativeObject(long ptr) {
-        this.ptr = ptr;
-        if( ptr==0 ) {
+    protected NativeObject(long self) {
+        this.self = self;
+        if( self ==0 ) {
             throw new OutOfMemoryError("Failure allocating native heap memory");
         }
     }
 
     long pointer() {
-        return ptr;
+        return self;
     }
 
     public boolean isAllocated() {
-        return ptr!=0;
+        return self !=0;
     }
 
     protected void assertAllocated() {
         assert isAllocated() : "This object has been deleted";
     }
-
-    abstract public void delete();
-
 
 }

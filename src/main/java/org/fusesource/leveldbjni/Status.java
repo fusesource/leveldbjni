@@ -25,45 +25,44 @@ class Status extends NativeObject{
         }
 
         @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::Status *") long ptr);
+        public static final native void delete(@JniArg(cast="leveldb::Status *") long self);
 
         @JniMethod(flags={MethodFlag.CPP})
         public static final native boolean ok(
-                @JniArg(cast="leveldb::Status *") long ptr);
+                @JniArg(cast="leveldb::Status *") long self);
 
         @JniMethod(flags={MethodFlag.CPP})
         public static final native boolean IsNotFound(
-                @JniArg(cast="leveldb::Status *") long ptr);
+                @JniArg(cast="leveldb::Status *") long self);
 
         @JniMethod(copy="std::string", flags={MethodFlag.CPP})
         public static final native long ToString(
-                @JniArg(cast="leveldb::Status *") long ptr);
+                @JniArg(cast="leveldb::Status *") long self);
     }
 
-    public Status(long ptr) {
-        super(ptr);
+    public Status(long self) {
+        super(self);
     }
 
-    @Override
     public void delete() {
         assertAllocated();
-        StatusJNI.delete(ptr);
-        ptr = 0;
+        StatusJNI.delete(self);
+        self = 0;
     }
 
     public boolean isOk() {
         assertAllocated();
-        return StatusJNI.ok(ptr);
+        return StatusJNI.ok(self);
     }
 
     public boolean isNotFound() {
         assertAllocated();
-        return StatusJNI.IsNotFound(ptr);
+        return StatusJNI.IsNotFound(self);
     }
 
     public String toString() {
         assertAllocated();
-        long strptr = StatusJNI.ToString(ptr);
+        long strptr = StatusJNI.ToString(self);
         if( strptr==0 ) {
             return null;
         } else {

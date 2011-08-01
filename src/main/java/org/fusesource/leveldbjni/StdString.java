@@ -32,20 +32,20 @@ public class StdString extends NativeObject {
 
         @JniMethod(flags={MethodFlag.CPP_DELETE})
         static final native void delete(
-                @JniArg(cast="std::string *") long ptr);
+                @JniArg(cast="std::string *") long self);
 
         @JniMethod(flags={MethodFlag.CPP}, accessor = "c_str", cast="const char*")
         public static final native long c_str_ptr (
-                @JniArg(cast="std::string *") long ptr);
+                @JniArg(cast="std::string *") long self);
 
         @JniMethod(flags={MethodFlag.CPP},cast = "size_t")
         public static final native long length (
-                @JniArg(cast="std::string *") long ptr);
+                @JniArg(cast="std::string *") long self);
 
     }
 
-    public StdString(long ptr) {
-        super(ptr);
+    public StdString(long self) {
+        super(self);
     }
 
     public StdString() {
@@ -54,8 +54,8 @@ public class StdString extends NativeObject {
 
     public void delete() {
         assertAllocated();
-        StdStringJNI.delete(ptr);
-        ptr = 0;
+        StdStringJNI.delete(self);
+        self = 0;
     }
 
     public String toString() {
@@ -64,7 +64,7 @@ public class StdString extends NativeObject {
 
     public long length() {
         assertAllocated();
-        return StdStringJNI.length(ptr);
+        return StdStringJNI.length(self);
     }
 
     public byte[] toByteArray() {
@@ -73,7 +73,7 @@ public class StdString extends NativeObject {
             throw new ArrayIndexOutOfBoundsException("Native string is larger than the maximum Java array");
         }
         byte []rc = new byte[(int) l];
-        NativeBuffer.NativeBufferJNI.buffer_copy(StdStringJNI.c_str_ptr(ptr), 0, rc, 0, rc.length);
+        NativeBuffer.NativeBufferJNI.buffer_copy(StdStringJNI.c_str_ptr(self), 0, rc, 0, rc.length);
         return rc;
     }
 }

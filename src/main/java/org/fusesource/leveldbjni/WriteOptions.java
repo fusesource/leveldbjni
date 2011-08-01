@@ -16,43 +16,37 @@ import org.fusesource.hawtjni.runtime.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class WriteOptions extends NativeObject {
+@JniClass(name="leveldb::WriteOptions", flags={ClassFlag.STRUCT, ClassFlag.CPP})
+public class WriteOptions {
 
-    @JniClass(name="leveldb::WriteOptions", flags={ClassFlag.CPP})
-    private static class WriteOptionsJNI {
-        static {
-            DB.LIBRARY.load();
-        }
+    @JniField
+    boolean sync;
 
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="leveldb::WriteOptions *")
-        public static final native long create();
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::WriteOptions *") long ptr);
+//    @JniField(cast="const leveldb::Snapshot**")
+//    long post_write_snapshot;
 
-        @JniMethod(flags = {MethodFlag.CPP, MethodFlag.GETTER})
-        public static final native boolean sync(@JniArg(cast="leveldb::WriteOptions *") long ptr);
-        @JniMethod(flags = {MethodFlag.CPP, MethodFlag.SETTER})
-        public static final native void sync(@JniArg(cast="leveldb::WriteOptions *") long ptr, boolean value);
-
+    public boolean isSync() {
+        return sync;
     }
 
-    public WriteOptions() {
-        super(WriteOptionsJNI.create());
+    public void setSync(boolean sync) {
+        this.sync = sync;
     }
 
-    public void delete() {
-        assertAllocated();
-        WriteOptionsJNI.delete(ptr);
-        ptr = 0;
-    }
-
-    public void setSync(boolean value) {
-        assertAllocated();
-        WriteOptionsJNI.sync(ptr, value);
-    }
-    public boolean getSync() {
-        assertAllocated();
-        return WriteOptionsJNI.sync(ptr);
-    }
+//    public void enablePostWriteSnapshot(boolean value) {
+//        if( value ) {
+//            post_write_snapshot = new long[1];
+//        } else {
+//            post_write_snapshot = null;
+//        }
+//    }
+//
+//    public Snapshot getPostWriteSnapshot() {
+//        if( post_write_snapshot==null || post_write_snapshot[0]==0 ) {
+//            return null;
+//        } else {
+//            return new Snapshot(post_write_snapshot[0]);
+//        }
+//    }
 
 }
