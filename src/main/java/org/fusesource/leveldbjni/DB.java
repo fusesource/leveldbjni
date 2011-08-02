@@ -257,25 +257,38 @@ public class DB extends NativeObject {
         if( ranges==null ) {
             return null;
         }
+
         long rc[] = new long[ranges.length];
+        Range.RangeJNI structs[] = new Range.RangeJNI[ranges.length];
         if( rc.length> 0 ) {
-            NativeBuffer range_array = Range.arrayCreate(ranges.length);
+            NativeBuffer range_array = Range.RangeJNI.arrayCreate(ranges.length);
             try {
                 for(int i=0; i < ranges.length; i++) {
-                    ranges[i].arrayWrite(range_array.pointer(), i);
+                    structs[i] = new Range.RangeJNI(ranges[i]);
+                    structs[i].arrayWrite(range_array.pointer(), i);
                 }
                 DBJNI.GetApproximateSizes(self,range_array.pointer(), ranges.length, rc);
             } finally {
+                for(int i=0; i < ranges.length; i++) {
+                    if( structs[i] != null ) {
+                        structs[i].delete();
+                    }
+                }
                 range_array.delete();
             }
         }
         return rc;
     }
 
-    public byte[] getProperty(byte[] name) throws DBException {
-        NativeBuffer keyBuffer = new NativeBuffer(name);
+    public String getProperty(String name) throws DBException {
+        NativeBuffer keyBuffer = new NativeBuffer(name.getBytes());
         try {
-            return getProperty(keyBuffer);
+            byte[] property = getProperty(keyBuffer);
+            if( property==null ) {
+                return null;
+            } else {
+                return new String(property);
+            }
         } finally {
             keyBuffer.delete();
         }

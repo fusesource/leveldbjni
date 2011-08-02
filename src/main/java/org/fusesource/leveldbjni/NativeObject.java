@@ -15,7 +15,7 @@ package org.fusesource.leveldbjni;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class NativeObject {
+class NativeObject {
 
     protected long self;
 

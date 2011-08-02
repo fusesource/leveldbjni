@@ -20,7 +20,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 @JniClass(name="leveldb::Slice", flags={ClassFlag.STRUCT, ClassFlag.CPP})
-public class Slice {
+class Slice {
 
     @JniClass(flags={ClassFlag.CPP})
     static class SliceJNI {

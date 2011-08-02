@@ -16,7 +16,7 @@ import org.fusesource.hawtjni.runtime.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class StdString extends NativeObject {
+class StdString extends NativeObject {
 
     @JniClass(name="std::string", flags={ClassFlag.CPP})
     private static class StdStringJNI {

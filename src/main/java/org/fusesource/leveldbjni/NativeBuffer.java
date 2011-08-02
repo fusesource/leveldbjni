@@ -25,7 +25,7 @@ import static org.fusesource.hawtjni.runtime.ArgFlag.NO_OUT;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class NativeBuffer extends NativeObject {
+class NativeBuffer extends NativeObject {
 
     @JniClass
     static class NativeBufferJNI {

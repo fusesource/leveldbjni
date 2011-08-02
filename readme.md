@@ -154,3 +154,14 @@ Working against a Snapshot view of the Database.
       db.releaseSnapshot(ro.getSnapshot());
       ro.setSnapshot(null);
     }
+
+Getting approximate sizes.
+
+    long[] sizes = db.getApproximateSizes(new Range(bytes("a"), bytes("k")), new Range(bytes("l"), bytes("z")));
+    System.out.println("Size: "+sizes[0]+", "+sizes[1]);
+    
+Getting database status.
+
+    String stats = db.getProperty("leveldb.stats");
+    System.out.println(stats);
+    

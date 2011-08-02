@@ -19,11 +19,11 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-@JniClass(name="leveldb::Range", flags={ClassFlag.STRUCT, ClassFlag.CPP})
 public class Range {
 
-    @JniClass(flags={ClassFlag.CPP})
-    static class RangeJNI {
+    @JniClass(name="leveldb::Range", flags={ClassFlag.STRUCT, ClassFlag.CPP})
+    static public class RangeJNI {
+
         static {
             DB.LIBRARY.load();
             init();
@@ -31,11 +31,11 @@ public class Range {
 
         public static final native void memmove (
                 @JniArg(cast="void *") long dest,
-                @JniArg(cast="const void *", flags={ArgFlag.NO_OUT, ArgFlag.CRITICAL}) Range src,
+                @JniArg(cast="const void *", flags={ArgFlag.NO_OUT, ArgFlag.CRITICAL}) RangeJNI src,
                 @JniArg(cast="size_t") long size);
 
         public static final native void memmove (
-                @JniArg(cast="void *", flags={ArgFlag.NO_IN, ArgFlag.CRITICAL}) Range dest,
+                @JniArg(cast="void *", flags={ArgFlag.NO_IN, ArgFlag.CRITICAL}) RangeJNI dest,
                 @JniArg(cast="const void *") long src,
                 @JniArg(cast="size_t") long size);
 
@@ -46,32 +46,66 @@ public class Range {
         @JniField(flags={CONSTANT}, accessor="sizeof(struct leveldb::Range)")
         static int SIZEOF;
 
+        @JniField
+        Slice start = new Slice();
+        @JniField(ignore = true)
+        NativeBuffer start_buffer;
+
+        @JniField
+        Slice limit = new Slice();
+        @JniField(ignore = true)
+        NativeBuffer limit_buffer;
+
+        public RangeJNI(Range range) {
+            start_buffer = new NativeBuffer(range.start());
+            start.set(start_buffer);
+            try {
+                limit_buffer = new NativeBuffer(range.limit());
+            } catch (OutOfMemoryError e) {
+                start_buffer.delete();
+                throw e;
+            }
+            limit.set(limit_buffer);
+        }
+
+        public void delete() {
+            start_buffer.delete();
+            limit_buffer.delete();
+        }
+
+        static NativeBuffer arrayCreate(int dimension) {
+            return new NativeBuffer(dimension*SIZEOF);
+        }
+
+        void arrayWrite(long buffer, int index) {
+            RangeJNI.memmove(PointerMath.add(buffer, SIZEOF * index), this, SIZEOF);
+        }
+
+        void arrayRead(long buffer, int index) {
+            RangeJNI.memmove(this, PointerMath.add(buffer, SIZEOF * index), SIZEOF);
+        }
+
     }
 
-    @JniField
-    private Slice start = new Slice();
+    final private byte[] start;
+    final private byte[] limit;
 
-    @JniField
-    private Slice limit = new Slice();
-
-    public Slice limit() {
+    public byte[] limit() {
         return limit;
     }
 
-    public Slice start() {
+    public byte[] start() {
         return start;
     }
 
-    static NativeBuffer arrayCreate(int dimension) {
-        return new NativeBuffer(dimension*RangeJNI.SIZEOF);
+    public Range(byte[] start, byte[] limit) {
+        this.limit = limit;
+        this.start = start;
+        if( start == null ) {
+            throw new IllegalArgumentException("start cannot be null");
+        }
+        if( limit == null ) {
+            throw new IllegalArgumentException("start cannot be null");
+        }
     }
-
-    void arrayWrite(long buffer, int index) {
-        RangeJNI.memmove(PointerMath.add(buffer, RangeJNI.SIZEOF*index), this, RangeJNI.SIZEOF);
-    }
-
-    void arrayRead(long buffer, int index) {
-        RangeJNI.memmove(this, PointerMath.add(buffer, RangeJNI.SIZEOF*index), RangeJNI.SIZEOF);
-    }
-
 }

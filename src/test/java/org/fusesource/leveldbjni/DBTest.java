@@ -17,7 +17,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
+
 import static org.fusesource.leveldbjni.DB.*;
+
 /**
  * A Unit test for the DB class implementation.
  *
@@ -33,8 +36,8 @@ public class DBTest extends TestCase {
     }
 
     private void delete(File rc) {
-        if( rc.isDirectory() ) {
-            for(File f: rc.listFiles()) {
+        if (rc.isDirectory()) {
+            for (File f : rc.listFiles()) {
                 delete(f);
             }
         }
@@ -85,7 +88,7 @@ public class DBTest extends TestCase {
         try {
             db.get(ro, bytes("New York"));
             fail("Expecting exception");
-        } catch( DB.DBException e) {
+        } catch (DB.DBException e) {
         }
 
         // leveldb does not consider deleting something that does not exist an error.
@@ -117,7 +120,7 @@ public class DBTest extends TestCase {
         ArrayList<String> actual = new ArrayList<String>();
 
         Iterator iterator = db.iterator(ro);
-        for(iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             actual.add(asString(iterator.key()));
         }
         iterator.delete();
@@ -151,7 +154,7 @@ public class DBTest extends TestCase {
         try {
             db.get(ro, bytes("New York"));
             fail("Expecting exception");
-        } catch( DB.DBException e) {
+        } catch (DB.DBException e) {
         }
 
         db.releaseSnapshot(ro.snapshot());
@@ -190,7 +193,7 @@ public class DBTest extends TestCase {
         ArrayList<String> actual = new ArrayList<String>();
 
         Iterator iterator = db.iterator(new ReadOptions());
-        for(iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             actual.add(asString(iterator.key()));
         }
         iterator.delete();
@@ -199,7 +202,56 @@ public class DBTest extends TestCase {
         db.delete();
     }
 
-    public void assertEquals(byte [] arg1, byte[] arg2) {
+    @Test
+    public void testApproximateSizes() throws IOException {
+        Options options = new Options().createIfMissing(true);
+
+        File path = getTestDirectory(getName());
+        DB db = DB.open(options, path);
+        WriteOptions wo = new WriteOptions().sync(false);
+
+        Random r = new Random(0);
+        String data="";
+        for(int i=0; i < 1024; i++) {
+            data+= 'a'+r.nextInt(26);
+        }
+        for(int i=0; i < 5*1024; i++) {
+            db.put(wo, bytes("row"+i), bytes(data));
+        }
+
+        long[] approximateSizes = db.getApproximateSizes(new Range(bytes("row"), bytes("s")));
+        assertNotNull(approximateSizes);
+        assertEquals(1, approximateSizes.length);
+        assertTrue("Wrong size", approximateSizes[0] > 0);
+
+        db.delete();
+    }
+
+    @Test
+    public void testGetProperty() throws IOException {
+        Options options = new Options().createIfMissing(true);
+
+        File path = getTestDirectory(getName());
+        DB db = DB.open(options, path);
+        WriteOptions wo = new WriteOptions().sync(false);
+
+        Random r = new Random(0);
+        String data="";
+        for(int i=0; i < 1024; i++) {
+            data+= 'a'+r.nextInt(26);
+        }
+        for(int i=0; i < 5*1024; i++) {
+            db.put(wo, bytes("row"+i), bytes(data));
+        }
+
+        String stats = db.getProperty("leveldb.stats");
+        assertNotNull(stats);
+        assertTrue(stats.contains("Compactions"));
+
+        db.delete();
+    }
+
+    public void assertEquals(byte[] arg1, byte[] arg2) {
         assertTrue(Arrays.equals(arg1, arg2));
     }
 }
