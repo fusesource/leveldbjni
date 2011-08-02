@@ -25,12 +25,13 @@ public class WriteOptions {
 //    @JniField(cast="const leveldb::Snapshot**")
 //    long post_write_snapshot;
 
-    public boolean isSync() {
+    public boolean sync() {
         return sync;
     }
 
-    public void setSync(boolean sync) {
+    public WriteOptions sync(boolean sync) {
         this.sync = sync;
+        return this;
     }
 
 //    public void enablePostWriteSnapshot(boolean value) {

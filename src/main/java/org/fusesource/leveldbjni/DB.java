@@ -10,6 +10,7 @@
 package org.fusesource.leveldbjni;
 
 import org.fusesource.hawtjni.runtime.*;
+import org.w3c.dom.ranges.RangeException;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,16 +42,16 @@ public class DB extends NativeObject {
         @JniMethod(copy="leveldb::Status", flags={MethodFlag.CPP})
         static final native long Put(
                 @JniArg(cast="leveldb::DB *") long self,
-                @JniArg(flags={ArgFlag.BY_VALUE}) WriteOptions options,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long key,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long value
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) WriteOptions options,
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key,
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice value
                 );
 
         @JniMethod(copy="leveldb::Status", flags={MethodFlag.CPP})
         static final native long Delete(
                 @JniArg(cast="leveldb::DB *") long self,
-                @JniArg(flags={ArgFlag.BY_VALUE}) WriteOptions options,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long key
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) WriteOptions options,
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key
                 );
 
         @JniMethod(copy="leveldb::Status", flags={MethodFlag.CPP})
@@ -64,7 +65,7 @@ public class DB extends NativeObject {
         static final native long Get(
                 @JniArg(cast="leveldb::DB *") long self,
                 @JniArg(flags={ArgFlag.NO_OUT, ArgFlag.BY_VALUE}) ReadOptions options,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long key,
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key,
                 @JniArg(cast="std::string *") long value
                 );
 
@@ -85,6 +86,20 @@ public class DB extends NativeObject {
                 @JniArg(cast="const leveldb::Snapshot *") long snapshot
                 );
 
+        @JniMethod(flags={MethodFlag.CPP})
+        static final native void GetApproximateSizes(
+                @JniArg(cast="leveldb::DB *") long self,
+                @JniArg(cast="const leveldb::Range *") long range,
+                int n,
+                @JniArg(cast="uint64_t*") long[] sizes
+                );
+
+        @JniMethod(flags={MethodFlag.CPP})
+        static final native boolean GetProperty(
+                @JniArg(cast="leveldb::DB *") long self,
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice property,
+                @JniArg(cast="std::string *") long value
+                );
 
     }
 
@@ -124,7 +139,14 @@ public class DB extends NativeObject {
 
     public static DB open(Options options, File path) throws IOException, DBException {
         long rc[] = new long[1];
-        checkStatus(DBJNI.Open(options, path.getCanonicalPath(), rc));
+        try {
+            checkStatus(DBJNI.Open(options, path.getCanonicalPath(), rc));
+        } catch (IOException e) {
+            if( rc[0]!=0 ) {
+                DBJNI.delete(rc[0]);
+            }
+            throw e;
+        }
         return new DB(rc[0]);
     }
 
@@ -143,22 +165,12 @@ public class DB extends NativeObject {
     }
 
     private void put(WriteOptions options, NativeBuffer keyBuffer, NativeBuffer valueBuffer) throws DBException {
-        Slice keySlice = new Slice(keyBuffer);
-        try {
-            Slice valueSlice = new Slice(valueBuffer);
-            try {
-                put(options, keySlice, valueSlice);
-            } finally {
-                valueSlice.delete();
-            }
-        } finally {
-            keySlice.delete();
-        }
+        put(options, new Slice(keyBuffer), new Slice(valueBuffer));
     }
 
     private void put(WriteOptions options, Slice keySlice, Slice valueSlice) throws DBException {
         assertAllocated();
-        checkStatus(DBJNI.Put(self, options, keySlice.pointer(), valueSlice.pointer()));
+        checkStatus(DBJNI.Put(self, options, keySlice, valueSlice));
     }
 
     public void delete(WriteOptions options, byte[] key) throws DBException {
@@ -171,17 +183,12 @@ public class DB extends NativeObject {
     }
 
     private void delete(WriteOptions options, NativeBuffer keyBuffer) throws DBException {
-        Slice keySlice = new Slice(keyBuffer);
-        try {
-            delete(options, keySlice);
-        } finally {
-            keySlice.delete();
-        }
+        delete(options, new Slice(keyBuffer));
     }
 
     private void delete(WriteOptions options, Slice keySlice) throws DBException {
         assertAllocated();
-        checkStatus(DBJNI.Delete(self, options, keySlice.pointer()));
+        checkStatus(DBJNI.Delete(self, options, keySlice));
     }
 
     public void write(WriteOptions options, WriteBatch updates) throws DBException {
@@ -198,19 +205,14 @@ public class DB extends NativeObject {
     }
 
     private byte[] get(ReadOptions options, NativeBuffer keyBuffer) throws DBException {
-        Slice keySlice = new Slice(keyBuffer);
-        try {
-            return get(options, keySlice);
-        } finally {
-            keySlice.delete();
-        }
+        return get(options, new Slice(keyBuffer));
     }
 
     private byte[] get(ReadOptions options, Slice keySlice) throws DBException {
         assertAllocated();
         StdString result = new StdString();
         try {
-            checkStatus(DBJNI.Get(self, options, keySlice.pointer(), result.pointer()));
+            checkStatus(DBJNI.Get(self, options, keySlice, result.pointer()));
             return result.toByteArray();
         } finally {
             result.delete();
@@ -250,5 +252,52 @@ public class DB extends NativeObject {
             throw new RuntimeException(e);
         }
     }
+
+    public long[] getApproximateSizes(Range ... ranges) {
+        if( ranges==null ) {
+            return null;
+        }
+        long rc[] = new long[ranges.length];
+        if( rc.length> 0 ) {
+            NativeBuffer range_array = Range.arrayCreate(ranges.length);
+            try {
+                for(int i=0; i < ranges.length; i++) {
+                    ranges[i].arrayWrite(range_array.pointer(), i);
+                }
+                DBJNI.GetApproximateSizes(self,range_array.pointer(), ranges.length, rc);
+            } finally {
+                range_array.delete();
+            }
+        }
+        return rc;
+    }
+
+    public byte[] getProperty(byte[] name) throws DBException {
+        NativeBuffer keyBuffer = new NativeBuffer(name);
+        try {
+            return getProperty(keyBuffer);
+        } finally {
+            keyBuffer.delete();
+        }
+    }
+
+    private byte[] getProperty(NativeBuffer nameBuffer) throws DBException {
+        return getProperty(new Slice(nameBuffer));
+    }
+
+    private byte[] getProperty(Slice nameSlice) throws DBException {
+        assertAllocated();
+        StdString result = new StdString();
+        try {
+            if( DBJNI.GetProperty(self, nameSlice, result.pointer()) ) {
+                return result.toByteArray();
+            } else {
+                return null;
+            }
+        } finally {
+            result.delete();
+        }
+    }
+
 
 }

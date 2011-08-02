@@ -45,7 +45,7 @@ public class Iterator extends NativeObject {
         @JniMethod(flags={MethodFlag.CPP})
         static final native void Seek(
                 @JniArg(cast="leveldb::Iterator *") long self,
-                @JniArg(cast="leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long target
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice target
                 );
 
         @JniMethod(flags={MethodFlag.CPP})
@@ -113,17 +113,12 @@ public class Iterator extends NativeObject {
     }
 
     private void seek(NativeBuffer keyBuffer) throws DB.DBException {
-        Slice keySlice = new Slice(keyBuffer);
-        try {
-            seek(keySlice);
-        } finally {
-            keySlice.delete();
-        }
+        seek(new Slice(keyBuffer));
     }
 
     private void seek(Slice keySlice) throws DB.DBException {
         assertAllocated();
-        IteratorJNI.Seek(self, keySlice.pointer());
+        IteratorJNI.Seek(self, keySlice);
         checkStatus();
     }
 
@@ -143,11 +138,12 @@ public class Iterator extends NativeObject {
         assertAllocated();
         long slice_ptr = IteratorJNI.key(self);
         checkStatus();
-        Slice slice = new Slice(slice_ptr);
         try {
+            Slice slice = new Slice();
+            slice.read(slice_ptr, 0);
             return slice.toByteArray();
         } finally {
-            slice.delete();
+            Slice.SliceJNI.delete(slice_ptr);
         }
     }
 
@@ -155,11 +151,12 @@ public class Iterator extends NativeObject {
         assertAllocated();
         long slice_ptr = IteratorJNI.value(self);
         checkStatus();
-        Slice slice = new Slice(slice_ptr);
         try {
+            Slice slice = new Slice();
+            slice.read(slice_ptr, 0);
             return slice.toByteArray();
         } finally {
-            slice.delete();
+            Slice.SliceJNI.delete(slice_ptr);
         }
     }
 }

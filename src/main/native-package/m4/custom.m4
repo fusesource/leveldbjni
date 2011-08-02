@@ -19,6 +19,7 @@ AC_DEFUN([CUSTOM_M4_SETUP],
     CXXFLAGS="$CXXFLAGS -I${withval}/include"
     AC_SUBST(CXXFLAGS)
     LDFLAGS="$LDFLAGS -lleveldb -L${withval}"
+    LDFLAGS="$LDFLAGS -lsnappy"
     AC_SUBST(LDFLAGS)
   ])
 

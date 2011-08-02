@@ -28,15 +28,16 @@ public class ReadOptions {
     @JniField(cast="const leveldb::Snapshot*")
     private long snapshot=0;
 
-    public boolean isFillCache() {
+    public boolean fillCache() {
         return fill_cache;
     }
 
-    public void setFillCache(boolean fill_cache) {
+    public ReadOptions fillCache(boolean fill_cache) {
         this.fill_cache = fill_cache;
+        return this;
     }
 
-    public Snapshot getSnapshot() {
+    public Snapshot snapshot() {
         if( snapshot == 0 ) {
             return null;
         } else {
@@ -44,19 +45,21 @@ public class ReadOptions {
         }
     }
 
-    public void setSnapshot(Snapshot snapshot) {
+    public ReadOptions snapshot(Snapshot snapshot) {
         if( snapshot==null ) {
             this.snapshot = 0;
         } else {
             this.snapshot = snapshot.pointer();
         }
+        return this;
     }
 
-    public boolean isVerifyChecksums() {
+    public boolean verifyChecksums() {
         return verify_checksums;
     }
 
-    public void setVerifyChecksums(boolean verify_checksums) {
+    public ReadOptions verifyChecksums(boolean verify_checksums) {
         this.verify_checksums = verify_checksums;
+        return this;
     }
 }

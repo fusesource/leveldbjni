@@ -41,6 +41,7 @@
 #include "leveldb/cache.h"
 #include "leveldb/comparator.h"
 #include "leveldb/env.h"
+#include "leveldb/slice.h"
 #endif
 
 #ifdef __cplusplus

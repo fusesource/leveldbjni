@@ -14,16 +14,30 @@ that provides an ordered mapping from string keys to string values..
 
 ## Building
 
-The following worked for me on a OS X Lion system with X Code 4 Installed.
+The following worked for me on:
 
-First checkout the leveldb and leveldbjni project source code:
+ * OS X Lion with X Code 4
+ * Ubuntu 10.04 (32 and 64 bit)
+
+Install the snappy compression library:
+
+    wget http://snappy.googlecode.com/files/snappy-1.0.3.tar.gz
+    tar -zxvf snappy-1.0.3.tar.gz
+    cd snappy-1.0.3
+    ./configure
+    make
+    sudo make install
+    cd ..
+
+Then checkout the leveldb and leveldbjni project source code:
 
     svn checkout http://leveldb.googlecode.com/svn/trunk/ leveldb
     git clone git://github.com/fusesource/leveldbjni.git
 
-Compile the leveldb project.  This produces a static library.    
+Patch and Compile the leveldb project.  This produces a static library.    
     
     cd leveldb
+    patch -p 0 < ../leveldbjni/leveldb.patch
     make
 
 Now use maven to build the leveldbjni project.    

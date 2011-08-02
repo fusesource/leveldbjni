@@ -32,14 +32,14 @@ public class WriteBatch extends NativeObject {
         @JniMethod(flags={MethodFlag.CPP})
         static final native void Put(
                 @JniArg(cast="leveldb::WriteBatch *") long ptr,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long key,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long value
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key,
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice value
                 );
 
         @JniMethod(flags={MethodFlag.CPP})
         static final native void Delete(
                 @JniArg(cast="leveldb::WriteBatch *") long ptr,
-                @JniArg(cast="const leveldb::Slice *", flags={ArgFlag.BY_VALUE}) long key
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key
                 );
 
         @JniMethod(flags={MethodFlag.CPP})
@@ -74,22 +74,12 @@ public class WriteBatch extends NativeObject {
     }
 
     private void put(NativeBuffer keyBuffer, NativeBuffer valueBuffer) {
-        Slice keySlice = new Slice(keyBuffer);
-        try {
-            Slice valueSlice = new Slice(valueBuffer);
-            try {
-                put(keySlice, valueSlice);
-            } finally {
-                valueSlice.delete();
-            }
-        } finally {
-            keySlice.delete();
-        }
+        put(new Slice(keyBuffer), new Slice(valueBuffer));
     }
 
     private void put(Slice keySlice, Slice valueSlice) {
         assertAllocated();
-        WriteBatchJNI.Put(self, keySlice.pointer(), valueSlice.pointer());
+        WriteBatchJNI.Put(self, keySlice, valueSlice);
     }
 
 
@@ -103,17 +93,12 @@ public class WriteBatch extends NativeObject {
     }
 
     private void delete(NativeBuffer keyBuffer) {
-        Slice keySlice = new Slice(keyBuffer);
-        try {
-            delete(keySlice);
-        } finally {
-            keySlice.delete();
-        }
+        delete(new Slice(keyBuffer));
     }
 
     private void delete(Slice keySlice) {
         assertAllocated();
-        WriteBatchJNI.Delete(self, keySlice.pointer());
+        WriteBatchJNI.Delete(self, keySlice);
     }
 
     public void clear() {

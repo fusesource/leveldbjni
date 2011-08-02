@@ -44,8 +44,7 @@ public class DBTest extends TestCase {
     @Test
     public void testOpen() throws IOException {
 
-        Options options = new Options();
-        options.setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = DB.open(options, path);
@@ -53,8 +52,7 @@ public class DBTest extends TestCase {
         db.delete();
 
         // Try again.. this time we expect a failure since it exists.
-        options = new Options();
-        options.setErrorIfExists(true);
+        options = new Options().errorIfExists(true);
         try {
             DB.open(options, path);
             fail("Expected exception.");
@@ -66,18 +64,13 @@ public class DBTest extends TestCase {
     @Test
     public void testCRUD() throws IOException {
 
-        Options options = new Options();
-        options.setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = DB.open(options, path);
 
-        WriteOptions wo = new WriteOptions();
-        wo.setSync(false);
-
-        ReadOptions ro = new ReadOptions();
-        ro.setFillCache(true);
-        ro.setVerifyChecksums(true);
+        WriteOptions wo = new WriteOptions().sync(false);
+        ReadOptions ro = new ReadOptions().fillCache(true).verifyChecksums(true);
 
 
         db.put(wo, bytes("Tampa"), bytes("green"));
@@ -104,8 +97,7 @@ public class DBTest extends TestCase {
     @Test
     public void testIterator() throws IOException {
 
-        Options options = new Options();
-        options.setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = DB.open(options, path);
@@ -137,20 +129,17 @@ public class DBTest extends TestCase {
     @Test
     public void testSnapshot() throws IOException {
 
-        Options options = new Options();
-        options.setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = DB.open(options, path);
 
-        WriteOptions wo = new WriteOptions();
-        wo.setSync(false);
+        WriteOptions wo = new WriteOptions().sync(false);
 
         db.put(wo, bytes("Tampa"), bytes("green"));
         db.put(wo, bytes("London"), bytes("red"));
 
-        ReadOptions ro = new ReadOptions();
-        ro.setSnapshot(db.getSnapshot());
+        ReadOptions ro = new ReadOptions().snapshot(db.getSnapshot());
 
         db.put(wo, bytes("New York"), bytes("blue"));
 
@@ -165,10 +154,10 @@ public class DBTest extends TestCase {
         } catch( DB.DBException e) {
         }
 
-        db.releaseSnapshot(ro.getSnapshot());
+        db.releaseSnapshot(ro.snapshot());
 
         // Now try again without the snapshot..
-        ro.setSnapshot(null);
+        ro.snapshot(null);
         assertEquals(db.get(ro, bytes("New York")), bytes("blue"));
 
         db.delete();
@@ -177,13 +166,11 @@ public class DBTest extends TestCase {
     @Test
     public void testWriteBatch() throws IOException {
 
-        Options options = new Options();
-        options.setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = DB.open(options, path);
-        WriteOptions wo = new WriteOptions();
-        wo.setSync(false);
+        WriteOptions wo = new WriteOptions().sync(false);
 
         db.put(wo, bytes("NA"), bytes("Na"));
 

@@ -66,52 +66,59 @@ public class Options {
     @JniField(cast="leveldb::CompressionType")
     private int compression = CompressionType.kSnappyCompression.value;
 
-    public void setCreateIfMissing(boolean value) {
+    public Options createIfMissing(boolean value) {
         this.create_if_missing = value;
+        return this;
     }
-    public boolean getCreateIfMissing() {
+    public boolean createIfMissing() {
         return create_if_missing;
     }
 
-    public void setErrorIfExists(boolean value) {
+    public Options errorIfExists(boolean value) {
         this.error_if_exists = value;
+        return this;
     }
-    public boolean getErrorIfExists() {
+    public boolean errorIfExists() {
         return error_if_exists;
     }
 
-    public void setParanoidChecks(boolean value) {
+    public Options paranoidChecks(boolean value) {
         this.paranoid_checks = value;
+        return this;
     }
-    public boolean getParanoidChecks() {
+    public boolean paranoidChecks() {
         return paranoid_checks;
     }
 
-    public void setWriteBufferSize(long value) {
+    public Options writeBufferSize(long value) {
         this.write_buffer_size = value;
+        return this;
     }
-    public long getWriteBufferSize() {
+    public long writeBufferSize() {
         return write_buffer_size;
     }
 
-    public void setMaxOpenFiles(int value) {
+    public Options maxOpenFiles(int value) {
         this.max_open_files = value;
+        return this;
     }
-    public int getMaxOpenFiles() {
+    public int maxOpenFiles() {
         return max_open_files;
     }
 
-    public void setBlockRestartInterval(int value) {
+    public Options blockRestartInterval(int value) {
         this.block_restart_interval = value;
+        return this;
     }
-    public int getBlockRestartInterval() {
+    public int blockRestartInterval() {
         return block_restart_interval;
     }
 
-    public void setBlockSize(long value) {
+    public Options blockSize(long value) {
         this.block_size = value;
+        return this;
     }
-    public long getBlockSize() {
+    public long blockSize() {
         return block_size;
     }
 
@@ -128,7 +135,7 @@ public class Options {
 //    private int compression = kSnappyCompression;
 
 
-    public CompressionType getCompression() {
+    public CompressionType compression() {
         if(compression == CompressionType.kNoCompression.value) {
             return CompressionType.kNoCompression;
         } else if(compression == CompressionType.kSnappyCompression.value) {
@@ -138,20 +145,22 @@ public class Options {
         }
     }
 
-    public void setCompression(CompressionType compression) {
+    public Options compression(CompressionType compression) {
         this.compression = compression.value;
+        return this;
     }
 
-    public Cache getBlockCache() {
+    public Cache blockCache() {
         return cache;
     }
 
-    public void setBlockCache(Cache cache) {
+    public Options blockCache(Cache cache) {
         this.cache = cache;
         if( cache!=null ) {
             this.block_cache = cache.pointer();
         } else {
             this.block_cache = 0;
         }
+        return this;
     }
 }
