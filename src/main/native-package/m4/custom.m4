@@ -12,14 +12,6 @@ AC_DEFUN([CUSTOM_M4_SETUP],
 [
   AC_LANG_PUSH(C++)
 
-  AC_ARG_WITH([snappy],
-  [AS_HELP_STRING([--with-snappy@<:@=PATH@:>@],
-    [Directory where snappy was built. Example: --with-snappy=/opt/snappy])],
-  [
-    LDFLAGS="$LDFLAGS -lsnappy -L${withval}"
-    AC_SUBST(LDFLAGS)
-  ])
-
   AC_ARG_WITH([leveldb],
   [AS_HELP_STRING([--with-leveldb@<:@=PATH@:>@],
     [Directory where leveldb was built. Example: --with-leveldb=/opt/leveldb])],
@@ -32,5 +24,14 @@ AC_DEFUN([CUSTOM_M4_SETUP],
   ])
 
   AC_CHECK_HEADER([leveldb/db.h],,AC_MSG_ERROR([cannot find headers for leveldb]))
+
+  AC_ARG_WITH([snappy],
+  [AS_HELP_STRING([--with-snappy@<:@=PATH@:>@],
+    [Directory where snappy was built. Example: --with-snappy=/opt/snappy])],
+  [
+    LDFLAGS="$LDFLAGS -lsnappy -L${withval}"
+    AC_SUBST(LDFLAGS)
+  ])
+
   AC_LANG_POP()
 ])
