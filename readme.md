@@ -41,7 +41,7 @@ Patch and Compile the leveldb project.  This produces a static library.
 Now use maven to build the leveldbjni project.    
     
     cd ../leveldbjni
-    mvn install -P download -Dleveldb=`cd ../leveldb; pwd` -snappy=`cd ../snappy; pwd`
+    mvn install -P download -Dleveldb=`cd ../leveldb; pwd` -Dsnappy=`cd ../snappy-1.0.3; pwd`
 
 The above will produce:
 
