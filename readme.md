@@ -35,6 +35,9 @@ Compile the snappy project.  This produces a static library.
 Patch and Compile the leveldb project.  This produces a static library.    
     
     cd ../leveldb
+    export LIBRARY_PATH=`cd ../snappy-1.0.3; pwd`
+    export C_INCLUDE_PATH=${LIBRARY_PATH}
+    export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
     patch -p 0 < ../leveldbjni/leveldb.patch
     make
 
