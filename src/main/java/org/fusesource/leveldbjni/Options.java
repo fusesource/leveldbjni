@@ -9,9 +9,10 @@
  */
 package org.fusesource.leveldbjni;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.TypeHost;
-import org.fusesource.hawtjni.runtime.*;
-import sun.nio.cs.HistoricallyNamedCharset;
+import org.fusesource.hawtjni.runtime.ClassFlag;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniField;
+import org.fusesource.hawtjni.runtime.JniMethod;
 
 import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
 import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
@@ -24,12 +25,6 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
 @JniClass(name="leveldb::Options", flags={ClassFlag.STRUCT, ClassFlag.CPP})
 public class Options {
 
-//    : comparator(BytewiseComparator()),
-//      env(Env::Default()),
-//      info_log(NULL),
-//      block_cache(NULL),
-//      compression(kSnappyCompression) {
-    // Example of how to load constants.
     static {
         DB.LIBRARY.load();
         init();
