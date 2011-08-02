@@ -155,6 +155,35 @@ Working against a Snapshot view of the Database.
       ro.setSnapshot(null);
     }
 
+Using a custom Comparator.
+
+    Options options = new Options();
+    options.comparator(new Comparator(){
+        int compare(byte[] key1, byte[] key2) {
+            return new String(key1).compareTo(new String(key2));
+        }
+        String name() {
+            return "simple";
+        }
+    });
+    DB db = DB.open(options, new File("example"));
+
+Disabling Compression
+
+    Options options = new Options();
+    options.compression(CompressionType.kNoCompression);
+    DB db = DB.open(options, new File("example"));
+
+Configuring the Cache
+    
+    Cache cache = new Cache(100 * 1048576);  // 100MB cache
+    Options options = new Options();
+    options.cache(cache);
+    DB db = DB.open(options, new File("example"));
+    ... use the db ...
+    db.delete()
+    cache.delete()
+
 Getting approximate sizes.
 
     long[] sizes = db.getApproximateSizes(new Range(bytes("a"), bytes("k")), new Range(bytes("l"), bytes("z")));

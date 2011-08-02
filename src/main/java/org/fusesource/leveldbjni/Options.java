@@ -9,6 +9,7 @@
  */
 package org.fusesource.leveldbjni;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.TypeHost;
 import org.fusesource.hawtjni.runtime.*;
 import sun.nio.cs.HistoricallyNamedCharset;
 
@@ -37,9 +38,6 @@ public class Options {
     @JniMethod(flags={CONSTANT_INITIALIZER})
     private static final native void init();
 
-    @JniField(flags={CONSTANT}, cast="const Comparator*", accessor="leveldb::BytewiseComparator()")
-    private static long BYTEWISE_COMPARATOR;
-
     @JniField(flags={CONSTANT}, cast="Env*", accessor="leveldb::Env::Default()")
     private static long DEFAULT_ENV;
 
@@ -52,8 +50,14 @@ public class Options {
     private long block_size = 4086;
     private int max_open_files = 1000;
     private int block_restart_interval = 16;
+
+    @JniField(ignore = true)
+    private Comparator comparatorObject = Comparator.BYTEWISE_COMPARATOR;
+
     @JniField(cast="const leveldb::Comparator*")
-    private long comparator = BYTEWISE_COMPARATOR;
+    private long comparator = comparatorObject.pointer();
+
+
     @JniField(cast="leveldb::Env*")
     private long env = DEFAULT_ENV;
     @JniField(cast="leveldb::Logger*")
@@ -122,18 +126,23 @@ public class Options {
         return block_size;
     }
 
-
-//    @JniField(cast="const Comparator*")
-//    private long comparator = BYTEWISE_COMPARATOR;
 //    @JniField(cast="Env*")
 //    private long env = DEFAULT_ENV;
 //    @JniField(cast="Logger*")
 //    private long info_log = 0;
-//    @JniField(cast="Cache*")
-//    private long block_cache = 0;
-//    @JniField(cast="CompressionType")
-//    private int compression = kSnappyCompression;
 
+    public Comparator comparator() {
+        return comparatorObject;
+    }
+
+    public Options comparator(Comparator comparator) {
+        if( comparator==null ) {
+            throw new IllegalArgumentException("comparator cannot be null");
+        }
+        this.comparatorObject = comparator;
+        this.comparator = comparator.pointer();
+        return this;
+    }
 
     public CompressionType compression() {
         if(compression == CompressionType.kNoCompression.value) {
@@ -150,11 +159,11 @@ public class Options {
         return this;
     }
 
-    public Cache blockCache() {
+    public Cache cache() {
         return cache;
     }
 
-    public Options blockCache(Cache cache) {
+    public Options cache(Cache cache) {
         this.cache = cache;
         if( cache!=null ) {
             this.block_cache = cache.pointer();

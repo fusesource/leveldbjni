@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 import static org.fusesource.leveldbjni.DB.*;
@@ -251,6 +252,82 @@ public class DBTest extends TestCase {
         db.delete();
     }
 
+    @Test
+    public void testCustomComparator1() throws IOException {
+        Options options = new Options().createIfMissing(true);
+        options.comparator(new Comparator(){
+            @Override
+            int compare(byte[] key1, byte[] key2) {
+                return new String(key1).compareTo(new String(key2));
+            }
+
+            @Override
+            String name() {
+                return getName();
+            }
+        });
+
+        File path = getTestDirectory(getName());
+        DB db = DB.open(options, path);
+        WriteOptions wo = new WriteOptions().sync(false);
+
+        ArrayList<String> expecting = new ArrayList<String>();
+        for(int i=0; i < 26; i++) {
+            String t = ""+ ((char) ('a' + i));
+            expecting.add(t);
+            db.put(wo, bytes(t), bytes(t));
+        }
+
+        ArrayList<String> actual = new ArrayList<String>();
+
+        Iterator iterator = db.iterator(new ReadOptions());
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+            actual.add(asString(iterator.key()));
+        }
+        iterator.delete();
+        assertEquals(expecting, actual);
+
+
+        db.delete();
+    }
+
+    @Test
+    public void testCustomComparator2() throws IOException {
+        Options options = new Options().createIfMissing(true);
+        options.comparator(new Comparator(){
+            @Override
+            int compare(byte[] key1, byte[] key2) {
+                return new String(key1).compareTo(new String(key2)) * -1;
+            }
+
+            @Override
+            String name() {
+                return getName();
+            }
+        });
+
+        File path = getTestDirectory(getName());
+        DB db = DB.open(options, path);
+        WriteOptions wo = new WriteOptions().sync(false);
+
+        ArrayList<String> expecting = new ArrayList<String>();
+        for(int i=0; i < 26; i++) {
+            String t = ""+ ((char) ('a' + i));
+            expecting.add(t);
+            db.put(wo, bytes(t), bytes(t));
+        }
+        Collections.reverse(expecting);
+
+        ArrayList<String> actual = new ArrayList<String>();
+        Iterator iterator = db.iterator(new ReadOptions());
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+            actual.add(asString(iterator.key()));
+        }
+        iterator.delete();
+        assertEquals(expecting, actual);
+
+        db.delete();
+    }
     public void assertEquals(byte[] arg1, byte[] arg2) {
         assertTrue(Arrays.equals(arg1, arg2));
     }

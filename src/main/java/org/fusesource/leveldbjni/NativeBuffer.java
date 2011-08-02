@@ -83,6 +83,18 @@ class NativeBuffer extends NativeObject {
         this(data, 0, data.length);
     }
 
+    public NativeBuffer(String name) {
+        this(cbytes(name));
+    }
+
+    static byte[] cbytes(String strvalue) {
+        byte[] value = strvalue.getBytes();
+        // expand by 1 so we get a null at the end.
+        byte[] rc = new byte[value.length+1];
+        System.arraycopy(value, 0, rc, 0, value.length);
+        return rc;
+    }
+
     public NativeBuffer(byte data[], int offset, int length) {
         super(NativeBufferJNI.malloc(length));
         this.capacity = length;

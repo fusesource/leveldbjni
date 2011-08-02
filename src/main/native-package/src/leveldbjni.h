@@ -34,7 +34,11 @@
   #include <string.h>
 #endif
 
+#include "jni.h"
+#include <stdint.h>
+
 #ifdef __cplusplus
+
 #include "leveldb/db.h"
 #include "leveldb/options.h"
 #include "leveldb/write_batch.h"
@@ -42,7 +46,28 @@
 #include "leveldb/comparator.h"
 #include "leveldb/env.h"
 #include "leveldb/slice.h"
+
+struct JNIComparator : public leveldb::Comparator {
+  JNIEnv *env;
+  jobject target;
+  jmethodID compare_method;
+  const char *name;
+
+  int Compare(const leveldb::Slice& a, const leveldb::Slice& b) const {
+     return env->CallIntMethod(target, compare_method, (intptr_t)(leveldb::Slice *)&a, (intptr_t)(leveldb::Slice *)&b);
+  }
+
+  const char* Name() const {
+     return name;
+  }
+
+  void FindShortestSeparator(std::string*, const leveldb::Slice&) const { }
+  void FindShortSuccessor(std::string*) const { }
+};
+
+
 #endif
+
 
 #ifdef __cplusplus
 extern "C" {
