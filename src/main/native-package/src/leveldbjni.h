@@ -54,7 +54,7 @@ struct JNIComparator : public leveldb::Comparator {
   const char *name;
 
   int Compare(const leveldb::Slice& a, const leveldb::Slice& b) const {
-     return env->CallIntMethod(target, compare_method, (intptr_t)(leveldb::Slice *)&a, (intptr_t)(leveldb::Slice *)&b);
+     return env->CallIntMethod(target, compare_method, (jlong)(intptr_t)&a, (jlong)(intptr_t)&b);
   }
 
   const char* Name() const {
