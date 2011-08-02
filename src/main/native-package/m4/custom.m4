@@ -11,6 +11,15 @@ dnl ---------------------------------------------------------------------------
 AC_DEFUN([CUSTOM_M4_SETUP],
 [
   AC_LANG_PUSH(C++)
+
+  AC_ARG_WITH([snappy],
+  [AS_HELP_STRING([--with-snappy@<:@=PATH@:>@],
+    [Directory where snappy was built. Example: --with-snappy=/opt/snappy])],
+  [
+    LDFLAGS="$LDFLAGS -lsnappy -L${withval}"
+    AC_SUBST(LDFLAGS)
+  ])
+
   AC_ARG_WITH([leveldb],
   [AS_HELP_STRING([--with-leveldb@<:@=PATH@:>@],
     [Directory where leveldb was built. Example: --with-leveldb=/opt/leveldb])],
@@ -19,7 +28,6 @@ AC_DEFUN([CUSTOM_M4_SETUP],
     CXXFLAGS="$CXXFLAGS -I${withval}/include"
     AC_SUBST(CXXFLAGS)
     LDFLAGS="$LDFLAGS -lleveldb -L${withval}"
-    LDFLAGS="$LDFLAGS -lsnappy"
     AC_SUBST(LDFLAGS)
   ])
 

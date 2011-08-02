@@ -19,31 +19,29 @@ The following worked for me on:
  * OS X Lion with X Code 4
  * Ubuntu 10.04 (32 and 64 bit)
 
-Install the snappy compression library:
+Then download the snappy, leveldb, and leveldbjni project source code:
 
     wget http://snappy.googlecode.com/files/snappy-1.0.3.tar.gz
     tar -zxvf snappy-1.0.3.tar.gz
-    cd snappy-1.0.3
-    ./configure
-    make
-    sudo make install
-    cd ..
-
-Then checkout the leveldb and leveldbjni project source code:
-
     svn checkout http://leveldb.googlecode.com/svn/trunk/ leveldb
     git clone git://github.com/fusesource/leveldbjni.git
 
+Compile the snappy project.  This produces a static library.    
+
+    cd snappy-1.0.3 
+    ./configure --disable-shared --with-pic
+    make
+    
 Patch and Compile the leveldb project.  This produces a static library.    
     
-    cd leveldb
+    cd ../leveldb
     patch -p 0 < ../leveldbjni/leveldb.patch
     make
 
 Now use maven to build the leveldbjni project.    
     
     cd ../leveldbjni
-    mvn install -P download -Dleveldb=`cd ../leveldb; pwd`
+    mvn install -P download -Dleveldb=`cd ../leveldb; pwd` -snappy=`cd ../snappy; pwd`
 
 The above will produce:
 

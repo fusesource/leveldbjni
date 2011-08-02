@@ -137,6 +137,7 @@
               ]]></copyright>
               <configureArgs>
                 <arg>--with-leveldb=${leveldb}</arg>
+                <arg>--with-snappy=${snappy}</arg>
               </configureArgs>
             </configuration>
           </execution>
@@ -278,6 +279,7 @@
               <configureArgs>
                 <arg>--with-universal</arg>
                 <arg>--with-leveldb=${leveldb}</arg>
+                <arg>--with-snappy=${snappy}</arg>
               </configureArgs>
               <platform>osx</platform>
             </configuration>
