@@ -106,11 +106,11 @@ public abstract class Comparator extends NativeObject {
             // we won't really delete this one since it's static.
         }
         @Override
-        int compare(byte[] key1, byte[] key2) {
+        public int compare(byte[] key1, byte[] key2) {
             throw new UnsupportedOperationException();
         }
         @Override
-        String name() {
+        public String name() {
             throw new UnsupportedOperationException();
         }
     };

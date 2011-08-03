@@ -157,10 +157,10 @@ Working against a Snapshot view of the Database.
 
 Using a custom Comparator.
     Comparator comparator = new Comparator(){
-        int compare(byte[] key1, byte[] key2) {
+        public int compare(byte[] key1, byte[] key2) {
             return new String(key1).compareTo(new String(key2));
         }
-        String name() {
+        public String name() {
             return "simple";
         }
     };
@@ -199,7 +199,7 @@ Getting database status.
 
 Getting informational log messages.
     Logger logger = new Logger() {
-      void log(String message) {
+      public void log(String message) {
         System.out.println(message);
       }
     };

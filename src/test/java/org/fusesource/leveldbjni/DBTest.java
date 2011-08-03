@@ -254,12 +254,12 @@ public class DBTest extends TestCase {
         Options options = new Options().createIfMissing(true);
         options.comparator(new Comparator(){
             @Override
-            int compare(byte[] key1, byte[] key2) {
+            public int compare(byte[] key1, byte[] key2) {
                 return new String(key1).compareTo(new String(key2));
             }
 
             @Override
-            String name() {
+            public String name() {
                 return getName();
             }
         });
@@ -293,12 +293,12 @@ public class DBTest extends TestCase {
         Options options = new Options().createIfMissing(true);
         options.comparator(new Comparator(){
             @Override
-            int compare(byte[] key1, byte[] key2) {
+            public int compare(byte[] key1, byte[] key2) {
                 return new String(key1).compareTo(new String(key2)) * -1;
             }
 
             @Override
-            String name() {
+            public String name() {
                 return getName();
             }
         });
@@ -333,7 +333,7 @@ public class DBTest extends TestCase {
         Options options = new Options().createIfMissing(true);
         options.infoLog(new Logger(){
             @Override
-            void log(String message) {
+            public void log(String message) {
                 messages.add(message);
             }
         });
