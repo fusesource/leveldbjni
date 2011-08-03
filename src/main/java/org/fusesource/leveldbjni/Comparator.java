@@ -138,7 +138,7 @@ public abstract class Comparator extends NativeObject {
         return compare(s1.toByteArray(), s2.toByteArray());
     }
 
-    abstract int compare(byte[] key1, byte[] key2);
-    abstract String name();
+    public abstract int compare(byte[] key1, byte[] key2);
+    public abstract String name();
 
 }
