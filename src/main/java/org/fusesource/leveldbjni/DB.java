@@ -135,6 +135,15 @@ public class DB extends NativeObject {
                 @JniArg(cast="std::string *") long value
                 );
 
+        @JniMethod(copy="leveldb::Status", accessor = "leveldb::DestroyDB")
+        static final native long DestroyDB(
+                @JniArg(cast="const char*") String path,
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Options options);
+
+        @JniMethod(copy="leveldb::Status", accessor = "leveldb::RepairDB")
+        static final native long RepairDB(
+                @JniArg(cast="const char*") String path,
+                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Options options);
     }
 
     public void delete() {
@@ -346,5 +355,11 @@ public class DB extends NativeObject {
         }
     }
 
+    static public void destroy(File name, Options options) throws IOException, DBException {
+        checkStatus(DBJNI.DestroyDB(name.getCanonicalPath(), options));
+    }
 
+    static public void repair(File name, Options options) throws IOException, DBException {
+        checkStatus(DBJNI.RepairDB(name.getCanonicalPath(), options));
+    }
 }

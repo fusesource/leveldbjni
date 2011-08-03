@@ -198,6 +198,7 @@ Getting database status.
     System.out.println(stats);
 
 Getting informational log messages.
+
     Logger logger = new Logger() {
       public void log(String message) {
         System.out.println(message);
@@ -209,4 +210,14 @@ Getting informational log messages.
     ...
     db.close();
     logger.delete();
+
+Destroying a database.
+    
+    Options options = new Options();
+    DB.destroy(new File("example"), options);
+
+Repairing a database.
+    
+    Options options = new Options();
+    DB.repair(new File("example"), options);
     

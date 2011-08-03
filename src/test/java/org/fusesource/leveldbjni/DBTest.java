@@ -12,9 +12,9 @@ package org.fusesource.leveldbjni;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import javax.swing.text.html.Option;
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 import static org.fusesource.leveldbjni.DB.*;
@@ -26,20 +26,11 @@ import static org.fusesource.leveldbjni.DB.*;
  */
 public class DBTest extends TestCase {
 
-    File getTestDirectory(String name) {
+    File getTestDirectory(String name) throws IOException {
         File rc = new File(new File("test-data"), name);
-        delete(rc);
+        DB.destroy(rc, new Options().createIfMissing(true));
         rc.mkdirs();
         return rc;
-    }
-
-    private void delete(File rc) {
-        if (rc.isDirectory()) {
-            for (File f : rc.listFiles()) {
-                delete(f);
-            }
-        }
-        rc.delete();
     }
 
     @Test
@@ -59,6 +50,14 @@ public class DBTest extends TestCase {
             fail("Expected exception.");
         } catch (DB.DBException e) {
         }
+
+    }
+
+    @Test
+    public void testRepair() throws IOException {
+
+        testCRUD();
+        DB.repair(new File(new File("test-data"), getName()), new Options());
 
     }
 
