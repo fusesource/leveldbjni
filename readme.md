@@ -156,18 +156,21 @@ Working against a Snapshot view of the Database.
     }
 
 Using a custom Comparator.
-
-    Options options = new Options();
-    options.comparator(new Comparator(){
+    Comparator comparator = new Comparator(){
         int compare(byte[] key1, byte[] key2) {
             return new String(key1).compareTo(new String(key2));
         }
         String name() {
             return "simple";
         }
-    });
+    };
+    Options options = new Options();
+    options.comparator(comparator);
     DB db = DB.open(options, new File("example"));
-
+    ...
+    db.delete();
+    comparator.delete();
+    
 Disabling Compression
 
     Options options = new Options();
@@ -195,11 +198,15 @@ Getting database status.
     System.out.println(stats);
 
 Getting informational log messages.
-
-    Options options = new Options();
-    options.infoLog(new Logger(){
+    Logger logger = new Logger() {
       void log(String message) {
         System.out.println(message);
       }
-    });
+    };
+    Options options = new Options();
+    options.infoLog(logger);
     DB db = DB.open(options, new File("example"));
+    ...
+    db.close();
+    logger.delete();
+    
