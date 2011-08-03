@@ -99,13 +99,9 @@ public class Range {
     }
 
     public Range(byte[] start, byte[] limit) {
+        DB.checkArgNotNull(start, "start");
+        DB.checkArgNotNull(limit, "limit");
         this.limit = limit;
         this.start = start;
-        if( start == null ) {
-            throw new IllegalArgumentException("start cannot be null");
-        }
-        if( limit == null ) {
-            throw new IllegalArgumentException("start cannot be null");
-        }
     }
 }

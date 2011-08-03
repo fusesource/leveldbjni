@@ -60,6 +60,8 @@ public class WriteBatch extends NativeObject {
     }
 
     public void put(byte[] key, byte[] value) {
+        DB.checkArgNotNull(key, "key");
+        DB.checkArgNotNull(value, "value");
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
             NativeBuffer valueBuffer = new NativeBuffer(value);
@@ -84,6 +86,7 @@ public class WriteBatch extends NativeObject {
 
 
     public void delete(byte[] key) {
+        DB.checkArgNotNull(key, "key");
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
             delete(keyBuffer);

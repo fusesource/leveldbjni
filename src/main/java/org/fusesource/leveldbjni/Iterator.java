@@ -104,6 +104,7 @@ public class Iterator extends NativeObject {
     }
 
     public void seek(byte[] key) throws DB.DBException {
+        DB.checkArgNotNull(key, "key");
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
             seek(keyBuffer);

@@ -180,7 +180,15 @@ public class DB extends NativeObject {
         }
     }
 
+    static void checkArgNotNull(Object value, String name) {
+        if(value==null) {
+            throw new IllegalArgumentException("The "+name+" argument cannot be null");
+        }
+    }
+
     public static DB open(Options options, File path) throws IOException, DBException {
+        checkArgNotNull(options, "options");
+        checkArgNotNull(path, "path");
         long rc[] = new long[1];
         try {
             checkStatus(DBJNI.Open(options, path.getCanonicalPath(), rc));
@@ -194,6 +202,9 @@ public class DB extends NativeObject {
     }
 
     public void put(WriteOptions options, byte[] key, byte[] value) throws DBException {
+        checkArgNotNull(options, "options");
+        checkArgNotNull(key, "key");
+        checkArgNotNull(value, "value");
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
             NativeBuffer valueBuffer = new NativeBuffer(value);
@@ -217,6 +228,8 @@ public class DB extends NativeObject {
     }
 
     public void delete(WriteOptions options, byte[] key) throws DBException {
+        checkArgNotNull(options, "options");
+        checkArgNotNull(key, "key");
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
             delete(options, keyBuffer);
@@ -235,10 +248,14 @@ public class DB extends NativeObject {
     }
 
     public void write(WriteOptions options, WriteBatch updates) throws DBException {
+        checkArgNotNull(options, "options");
+        checkArgNotNull(updates, "updates");
         checkStatus(DBJNI.Write(self, options, updates.pointer()));
     }
 
     public byte[] get(ReadOptions options, byte[] key) throws DBException {
+        checkArgNotNull(options, "options");
+        checkArgNotNull(key, "key");
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
             return get(options, keyBuffer);
@@ -267,14 +284,17 @@ public class DB extends NativeObject {
     }
 
     public void releaseSnapshot(Snapshot snapshot) {
+        checkArgNotNull(snapshot, "snapshot");
         DBJNI.ReleaseSnapshot(self, snapshot.pointer());
     }
 
     public Iterator iterator(ReadOptions options) {
+        checkArgNotNull(options, "options");
         return new Iterator(DBJNI.NewIterator(self, options));
     }
 
     public static byte[] bytes(String value) {
+        checkArgNotNull(value, "value");
         if( value == null) {
             return null;
         }
@@ -324,6 +344,7 @@ public class DB extends NativeObject {
     }
 
     public String getProperty(String name) throws DBException {
+        checkArgNotNull(name, "name");
         NativeBuffer keyBuffer = new NativeBuffer(name.getBytes());
         try {
             byte[] property = getProperty(keyBuffer);
@@ -355,11 +376,15 @@ public class DB extends NativeObject {
         }
     }
 
-    static public void destroy(File name, Options options) throws IOException, DBException {
-        checkStatus(DBJNI.DestroyDB(name.getCanonicalPath(), options));
+    static public void destroy(File path, Options options) throws IOException, DBException {
+        checkArgNotNull(options, "options");
+        checkArgNotNull(path, "path");
+        checkStatus(DBJNI.DestroyDB(path.getCanonicalPath(), options));
     }
 
-    static public void repair(File name, Options options) throws IOException, DBException {
-        checkStatus(DBJNI.RepairDB(name.getCanonicalPath(), options));
+    static public void repair(File path, Options options) throws IOException, DBException {
+        checkArgNotNull(options, "options");
+        checkArgNotNull(path, "path");
+        checkStatus(DBJNI.RepairDB(path.getCanonicalPath(), options));
     }
 }
