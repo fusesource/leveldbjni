@@ -7,15 +7,18 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.test;
 
 import junit.framework.TestCase;
+import org.fusesource.leveldbjni.*;
 import org.junit.Test;
 
 import javax.swing.text.html.Option;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import static org.fusesource.leveldbjni.DB.*;
 
@@ -116,7 +119,7 @@ public class DBTest extends TestCase {
 
         ArrayList<String> actual = new ArrayList<String>();
 
-        Iterator iterator = db.iterator(ro);
+        org.fusesource.leveldbjni.Iterator iterator = db.iterator(ro);
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             actual.add(asString(iterator.key()));
         }
@@ -189,7 +192,7 @@ public class DBTest extends TestCase {
 
         ArrayList<String> actual = new ArrayList<String>();
 
-        Iterator iterator = db.iterator(new ReadOptions());
+        org.fusesource.leveldbjni.Iterator iterator = db.iterator(new ReadOptions());
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             actual.add(asString(iterator.key()));
         }
@@ -251,7 +254,7 @@ public class DBTest extends TestCase {
     @Test
     public void testCustomComparator1() throws IOException {
         Options options = new Options().createIfMissing(true);
-        options.comparator(new Comparator(){
+        options.comparator(new org.fusesource.leveldbjni.Comparator(){
             @Override
             public int compare(byte[] key1, byte[] key2) {
                 return new String(key1).compareTo(new String(key2));
@@ -276,7 +279,7 @@ public class DBTest extends TestCase {
 
         ArrayList<String> actual = new ArrayList<String>();
 
-        Iterator iterator = db.iterator(new ReadOptions());
+        org.fusesource.leveldbjni.Iterator iterator = db.iterator(new ReadOptions());
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             actual.add(asString(iterator.key()));
         }
@@ -290,7 +293,7 @@ public class DBTest extends TestCase {
     @Test
     public void testCustomComparator2() throws IOException {
         Options options = new Options().createIfMissing(true);
-        options.comparator(new Comparator(){
+        options.comparator(new org.fusesource.leveldbjni.Comparator(){
             @Override
             public int compare(byte[] key1, byte[] key2) {
                 return new String(key1).compareTo(new String(key2)) * -1;
@@ -315,7 +318,7 @@ public class DBTest extends TestCase {
         Collections.reverse(expecting);
 
         ArrayList<String> actual = new ArrayList<String>();
-        Iterator iterator = db.iterator(new ReadOptions());
+        org.fusesource.leveldbjni.Iterator iterator = db.iterator(new ReadOptions());
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             actual.add(asString(iterator.key()));
         }
@@ -325,8 +328,8 @@ public class DBTest extends TestCase {
         db.delete();
     }
 
-@Test
-    public void testLogger() throws IOException {
+    @Test
+    public void testLogger() throws IOException, InterruptedException {
         final List<String> messages = Collections.synchronizedList(new ArrayList<String>());
 
         Options options = new Options().createIfMissing(true);
@@ -341,12 +344,18 @@ public class DBTest extends TestCase {
         DB db = DB.open(options, path);
         WriteOptions wo = new WriteOptions().sync(false);
 
-        ArrayList<String> expecting = new ArrayList<String>();
-        for(int i=0; i < 26; i++) {
-            String t = ""+ ((char) ('a' + i));
-            expecting.add(t);
-            db.put(wo, bytes(t), bytes(t));
+        for( int j=0; j < 5; j++) {
+            Random r = new Random(0);
+            String data="";
+            for(int i=0; i < 1024; i++) {
+                data+= 'a'+r.nextInt(26);
+            }
+            for(int i=0; i < 5*1024; i++) {
+                db.put(wo, bytes("row"+i), bytes(data));
+            }
+            Thread.sleep(100);
         }
+
         db.delete();
 
         assertFalse(messages.isEmpty());

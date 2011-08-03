@@ -36,9 +36,6 @@ public abstract class Logger extends NativeObject {
                 @JniArg(cast="const void *", flags={ArgFlag.NO_OUT, ArgFlag.CRITICAL}) LoggerJNI src,
                 @JniArg(cast="size_t") long size);
 
-        @JniField(cast="JNIEnv *")
-        long env;
-
         @JniField(cast="jobject", flags={POINTER_FIELD})
         long target;
 
@@ -71,7 +68,6 @@ public abstract class Logger extends NativeObject {
             if( struct.log_method ==0 ) {
                 throw new RuntimeException("jni call failed: GetMethodID");
             }
-            struct.env = DB.DBJNI.ENV;
             struct.target = globalRef;
             LoggerJNI.memmove(self, struct, LoggerJNI.SIZEOF);
 

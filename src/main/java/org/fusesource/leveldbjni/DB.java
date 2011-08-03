@@ -10,16 +10,13 @@
 package org.fusesource.leveldbjni;
 
 import org.fusesource.hawtjni.runtime.*;
-import org.w3c.dom.ranges.RangeException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
-import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
-import static org.fusesource.hawtjni.runtime.MethodFlag.JNI;
-import static org.fusesource.hawtjni.runtime.MethodFlag.POINTER_RETURN;
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 
 /**
  * The DB object provides the main interface to acessing LevelDB
@@ -34,14 +31,7 @@ public class DB extends NativeObject {
     static class DBJNI {
         static {
             DB.LIBRARY.load();
-            init();
         }
-
-        @JniMethod(flags={CONSTANT_INITIALIZER})
-        private static final native void init();
-
-        @JniField(flags={CONSTANT}, cast="JNIEnv *", accessor="env")
-        static long ENV;
 
         @JniMethod(flags={JNI, POINTER_RETURN}, cast="jobject")
         public static final native long NewGlobalRef(

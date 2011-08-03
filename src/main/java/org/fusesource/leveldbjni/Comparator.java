@@ -45,9 +45,6 @@ public abstract class Comparator extends NativeObject {
                 @JniArg(cast="const void *") long src,
                 @JniArg(cast="size_t") long size);
 
-        @JniField(cast="JNIEnv *")
-        long env;
-
         @JniField(cast="jobject", flags={POINTER_FIELD})
         long target;
 
@@ -89,7 +86,6 @@ public abstract class Comparator extends NativeObject {
             if( struct.compare_method==0 ) {
                 throw new RuntimeException("jni call failed: GetMethodID");
             }
-            struct.env = DB.DBJNI.ENV;
             struct.target = globalRef;
             struct.name = name_buffer.pointer();
             ComparatorJNI.memmove(self, struct, ComparatorJNI.SIZEOF);

@@ -34,7 +34,7 @@
   #include <string.h>
 #endif
 
-#include "jni.h"
+#include "hawtjni.h"
 #include <stdint.h>
 #include <stdarg.h>
 
@@ -49,13 +49,18 @@
 #include "leveldb/slice.h"
 
 struct JNIComparator : public leveldb::Comparator {
-  JNIEnv *env;
   jobject target;
   jmethodID compare_method;
   const char *name;
 
   int Compare(const leveldb::Slice& a, const leveldb::Slice& b) const {
-     return env->CallIntMethod(target, compare_method, (jlong)(intptr_t)&a, (jlong)(intptr_t)&b);
+    JNIEnv *env;
+    if ( hawtjni_attach_thread(&env, "leveldb") ) {
+      return 0;
+    }
+    int rc = env->CallIntMethod(target, compare_method, (jlong)(intptr_t)&a, (jlong)(intptr_t)&b);
+    hawtjni_detach_thread();
+    return rc;
   }
 
   const char* Name() const {
@@ -67,11 +72,14 @@ struct JNIComparator : public leveldb::Comparator {
 };
 
 struct JNILogger : public leveldb::Logger {
-  JNIEnv *env;
   jobject target;
   jmethodID log_method;
 
   void Logv(const char* format, va_list ap) {
+    JNIEnv *env;
+    if ( hawtjni_attach_thread(&env, "leveldb") ) {
+      return;
+    }
 
     char buffer[1024];
     vsnprintf(buffer, sizeof(buffer), format, ap);
@@ -81,6 +89,12 @@ struct JNILogger : public leveldb::Logger {
       env->CallVoidMethod(target, log_method, message);
       env->DeleteLocalRef(message);
     }
+
+    if (env->ExceptionOccurred() ) {
+      env->ExceptionDescribe();
+      env->ExceptionClear();
+    }
+    hawtjni_detach_thread();
   }
 
 };
