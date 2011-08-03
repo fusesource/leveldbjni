@@ -16,6 +16,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
+import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
+import static org.fusesource.hawtjni.runtime.MethodFlag.JNI;
+import static org.fusesource.hawtjni.runtime.MethodFlag.POINTER_RETURN;
+
 /**
  * The DB object provides the main interface to acessing LevelDB
  *
@@ -26,8 +31,37 @@ public class DB extends NativeObject {
     static final Library LIBRARY = new Library("leveldbjni", DB.class);
 
     @JniClass(name="leveldb::DB", flags={ClassFlag.CPP})
-    private static class DBJNI {
-        static { DB.LIBRARY.load(); }
+    static class DBJNI {
+        static {
+            DB.LIBRARY.load();
+            init();
+        }
+
+        @JniMethod(flags={CONSTANT_INITIALIZER})
+        private static final native void init();
+
+        @JniField(flags={CONSTANT}, cast="JNIEnv *", accessor="env")
+        static long ENV;
+
+        @JniMethod(flags={JNI, POINTER_RETURN}, cast="jobject")
+        public static final native long NewGlobalRef(
+                Object target);
+
+        @JniMethod(flags={JNI}, cast="jobject")
+        public static final native void DeleteGlobalRef(
+                @JniArg(cast="jobject", flags={ArgFlag.POINTER_ARG})
+                long target);
+
+        @JniMethod(flags={JNI, POINTER_RETURN}, cast="jclass")
+        public static final native long GetObjectClass(
+                Object target);
+
+        @JniMethod(flags={JNI, POINTER_RETURN}, cast="jmethodID")
+        public static final native long GetMethodID(
+                @JniArg(cast="jclass", flags={ArgFlag.POINTER_ARG})
+                long clazz,
+                String name,
+                String signature);
 
         @JniMethod(flags={MethodFlag.CPP_DELETE})
         static final native void delete(

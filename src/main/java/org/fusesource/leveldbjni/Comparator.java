@@ -15,6 +15,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.POINTER_RETURN;
 
 /**
  * <p>
+ * Provides a java interface to the C++ leveldb::Comparator class.
  * </p>
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
@@ -65,30 +66,6 @@ abstract class Comparator extends NativeObject {
         @JniField(flags={CONSTANT}, cast="const Comparator*", accessor="leveldb::BytewiseComparator()")
         private static long BYTEWISE_COMPARATOR;
 
-        @JniField(flags={CONSTANT}, cast="JNIEnv *", accessor="env")
-        static long ENV;
-
-        @JniMethod(flags={JNI, POINTER_RETURN}, cast="jobject")
-        public static final native long NewGlobalRef(
-                Object target);
-
-        @JniMethod(flags={JNI}, cast="jobject")
-        public static final native void DeleteGlobalRef(
-                @JniArg(cast="jobject", flags={ArgFlag.POINTER_ARG})
-                long target);
-
-        @JniMethod(flags={JNI, POINTER_RETURN}, cast="jclass")
-        public static final native long GetObjectClass(
-                Object target);
-
-        @JniMethod(flags={JNI, POINTER_RETURN}, cast="jmethodID")
-        public static final native long GetMethodID(
-                @JniArg(cast="jclass", flags={ArgFlag.POINTER_ARG})
-                long clazz,
-                String name,
-                String signature);
-
-
     }
 
     private NativeBuffer name_buffer;
@@ -98,21 +75,21 @@ abstract class Comparator extends NativeObject {
         super(ComparatorJNI.create());
         try {
             name_buffer = new NativeBuffer(name());
-            globalRef = ComparatorJNI.NewGlobalRef(this);
+            globalRef = DB.DBJNI.NewGlobalRef(this);
             if( globalRef==0 ) {
                 throw new RuntimeException("jni call failed: NewGlobalRef");
             }
-            long clz = ComparatorJNI.GetObjectClass(this);
+            long clz = DB.DBJNI.GetObjectClass(this);
             if( clz==0 ) {
                 throw new RuntimeException("jni call failed: GetObjectClass");
             }
 
             ComparatorJNI struct = new ComparatorJNI();
-            struct.compare_method = ComparatorJNI.GetMethodID(clz, "compare", "(JJ)I");
+            struct.compare_method = DB.DBJNI.GetMethodID(clz, "compare", "(JJ)I");
             if( struct.compare_method==0 ) {
                 throw new RuntimeException("jni call failed: GetMethodID");
             }
-            struct.env = ComparatorJNI.ENV;
+            struct.env = DB.DBJNI.ENV;
             struct.target = globalRef;
             struct.name = name_buffer.pointer();
             ComparatorJNI.memmove(self, struct, ComparatorJNI.SIZEOF);
@@ -148,7 +125,7 @@ abstract class Comparator extends NativeObject {
             name_buffer = null;
         }
         if( globalRef!=0 ) {
-            ComparatorJNI.DeleteGlobalRef(globalRef);
+            DB.DBJNI.DeleteGlobalRef(globalRef);
             globalRef = 0;
         }
     }

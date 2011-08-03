@@ -15,10 +15,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import static org.fusesource.leveldbjni.DB.*;
 
@@ -328,6 +325,35 @@ public class DBTest extends TestCase {
 
         db.delete();
     }
+
+@Test
+    public void testLogger() throws IOException {
+        final List<String> messages = Collections.synchronizedList(new ArrayList<String>());
+
+        Options options = new Options().createIfMissing(true);
+        options.infoLog(new Logger(){
+            @Override
+            void log(String message) {
+                messages.add(message);
+            }
+        });
+
+        File path = getTestDirectory(getName());
+        DB db = DB.open(options, path);
+        WriteOptions wo = new WriteOptions().sync(false);
+
+        ArrayList<String> expecting = new ArrayList<String>();
+        for(int i=0; i < 26; i++) {
+            String t = ""+ ((char) ('a' + i));
+            expecting.add(t);
+            db.put(wo, bytes(t), bytes(t));
+        }
+        db.delete();
+
+        assertFalse(messages.isEmpty());
+
+    }
+
     public void assertEquals(byte[] arg1, byte[] arg2) {
         assertTrue(Arrays.equals(arg1, arg2));
     }

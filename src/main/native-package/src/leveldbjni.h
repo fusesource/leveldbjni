@@ -36,6 +36,7 @@
 
 #include "jni.h"
 #include <stdint.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 
@@ -65,6 +66,24 @@ struct JNIComparator : public leveldb::Comparator {
   void FindShortSuccessor(std::string*) const { }
 };
 
+struct JNILogger : public leveldb::Logger {
+  JNIEnv *env;
+  jobject target;
+  jmethodID log_method;
+
+  void Logv(const char* format, va_list ap) {
+
+    char buffer[1024];
+    vsnprintf(buffer, sizeof(buffer), format, ap);
+
+    jstring message = env->NewStringUTF(buffer);
+    if( message ) {
+      env->CallVoidMethod(target, log_method, message);
+      env->DeleteLocalRef(message);
+    }
+  }
+
+};
 
 #endif
 

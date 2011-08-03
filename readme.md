@@ -193,4 +193,13 @@ Getting database status.
 
     String stats = db.getProperty("leveldb.stats");
     System.out.println(stats);
-    
+
+Getting informational log messages.
+
+    Options options = new Options();
+    options.infoLog(new Logger(){
+      void log(String message) {
+        System.out.println(message);
+      }
+    });
+    DB db = DB.open(options, new File("example"));

@@ -48,15 +48,16 @@ public class Options {
 
     @JniField(ignore = true)
     private Comparator comparatorObject = Comparator.BYTEWISE_COMPARATOR;
-
     @JniField(cast="const leveldb::Comparator*")
     private long comparator = comparatorObject.pointer();
 
+    @JniField(ignore = true)
+    private Logger infoLogObject = null;
+    @JniField(cast="leveldb::Logger*")
+    private long info_log = 0;
 
     @JniField(cast="leveldb::Env*")
     private long env = DEFAULT_ENV;
-    @JniField(cast="leveldb::Logger*")
-    private long info_log = 0;
     @JniField(cast="leveldb::Cache*")
     private long block_cache = 0;
     @JniField(ignore = true)
@@ -123,8 +124,6 @@ public class Options {
 
 //    @JniField(cast="Env*")
 //    private long env = DEFAULT_ENV;
-//    @JniField(cast="Logger*")
-//    private long info_log = 0;
 
     public Comparator comparator() {
         return comparatorObject;
@@ -136,6 +135,20 @@ public class Options {
         }
         this.comparatorObject = comparator;
         this.comparator = comparator.pointer();
+        return this;
+    }
+
+    public Logger infoLog() {
+        return infoLogObject;
+    }
+
+    public Options infoLog(Logger logger) {
+        this.infoLogObject = logger;
+        if( logger ==null ) {
+            this.info_log = 0;
+        } else {
+            this.info_log = logger.pointer();
+        }
         return this;
     }
 
