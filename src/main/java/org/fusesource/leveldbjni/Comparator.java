@@ -20,7 +20,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.POINTER_RETURN;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-abstract class Comparator extends NativeObject {
+public abstract class Comparator extends NativeObject {
 
     @JniClass(name="JNIComparator", flags={ClassFlag.STRUCT, ClassFlag.CPP})
     static public class ComparatorJNI {

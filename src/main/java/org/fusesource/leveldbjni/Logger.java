@@ -16,7 +16,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-abstract class Logger extends NativeObject {
+public abstract class Logger extends NativeObject {
 
     @JniClass(name="JNILogger", flags={ClassFlag.STRUCT, ClassFlag.CPP})
     static public class LoggerJNI {
