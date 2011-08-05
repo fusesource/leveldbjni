@@ -34,6 +34,10 @@
   #include <string.h>
 #endif
 
+#ifdef HAVE_SYS_ERRNO_H
+  #include <sys/errno.h>
+#endif
+
 #include "hawtjni.h"
 #include <stdint.h>
 #include <stdarg.h>

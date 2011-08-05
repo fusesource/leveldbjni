@@ -35,5 +35,7 @@ AC_DEFUN([CUSTOM_M4_SETUP],
     AC_SUBST(LDFLAGS)
   ])
 
+  AC_CHECK_HEADER([sys/errno.h],[AC_DEFINE([HAVE_SYS_ERRNO_H], [1], [Define to 1 if you have the <sys/errno.h> header file.])])
+
   AC_LANG_POP()
 ])

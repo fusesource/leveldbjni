@@ -40,12 +40,12 @@ class NativeBuffer extends NativeObject {
         public static final native void free(
                 @JniArg(cast="void *") long self);
 
-        public static final native void buffer_copy (
-                @JniArg(cast="const void *") long src,
-                @JniArg(cast="size_t") long srcPos,
-                @JniArg(cast="void *") long dest,
-                @JniArg(cast="size_t") long destPos,
-                @JniArg(cast="size_t") long length);
+//        public static final native void buffer_copy (
+//                @JniArg(cast="const void *") long src,
+//                @JniArg(cast="size_t") long srcPos,
+//                @JniArg(cast="void *") long dest,
+//                @JniArg(cast="size_t") long destPos,
+//                @JniArg(cast="size_t") long length);
 
         public static final native void buffer_copy (
                 @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) byte[] src,
@@ -61,14 +61,13 @@ class NativeBuffer extends NativeObject {
                 @JniArg(cast="size_t") long destPos,
                 @JniArg(cast="size_t") long length);
 
-        @JniMethod(cast="void *")
-        public static final native long memset (
-                @JniArg(cast="void *") long buffer,
-                int c,
-                @JniArg(cast="size_t") long num);
+//        @JniMethod(cast="void *")
+//        public static final native long memset (
+//                @JniArg(cast="void *") long buffer,
+//                int c,
+//                @JniArg(cast="size_t") long num);
 
-        public static final native int strlen(
-                @JniArg(cast="char *")long s);    }
+    }
 
     private final long capacity;
     private final AtomicInteger retained;
