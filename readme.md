@@ -70,13 +70,29 @@ You just nee to add the following repositories and dependencies to your Maven po
         <artifactId>leveldbjni</artifactId>
         <version>1.0-SNAPSHOT</version>
       </dependency>
+
+      <!-- Add one or more of the platform specific dependencies -->
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
         <artifactId>leveldbjni</artifactId>
         <version>1.0-SNAPSHOT</version>
         <classifier>osx</classifier>
       </dependency>
+      <dependency>
+        <groupId>org.fusesource.leveldbjni</groupId>
+        <artifactId>leveldbjni</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <classifier>linux32</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.fusesource.leveldbjni</groupId>
+        <artifactId>leveldbjni</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <classifier>linux64</classifier>
+      </dependency>
     </dependencies>
+
+Where ${platform}
 
 ## API Usage:
 
