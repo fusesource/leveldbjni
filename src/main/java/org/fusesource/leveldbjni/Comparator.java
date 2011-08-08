@@ -1,17 +1,20 @@
-/**
- * Copyright (C) 2010, FuseSource Corp.  All rights reserved.
+/*
+ * Copyright (C) 2011, FuseSource Corp.  All rights reserved.
+ *
+ *     http://fusesource.com
+ *
+ * The software in this package is published under the terms of the
+ * CDDL license a copy of which has been included with this distribution
+ * in the license.txt file.
  */
 package org.fusesource.leveldbjni;
 
 import org.fusesource.hawtjni.runtime.*;
 
-import java.security.Key;
-
-import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
-import static org.fusesource.hawtjni.runtime.FieldFlag.POINTER_FIELD;
-import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
-import static org.fusesource.hawtjni.runtime.MethodFlag.JNI;
-import static org.fusesource.hawtjni.runtime.MethodFlag.POINTER_RETURN;
+import static org.fusesource.hawtjni.runtime.FieldFlag.*;
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
+import static org.fusesource.hawtjni.runtime.ArgFlag.*;
+import static org.fusesource.hawtjni.runtime.ClassFlag.*;
 
 /**
  * <p>
@@ -22,7 +25,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.POINTER_RETURN;
  */
 public abstract class Comparator extends NativeObject {
 
-    @JniClass(name="JNIComparator", flags={ClassFlag.STRUCT, ClassFlag.CPP})
+    @JniClass(name="JNIComparator", flags={STRUCT, CPP})
     static public class ComparatorJNI {
 
         static {
@@ -30,18 +33,18 @@ public abstract class Comparator extends NativeObject {
             init();
         }
 
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="JNIComparator *")
+        @JniMethod(flags={CPP_NEW})
         public static final native long create();
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="JNIComparator *") long ptr);
+        @JniMethod(flags={CPP_DELETE})
+        public static final native void delete(long ptr);
 
         public static final native void memmove (
                 @JniArg(cast="void *") long dest,
-                @JniArg(cast="const void *", flags={ArgFlag.NO_OUT, ArgFlag.CRITICAL}) ComparatorJNI src,
+                @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) ComparatorJNI src,
                 @JniArg(cast="size_t") long size);
 
         public static final native void memmove (
-                @JniArg(cast="void *", flags={ArgFlag.NO_IN, ArgFlag.CRITICAL}) ComparatorJNI dest,
+                @JniArg(cast="void *", flags={NO_IN, CRITICAL}) ComparatorJNI dest,
                 @JniArg(cast="const void *") long src,
                 @JniArg(cast="size_t") long size);
 

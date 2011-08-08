@@ -9,12 +9,14 @@
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.hawtjni.runtime.ClassFlag;
 import org.fusesource.hawtjni.runtime.JniClass;
 import org.fusesource.hawtjni.runtime.JniField;
 import org.fusesource.hawtjni.runtime.JniMethod;
 
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.ClassFlag.STRUCT;
 import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
+import static org.fusesource.hawtjni.runtime.FieldFlag.FIELD_SKIP;
 import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
 
 /**
@@ -22,7 +24,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-@JniClass(name="leveldb::Options", flags={ClassFlag.STRUCT, ClassFlag.CPP})
+@JniClass(name="leveldb::Options", flags={STRUCT, CPP})
 public class Options {
 
     static {
@@ -46,12 +48,12 @@ public class Options {
     private int max_open_files = 1000;
     private int block_restart_interval = 16;
 
-    @JniField(ignore = true)
+    @JniField(flags={FIELD_SKIP})
     private Comparator comparatorObject = Comparator.BYTEWISE_COMPARATOR;
     @JniField(cast="const leveldb::Comparator*")
     private long comparator = comparatorObject.pointer();
 
-    @JniField(ignore = true)
+    @JniField(flags={FIELD_SKIP})
     private Logger infoLogObject = null;
     @JniField(cast="leveldb::Logger*")
     private long info_log = 0;
@@ -60,7 +62,7 @@ public class Options {
     private long env = DEFAULT_ENV;
     @JniField(cast="leveldb::Cache*")
     private long block_cache = 0;
-    @JniField(ignore = true)
+    @JniField(flags={FIELD_SKIP})
     private Cache cache;
 
     @JniField(cast="leveldb::CompressionType")

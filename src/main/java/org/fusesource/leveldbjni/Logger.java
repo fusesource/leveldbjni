@@ -1,13 +1,26 @@
-/**
- * Copyright (C) 2010, FuseSource Corp.  All rights reserved.
+/*
+ * Copyright (C) 2011, FuseSource Corp.  All rights reserved.
+ *
+ *     http://fusesource.com
+ *
+ * The software in this package is published under the terms of the
+ * CDDL license a copy of which has been included with this distribution
+ * in the license.txt file.
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.hawtjni.runtime.*;
+import org.fusesource.hawtjni.runtime.JniArg;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniField;
+import org.fusesource.hawtjni.runtime.JniMethod;
 
+import static org.fusesource.hawtjni.runtime.ArgFlag.CRITICAL;
+import static org.fusesource.hawtjni.runtime.ArgFlag.NO_OUT;
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.ClassFlag.STRUCT;
 import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
 import static org.fusesource.hawtjni.runtime.FieldFlag.POINTER_FIELD;
-import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 
 /**
  * <p>
@@ -18,7 +31,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
  */
 public abstract class Logger extends NativeObject {
 
-    @JniClass(name="JNILogger", flags={ClassFlag.STRUCT, ClassFlag.CPP})
+    @JniClass(name="JNILogger", flags={STRUCT, CPP})
     static public class LoggerJNI {
 
         static {
@@ -26,14 +39,17 @@ public abstract class Logger extends NativeObject {
             init();
         }
 
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="JNILogger *")
+        @JniMethod(flags={CPP_NEW})
         public static final native long create();
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="JNILogger *") long ptr);
+
+        @JniMethod(flags={CPP_DELETE})
+        public static final native void delete(
+                long self
+                );
 
         public static final native void memmove (
                 @JniArg(cast="void *") long dest,
-                @JniArg(cast="const void *", flags={ArgFlag.NO_OUT, ArgFlag.CRITICAL}) LoggerJNI src,
+                @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) LoggerJNI src,
                 @JniArg(cast="size_t") long size);
 
         @JniField(cast="jobject", flags={POINTER_FIELD})

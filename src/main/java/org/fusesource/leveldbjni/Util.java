@@ -9,13 +9,15 @@
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.hawtjni.runtime.*;
+import org.fusesource.hawtjni.runtime.JniArg;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniMethod;
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.fusesource.hawtjni.runtime.MethodFlag.JNI;
-import static org.fusesource.hawtjni.runtime.MethodFlag.POINTER_RETURN;
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_GETTER;
 
 /**
  * Some miscellaneous utility functions.
@@ -24,7 +26,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.POINTER_RETURN;
  */
 public class Util {
 
-    @JniClass(flags={ClassFlag.CPP})
+    @JniClass(flags={CPP})
     static class UtilJNI {
 
         static {
@@ -36,7 +38,7 @@ public class Util {
                 @JniArg(cast="const char*") String source,
                 @JniArg(cast="const char*") String target);
 
-        @JniMethod(flags={MethodFlag.CONSTANT_GETTER})
+        @JniMethod(flags={CONSTANT_GETTER})
         public static final native int errno();
 
         @JniMethod(cast="char *")

@@ -9,7 +9,12 @@
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.hawtjni.runtime.*;
+import org.fusesource.hawtjni.runtime.JniArg;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniMethod;
+
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.MethodFlag.CPP_DELETE;
 
 /**
  * Provides a java interface to the C++ leveldb::Cache class.
@@ -18,7 +23,7 @@ import org.fusesource.hawtjni.runtime.*;
  */
 public class Cache extends NativeObject {
 
-    @JniClass(name="leveldb::Cache", flags={ClassFlag.CPP})
+    @JniClass(name="leveldb::Cache", flags={CPP})
     private static class CacheJNI {
         static {
             DB.LIBRARY.load();
@@ -28,8 +33,8 @@ public class Cache extends NativeObject {
         public static final native long NewLRUCache(
                 @JniArg(cast="size_t") long capacity);
 
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::Cache *") long self);
+        @JniMethod(flags={CPP_DELETE})
+        public static final native void delete(long self);
     }
 
     public Cache(long capacity) {

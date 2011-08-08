@@ -11,7 +11,11 @@ package org.fusesource.leveldbjni;
 
 import org.fusesource.hawtjni.runtime.*;
 
+import static org.fusesource.hawtjni.runtime.ArgFlag.*;
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.ClassFlag.STRUCT;
 import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
+import static org.fusesource.hawtjni.runtime.FieldFlag.FIELD_SKIP;
 import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
 
 /**
@@ -21,7 +25,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
  */
 public class Range {
 
-    @JniClass(name="leveldb::Range", flags={ClassFlag.STRUCT, ClassFlag.CPP})
+    @JniClass(name="leveldb::Range", flags={STRUCT, CPP})
     static public class RangeJNI {
 
         static {
@@ -31,11 +35,11 @@ public class Range {
 
         public static final native void memmove (
                 @JniArg(cast="void *") long dest,
-                @JniArg(cast="const void *", flags={ArgFlag.NO_OUT, ArgFlag.CRITICAL}) RangeJNI src,
+                @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) RangeJNI src,
                 @JniArg(cast="size_t") long size);
 
         public static final native void memmove (
-                @JniArg(cast="void *", flags={ArgFlag.NO_IN, ArgFlag.CRITICAL}) RangeJNI dest,
+                @JniArg(cast="void *", flags={NO_IN, CRITICAL}) RangeJNI dest,
                 @JniArg(cast="const void *") long src,
                 @JniArg(cast="size_t") long size);
 
@@ -48,12 +52,12 @@ public class Range {
 
         @JniField
         Slice start = new Slice();
-        @JniField(ignore = true)
+        @JniField(flags={FIELD_SKIP})
         NativeBuffer start_buffer;
 
         @JniField
         Slice limit = new Slice();
-        @JniField(ignore = true)
+        @JniField(flags={FIELD_SKIP})
         NativeBuffer limit_buffer;
 
         public RangeJNI(Range range) {

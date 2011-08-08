@@ -9,14 +9,18 @@
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.hawtjni.runtime.*;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniField;
+
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.ClassFlag.STRUCT;
 
 /**
  * Provides a java interface to the C++ leveldb::ReadOptions class.
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-@JniClass(name="leveldb::ReadOptions", flags={ClassFlag.STRUCT, ClassFlag.CPP})
+@JniClass(name="leveldb::ReadOptions", flags={STRUCT, CPP})
 public class ReadOptions {
 
     @JniField

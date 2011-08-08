@@ -9,13 +9,17 @@
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.hawtjni.runtime.*;
+import org.fusesource.hawtjni.runtime.JniArg;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniMethod;
+import org.fusesource.hawtjni.runtime.Library;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
+import static org.fusesource.hawtjni.runtime.ArgFlag.*;
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
 import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 
 /**
@@ -27,7 +31,7 @@ public class DB extends NativeObject {
 
     static final Library LIBRARY = new Library("leveldbjni", DB.class);
 
-    @JniClass(name="leveldb::DB", flags={ClassFlag.CPP})
+    @JniClass(name="leveldb::DB", flags={CPP})
     static class DBJNI {
         static {
             DB.LIBRARY.load();
@@ -39,7 +43,7 @@ public class DB extends NativeObject {
 
         @JniMethod(flags={JNI}, cast="jobject")
         public static final native void DeleteGlobalRef(
-                @JniArg(cast="jobject", flags={ArgFlag.POINTER_ARG})
+                @JniArg(cast="jobject", flags={POINTER_ARG})
                 long target);
 
         @JniMethod(flags={JNI, POINTER_RETURN}, cast="jclass")
@@ -48,92 +52,92 @@ public class DB extends NativeObject {
 
         @JniMethod(flags={JNI, POINTER_RETURN}, cast="jmethodID")
         public static final native long GetMethodID(
-                @JniArg(cast="jclass", flags={ArgFlag.POINTER_ARG})
+                @JniArg(cast="jclass", flags={POINTER_ARG})
                 long clazz,
                 String name,
                 String signature);
 
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
+        @JniMethod(flags={CPP_DELETE})
         static final native void delete(
-                @JniArg(cast="leveldb::DB *") long self);
+                long self
+                );
 
         @JniMethod(copy="leveldb::Status", accessor = "leveldb::DB::Open")
         static final native long Open(
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Options options,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Options options,
                 @JniArg(cast="const char*") String path,
                 @JniArg(cast="leveldb::DB**") long[] self);
 
-        @JniMethod(copy="leveldb::Status", flags={MethodFlag.CPP})
+        @JniMethod(copy="leveldb::Status", flags={CPP_METHOD})
         static final native long Put(
-                @JniArg(cast="leveldb::DB *") long self,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) WriteOptions options,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice value
+                long self,
+                @JniArg(flags={BY_VALUE, NO_OUT}) WriteOptions options,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Slice value
                 );
 
-        @JniMethod(copy="leveldb::Status", flags={MethodFlag.CPP})
+        @JniMethod(copy="leveldb::Status", flags={CPP_METHOD})
         static final native long Delete(
-                @JniArg(cast="leveldb::DB *") long self,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) WriteOptions options,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key
+                long self,
+                @JniArg(flags={BY_VALUE, NO_OUT}) WriteOptions options,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key
                 );
 
-        @JniMethod(copy="leveldb::Status", flags={MethodFlag.CPP})
+        @JniMethod(copy="leveldb::Status", flags={CPP_METHOD})
         static final native long Write(
-                @JniArg(cast="leveldb::DB *") long self,
-                @JniArg(flags={ArgFlag.BY_VALUE}) WriteOptions options,
+                long self,
+                @JniArg(flags={BY_VALUE}) WriteOptions options,
                 @JniArg(cast="leveldb::WriteBatch *") long updates
                 );
 
-        @JniMethod(copy="leveldb::Status", flags={MethodFlag.CPP})
+        @JniMethod(copy="leveldb::Status", flags={CPP_METHOD})
         static final native long Get(
-                @JniArg(cast="leveldb::DB *") long self,
-                @JniArg(flags={ArgFlag.NO_OUT, ArgFlag.BY_VALUE}) ReadOptions options,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key,
+                long self,
+                @JniArg(flags={NO_OUT, BY_VALUE}) ReadOptions options,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key,
                 @JniArg(cast="std::string *") long value
                 );
 
-        @JniMethod(cast="leveldb::Iterator *", flags={MethodFlag.CPP})
+        @JniMethod(cast="leveldb::Iterator *", flags={CPP_METHOD})
         static final native long NewIterator(
-                @JniArg(cast="leveldb::DB *") long self,
-                @JniArg(flags={ArgFlag.NO_OUT, ArgFlag.BY_VALUE}) ReadOptions options
+                long self,
+                @JniArg(flags={NO_OUT, BY_VALUE}) ReadOptions options
                 );
 
-        @JniMethod(cast="leveldb::Snapshot *", flags={MethodFlag.CPP})
+        @JniMethod(cast="leveldb::Snapshot *", flags={CPP_METHOD})
         static final native long GetSnapshot(
-                @JniArg(cast="leveldb::DB *") long self
-                );
+                long self);
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void ReleaseSnapshot(
-                @JniArg(cast="leveldb::DB *") long self,
+                long self,
                 @JniArg(cast="const leveldb::Snapshot *") long snapshot
                 );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void GetApproximateSizes(
-                @JniArg(cast="leveldb::DB *") long self,
+                long self,
                 @JniArg(cast="const leveldb::Range *") long range,
                 int n,
                 @JniArg(cast="uint64_t*") long[] sizes
                 );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native boolean GetProperty(
-                @JniArg(cast="leveldb::DB *") long self,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice property,
+                long self,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Slice property,
                 @JniArg(cast="std::string *") long value
                 );
 
         @JniMethod(copy="leveldb::Status", accessor = "leveldb::DestroyDB")
         static final native long DestroyDB(
                 @JniArg(cast="const char*") String path,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Options options);
+                @JniArg(flags={BY_VALUE, NO_OUT}) Options options);
 
         @JniMethod(copy="leveldb::Status", accessor = "leveldb::RepairDB")
         static final native long RepairDB(
                 @JniArg(cast="const char*") String path,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Options options);
+                @JniArg(flags={BY_VALUE, NO_OUT}) Options options);
     }
 
     public void delete() {

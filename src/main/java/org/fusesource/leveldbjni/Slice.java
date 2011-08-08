@@ -11,34 +11,40 @@ package org.fusesource.leveldbjni;
 
 import org.fusesource.hawtjni.runtime.*;
 
+import static org.fusesource.hawtjni.runtime.ArgFlag.*;
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.ClassFlag.STRUCT;
 import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
 import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
+import static org.fusesource.hawtjni.runtime.MethodFlag.CPP_DELETE;
 
 /**
  * Provides a java interface to the C++ leveldb::Slice class.
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-@JniClass(name="leveldb::Slice", flags={ClassFlag.STRUCT, ClassFlag.CPP})
+@JniClass(name="leveldb::Slice", flags={STRUCT, CPP})
 class Slice {
 
-    @JniClass(flags={ClassFlag.CPP})
+    @JniClass(name="leveldb::Slice", flags={CPP})
     static class SliceJNI {
         static {
             DB.LIBRARY.load();
             init();
         }
 
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::Slice *") long ptr);
+        @JniMethod(flags={CPP_DELETE})
+        public static final native void delete(
+                long self
+                );
 
         public static final native void memmove (
                 @JniArg(cast="void *") long dest,
-                @JniArg(cast="const void *", flags={ArgFlag.NO_OUT, ArgFlag.CRITICAL}) Slice src,
+                @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) Slice src,
                 @JniArg(cast="size_t") long size);
 
         public static final native void memmove (
-                @JniArg(cast="void *", flags={ArgFlag.NO_IN, ArgFlag.CRITICAL}) Slice dest,
+                @JniArg(cast="void *", flags={NO_IN, CRITICAL}) Slice dest,
                 @JniArg(cast="const void *") long src,
                 @JniArg(cast="size_t") long size);
 

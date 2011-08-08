@@ -9,7 +9,14 @@
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.hawtjni.runtime.*;
+import org.fusesource.hawtjni.runtime.JniArg;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniMethod;
+
+import static org.fusesource.hawtjni.runtime.ArgFlag.BY_VALUE;
+import static org.fusesource.hawtjni.runtime.ArgFlag.NO_OUT;
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 
 /**
  * Provides a java interface to the C++ leveldb::WriteBatch class.
@@ -18,33 +25,34 @@ import org.fusesource.hawtjni.runtime.*;
  */
 public class WriteBatch extends NativeObject {
 
-    @JniClass(name="leveldb::WriteBatch", flags={ClassFlag.CPP})
+    @JniClass(name="leveldb::WriteBatch", flags={CPP})
     private static class WriteBatchJNI {
         static {
             DB.LIBRARY.load();
         }
 
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="leveldb::WriteBatch *")
+        @JniMethod(flags={CPP_NEW})
         public static final native long create();
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::WriteBatch *") long ptr);
+        @JniMethod(flags={CPP_DELETE})
+        public static final native void delete(
+                long self);
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void Put(
-                @JniArg(cast="leveldb::WriteBatch *") long ptr,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice value
+                long self,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Slice value
                 );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void Delete(
-                @JniArg(cast="leveldb::WriteBatch *") long ptr,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice key
+                long self,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key
                 );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void Clear(
-                @JniArg(cast="leveldb::WriteBatch *") long ptr
+                long self
                 );
 
     }

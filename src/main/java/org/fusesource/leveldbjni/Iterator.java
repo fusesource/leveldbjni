@@ -10,6 +10,10 @@
 package org.fusesource.leveldbjni;
 
 import org.fusesource.hawtjni.runtime.*;
+import static org.fusesource.hawtjni.runtime.FieldFlag.*;
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
+import static org.fusesource.hawtjni.runtime.ArgFlag.*;
+import static org.fusesource.hawtjni.runtime.ClassFlag.*;
 
 /**
  * Provides a java interface to the C++ leveldb::Iterator class.
@@ -18,59 +22,61 @@ import org.fusesource.hawtjni.runtime.*;
  */
 public class Iterator extends NativeObject {
 
-    @JniClass(name="leveldb::Iterator", flags={ClassFlag.CPP})
+    @JniClass(name="leveldb::Iterator", flags={CPP})
     private static class IteratorJNI {
         static {
             DB.LIBRARY.load();
         }
 
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::Iterator *") long self);
+        @JniMethod(flags={CPP_DELETE})
+        public static final native void delete(
+                long self
+                );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native boolean Valid(
-                @JniArg(cast="leveldb::Iterator *") long self
+                long self
                 );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void SeekToFirst(
-                @JniArg(cast="leveldb::Iterator *") long self
+                long self
                 );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void SeekToLast(
-                @JniArg(cast="leveldb::Iterator *") long self
+                long self
                 );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void Seek(
-                @JniArg(cast="leveldb::Iterator *") long self,
-                @JniArg(flags={ArgFlag.BY_VALUE, ArgFlag.NO_OUT}) Slice target
+                long self,
+                @JniArg(flags={BY_VALUE, NO_OUT}) Slice target
                 );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void Next(
-                @JniArg(cast="leveldb::Iterator *") long self
+                long self
                 );
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         static final native void Prev(
-                @JniArg(cast="leveldb::Iterator *") long self
+                long self
                 );
 
-        @JniMethod(copy="leveldb::Slice", flags={MethodFlag.CPP})
+        @JniMethod(copy="leveldb::Slice", flags={CPP_METHOD})
         static final native long key(
-                @JniArg(cast="leveldb::Iterator *") long self
+                long self
                 );
 
-        @JniMethod(copy="leveldb::Slice", flags={MethodFlag.CPP})
+        @JniMethod(copy="leveldb::Slice", flags={CPP_METHOD})
         static final native long value(
-                @JniArg(cast="leveldb::Iterator *") long self
+                long self
                 );
 
-        @JniMethod(copy="leveldb::Status", flags={MethodFlag.CPP})
+        @JniMethod(copy="leveldb::Status", flags={CPP_METHOD})
         static final native long status(
-                @JniArg(cast="leveldb::Iterator *") long self
+                long self
                 );
     }
 

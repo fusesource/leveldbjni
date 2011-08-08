@@ -9,7 +9,12 @@
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.hawtjni.runtime.*;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniMethod;
+
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.MethodFlag.CPP_DELETE;
+import static org.fusesource.hawtjni.runtime.MethodFlag.CPP_METHOD;
 
 /**
  * Provides a java interface to the C++ leveldb::Status class.
@@ -18,26 +23,27 @@ import org.fusesource.hawtjni.runtime.*;
  */
 class Status extends NativeObject{
 
-    @JniClass(name="leveldb::Status", flags={ClassFlag.CPP})
+    @JniClass(name="leveldb::Status", flags={CPP})
     static class StatusJNI {
         static {
             DB.LIBRARY.load();
         }
 
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
-        public static final native void delete(@JniArg(cast="leveldb::Status *") long self);
+        @JniMethod(flags={CPP_DELETE})
+        public static final native void delete(
+                long self);
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         public static final native boolean ok(
-                @JniArg(cast="leveldb::Status *") long self);
+                long self);
 
-        @JniMethod(flags={MethodFlag.CPP})
+        @JniMethod(flags={CPP_METHOD})
         public static final native boolean IsNotFound(
-                @JniArg(cast="leveldb::Status *") long self);
+                long self);
 
-        @JniMethod(copy="std::string", flags={MethodFlag.CPP})
+        @JniMethod(copy="std::string", flags={CPP_METHOD})
         public static final native long ToString(
-                @JniArg(cast="leveldb::Status *") long self);
+                long self);
     }
 
     public Status(long self) {

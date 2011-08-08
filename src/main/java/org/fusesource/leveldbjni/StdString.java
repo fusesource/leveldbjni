@@ -9,7 +9,11 @@
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.hawtjni.runtime.*;
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniMethod;
+
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 
 /**
  * Provides a java interface to the C++ std::string class.
@@ -18,29 +22,29 @@ import org.fusesource.hawtjni.runtime.*;
  */
 class StdString extends NativeObject {
 
-    @JniClass(name="std::string", flags={ClassFlag.CPP})
+    @JniClass(name="std::string", flags={CPP})
     private static class StdStringJNI {
         static {
             DB.LIBRARY.load();
         }
 
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="std::string *")
+        @JniMethod(flags={CPP_NEW})
         public static final native long create();
 
-        @JniMethod(flags={MethodFlag.CPP_NEW}, cast="std::string *")
+        @JniMethod(flags={CPP_NEW})
         public static final native long create(String value);
 
-        @JniMethod(flags={MethodFlag.CPP_DELETE})
+        @JniMethod(flags={CPP_DELETE})
         static final native void delete(
-                @JniArg(cast="std::string *") long self);
+                long self);
 
-        @JniMethod(flags={MethodFlag.CPP}, accessor = "c_str", cast="const char*")
+        @JniMethod(flags={CPP_METHOD}, accessor = "c_str", cast="const char*")
         public static final native long c_str_ptr (
-                @JniArg(cast="std::string *") long self);
+                long self);
 
-        @JniMethod(flags={MethodFlag.CPP},cast = "size_t")
+        @JniMethod(flags={CPP_METHOD},cast = "size_t")
         public static final native long length (
-                @JniArg(cast="std::string *") long self);
+                long self);
 
     }
 

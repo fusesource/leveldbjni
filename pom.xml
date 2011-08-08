@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.fusesource</groupId>
     <artifactId>fusesource-pom</artifactId>
-    <version>1.7</version>
+    <version>1.8</version>
   </parent>
 
   <groupId>org.fusesource.leveldbjni</groupId>
@@ -28,7 +28,7 @@
     <forge-project-id>leveldbjni</forge-project-id>
     <forge-project-id-uc>LEVELDBJNI</forge-project-id-uc>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hawtjni-version>1.3-SNAPSHOT</hawtjni-version>
+    <hawtjni-version>1.3</hawtjni-version>
   </properties>
   
   <url>http://${forge-project-id}.fusesource.org</url>
