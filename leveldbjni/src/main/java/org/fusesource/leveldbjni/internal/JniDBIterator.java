@@ -83,6 +83,8 @@ public class JniDBIterator implements DBIterator {
     }
 
     public boolean hasPrev() {
+        if( !iterator.isValid() )
+            return false;
         try {
             iterator.prev();
             try {

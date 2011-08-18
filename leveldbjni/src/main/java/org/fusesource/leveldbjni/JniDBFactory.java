@@ -45,37 +45,40 @@ public class JniDBFactory implements DBFactory {
         }
     }
 
-    public DB open(File path, Options options) throws IOException {
-        NativeDB db=null;
+    static private class OptionsResourceHolder {
+
         NativeCache cache = null;
         NativeComparator comparator=null;
         NativeLogger logger=null;
-        try {
-            NativeOptions o = new NativeOptions();
-            o.blockRestartInterval(options.blockRestartInterval());
-            o.blockSize(options.blockSize());
-            o.createIfMissing(options.createIfMissing());
-            o.errorIfExists(options.errorIfExists());
-            o.maxOpenFiles(options.maxOpenFiles());
-            o.paranoidChecks(options.paranoidChecks());
-            o.writeBufferSize(options.writeBufferSize());
+        NativeOptions options;
 
-            switch(options.compressionType()) {
+        public void init(Options value) {
+
+            options = new NativeOptions();
+            options.blockRestartInterval(value.blockRestartInterval());
+            options.blockSize(value.blockSize());
+            options.createIfMissing(value.createIfMissing());
+            options.errorIfExists(value.errorIfExists());
+            options.maxOpenFiles(value.maxOpenFiles());
+            options.paranoidChecks(value.paranoidChecks());
+            options.writeBufferSize(value.writeBufferSize());
+
+            switch(value.compressionType()) {
                 case NONE:
-                    o.compression(NativeCompressionType.kNoCompression);
+                    options.compression(NativeCompressionType.kNoCompression);
                     break;
                 case SNAPPY:
-                    o.compression(NativeCompressionType.kSnappyCompression);
+                    options.compression(NativeCompressionType.kSnappyCompression);
                     break;
             }
 
 
-            if(options.cacheSize()>0 ) {
-                cache = new NativeCache(options.cacheSize());
-                o.cache(cache);
+            if(value.cacheSize()>0 ) {
+                cache = new NativeCache(value.cacheSize());
+                options.cache(cache);
             }
 
-            final DBComparator userComparator = options.comparator();
+            final DBComparator userComparator = value.comparator();
             if(userComparator!=null) {
                 comparator = new NativeComparator() {
                     @Override
@@ -88,10 +91,10 @@ public class JniDBFactory implements DBFactory {
                         return userComparator.name();
                     }
                 };
-                o.comparator(comparator);
+                options.comparator(comparator);
             }
 
-            final Logger userLogger = options.logger();
+            final Logger userLogger = value.logger();
             if(userLogger!=null) {
                 logger = new NativeLogger() {
                     @Override
@@ -99,33 +102,57 @@ public class JniDBFactory implements DBFactory {
                         userLogger.log(message);
                     }
                 };
-                o.infoLog(logger);
+                options.infoLog(logger);
             }
 
-            db = NativeDB.open(o, path);
+        }
+        public void close() {
+            if(cache!=null) {
+                cache.delete();
+            }
+            if(comparator!=null){
+                comparator.delete();
+            }
+            if(logger!=null) {
+                logger.delete();
+            }
+        }
+    }
 
+    public DB open(File path, Options options) throws IOException {
+        NativeDB db=null;
+        OptionsResourceHolder holder = new OptionsResourceHolder();
+        try {
+            holder.init(options);
+            db = NativeDB.open(holder.options, path);
         } finally {
             // if we could not open up the DB, then clean up the
             // other allocated native resouces..
             if(db==null) {
-                if(cache!=null) {
-                    cache.delete();
-                }
-                if(comparator!=null){
-                    comparator.delete();
-                }
-                if(logger!=null) {
-                    logger.delete();
-                }
+                holder.close();
             }
         }
-        return new JniDB(db, cache, comparator, logger);
+        return new JniDB(db, holder.cache, holder.comparator, holder.logger);
     }
 
     public void destroy(File path, Options options) throws IOException {
+        OptionsResourceHolder holder = new OptionsResourceHolder();
+        try {
+            holder.init(options);
+            NativeDB.destroy(path, holder.options);
+        } finally {
+            holder.close();
+        }
     }
 
     public void repair(File path, Options options) throws IOException {
+        OptionsResourceHolder holder = new OptionsResourceHolder();
+        try {
+            holder.init(options);
+            NativeDB.repair(path, holder.options);
+        } finally {
+            holder.close();
+        }
     }
 
 }
