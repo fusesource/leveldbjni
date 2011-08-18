@@ -7,50 +7,6 @@ LevelDB JNI gives you a Java interface to the
 which is a fast key-value storage library written at Google 
 that provides an ordered mapping from string keys to string values.. 
 
-## Building Prerequisites 
-
-* GNU compiler toolchain
-* [Maven 3](http://maven.apache.org/download.html)
-
-## Building
-
-The following worked for me on:
-
- * OS X Lion with X Code 4
- * Ubuntu 10.04 (32 and 64 bit)
-
-Then download the snappy, leveldb, and leveldbjni project source code:
-
-    wget http://snappy.googlecode.com/files/snappy-1.0.3.tar.gz
-    tar -zxvf snappy-1.0.3.tar.gz
-    svn checkout -r 47 http://leveldb.googlecode.com/svn/trunk/ leveldb
-    git clone git://github.com/fusesource/leveldbjni.git
-
-Compile the snappy project.  This produces a static library.    
-
-    cd snappy-1.0.3 
-    ./configure --disable-shared --with-pic
-    make
-    
-Patch and Compile the leveldb project.  This produces a static library.    
-    
-    cd ../leveldb
-    export LIBRARY_PATH=`cd ../snappy-1.0.3; pwd`
-    export C_INCLUDE_PATH=${LIBRARY_PATH}
-    export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
-    patch -p 0 < ../leveldbjni/leveldb.patch
-    make
-
-Now use maven to build the leveldbjni project.    
-    
-    cd ../leveldbjni
-    mvn clean install -P download -P native -Dleveldb=`cd ../leveldb; pwd` -Dsnappy=`cd ../snappy-1.0.3; pwd`
-
-The above will produce:
-
-* `target/leveldbjni-${version}.jar` : The java class file to the library.
-* `target/leveldbjni-${version}-native-src.zip` : A GNU style source project which you can use to build the native library on other systems.
-* `target/leveldbjni-${version}-${platform}.jar` : A jar file containing the built native library using your currently platform.
 
 ## Using as a Maven Dependency
 
@@ -67,32 +23,10 @@ You just nee to add the following repositories and dependencies to your Maven po
     <dependencies>
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
-        <artifactId>leveldbjni</artifactId>
+        <artifactId>leveldbjni-all</artifactId>
         <version>1.1-SNAPSHOT</version>
-      </dependency>
-
-      <!-- Add one or more of the platform specific dependencies -->
-      <dependency>
-        <groupId>org.fusesource.leveldbjni</groupId>
-        <artifactId>leveldbjni</artifactId>
-        <version>1.1-SNAPSHOT</version>
-        <classifier>osx</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.fusesource.leveldbjni</groupId>
-        <artifactId>leveldbjni</artifactId>
-        <version>1.1-SNAPSHOT</version>
-        <classifier>linux32</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.fusesource.leveldbjni</groupId>
-        <artifactId>leveldbjni</artifactId>
-        <version>1.1-SNAPSHOT</version>
-        <classifier>linux64</classifier>
       </dependency>
     </dependencies>
-
-Where ${platform}
 
 ## API Usage:
 
@@ -227,4 +161,60 @@ Repairing a database.
     
     Options options = new Options();
     factory.repair(new File("example"), options);
+    
+## Building
+
+### Prerequisites 
+
+* GNU compiler toolchain
+* [Maven 3](http://maven.apache.org/download.html)
+
+### Supported Platforms
+
+The following worked for me on:
+
+ * OS X Lion with X Code 4
+ * CentOS 5.6 (32 and 64 bit)
+ * Ubuntu 10.04 (32 and 64 bit)
+
+### Build Procedure
+
+Then download the snappy, leveldb, and leveldbjni project source code:
+
+    wget http://snappy.googlecode.com/files/snappy-1.0.3.tar.gz
+    tar -zxvf snappy-1.0.3.tar.gz
+    svn checkout -r 47 http://leveldb.googlecode.com/svn/trunk/ leveldb
+    git clone git://github.com/fusesource/leveldbjni.git
+
+Compile the snappy project.  This produces a static library.    
+
+    cd snappy-1.0.3 
+    ./configure --disable-shared --with-pic
+    make
+    
+Patch and Compile the leveldb project.  This produces a static library.    
+    
+    cd ../leveldb
+    export LIBRARY_PATH=`cd ../snappy-1.0.3; pwd`
+    export C_INCLUDE_PATH=${LIBRARY_PATH}
+    export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
+    patch -p 0 < ../leveldbjni/leveldb.patch
+    make
+
+Now use maven to build the leveldbjni project.    
+    
+    cd ../leveldbjni
+    mvn clean install -Dleveldb=`cd ../leveldb; pwd` -Dsnappy=`cd ../snappy-1.0.3; pwd` -P download -P ${platform}
+
+Replace ${platform} with one of the following platform identifiers (depending on the platform your building on):
+
+* linux32
+* linux64
+* osx
+
+### Build Results
+
+* `leveldbjni/target/leveldbjni-${version}.jar` : The java class file to the library.
+* `leveldbjni/target/leveldbjni-${version}-native-src.zip` : A GNU style source project which you can use to build the native library on other systems.
+* `leveldbjni-${platform}/target/leveldbjni-${platform}-${version}.jar` : A jar file containing the built native library using your currently platform.
     
