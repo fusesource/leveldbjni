@@ -9,8 +9,8 @@
  */
 package org.fusesource.leveldbjni;
 
-import org.fusesource.leveldbjni.impl.*;
-import org.iq80.leveldb.api.*;
+import org.fusesource.leveldbjni.internal.*;
+import org.iq80.leveldb.*;
 
 import java.io.File;
 import java.io.IOException;

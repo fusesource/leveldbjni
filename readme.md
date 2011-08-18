@@ -98,7 +98,7 @@ Where ${platform}
 
 Recommended Package imports:
 
-    import org.iq80.leveldb.api.*;
+    import org.iq80.leveldb.*;
     import static org.fusesource.leveldbjni.JniDBFactory.*;
     import java.io.*;
 

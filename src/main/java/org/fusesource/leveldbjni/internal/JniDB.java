@@ -7,10 +7,9 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.internal;
 
-import org.fusesource.leveldbjni.impl.*;
-import org.iq80.leveldb.api.*;
+import org.iq80.leveldb.*;
 
 /**
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
@@ -22,7 +21,7 @@ public class JniDB implements DB {
     private final NativeComparator comparator;
     private final NativeLogger logger;
 
-    JniDB(NativeDB db, NativeCache cache, NativeComparator comparator, NativeLogger logger) {
+    public JniDB(NativeDB db, NativeCache cache, NativeComparator comparator, NativeLogger logger) {
         this.db = db;
         this.cache = cache;
         this.comparator = comparator;

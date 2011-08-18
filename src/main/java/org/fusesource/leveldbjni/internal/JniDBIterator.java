@@ -7,11 +7,11 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.internal;
 
-import org.fusesource.leveldbjni.impl.NativeDB;
-import org.fusesource.leveldbjni.impl.NativeIterator;
-import org.iq80.leveldb.api.DBIterator;
+import org.fusesource.leveldbjni.internal.NativeDB;
+import org.fusesource.leveldbjni.internal.NativeIterator;
+import org.iq80.leveldb.DBIterator;
 
 import java.util.AbstractMap;
 import java.util.Map;

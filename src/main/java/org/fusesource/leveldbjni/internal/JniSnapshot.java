@@ -7,10 +7,10 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.internal;
 
-import org.fusesource.leveldbjni.impl.*;
-import org.iq80.leveldb.api.*;
+import org.fusesource.leveldbjni.internal.*;
+import org.iq80.leveldb.Snapshot;
 
 /**
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>

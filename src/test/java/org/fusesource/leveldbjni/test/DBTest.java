@@ -11,7 +11,7 @@ package org.fusesource.leveldbjni.test;
 
 import junit.framework.TestCase;
 import org.fusesource.leveldbjni.JniDBFactory;
-import org.iq80.leveldb.api.*;
+import org.iq80.leveldb.*;
 import org.junit.Test;
 
 import java.io.File;
@@ -57,13 +57,13 @@ public class DBTest extends TestCase {
     }
 
     @Test
-    public void testRepair() throws IOException, org.iq80.leveldb.api.DBException {
+    public void testRepair() throws IOException, DBException {
         testCRUD();
         factory.repair(new File(new File("test-data"), getName()), new Options());
     }
 
     @Test
-    public void testCRUD() throws IOException, org.iq80.leveldb.api.DBException {
+    public void testCRUD() throws IOException, DBException {
 
         Options options = new Options().setCreateIfMissing(true);
 
@@ -91,7 +91,7 @@ public class DBTest extends TestCase {
     }
 
     @Test
-    public void testIterator() throws IOException, org.iq80.leveldb.api.DBException {
+    public void testIterator() throws IOException, DBException {
 
         Options options = new Options().setCreateIfMissing(true);
 
@@ -120,7 +120,7 @@ public class DBTest extends TestCase {
     }
 
     @Test
-    public void testSnapshot() throws IOException, org.iq80.leveldb.api.DBException {
+    public void testSnapshot() throws IOException, DBException {
 
         Options options = new Options().setCreateIfMissing(true);
 
@@ -151,7 +151,7 @@ public class DBTest extends TestCase {
     }
 
     @Test
-    public void testWriteBatch() throws IOException, org.iq80.leveldb.api.DBException {
+    public void testWriteBatch() throws IOException, DBException {
 
         Options options = new Options().setCreateIfMissing(true);
 
@@ -186,7 +186,7 @@ public class DBTest extends TestCase {
     }
 
     @Test
-    public void testApproximateSizes() throws IOException, org.iq80.leveldb.api.DBException {
+    public void testApproximateSizes() throws IOException, DBException {
         Options options = new Options().setCreateIfMissing(true);
 
         File path = getTestDirectory(getName());
@@ -210,7 +210,7 @@ public class DBTest extends TestCase {
     }
 
     @Test
-    public void testGetProperty() throws IOException, org.iq80.leveldb.api.DBException {
+    public void testGetProperty() throws IOException, DBException {
         Options options = new Options().setCreateIfMissing(true);
 
         File path = getTestDirectory(getName());
@@ -233,7 +233,7 @@ public class DBTest extends TestCase {
     }
 
     @Test
-    public void testCustomComparator1() throws IOException, org.iq80.leveldb.api.DBException {
+    public void testCustomComparator1() throws IOException, DBException {
         Options options = new Options().setCreateIfMissing(true);
         options.setComparator(new DBComparator() {
 
@@ -278,7 +278,7 @@ public class DBTest extends TestCase {
     }
 
     @Test
-    public void testCustomComparator2() throws IOException, org.iq80.leveldb.api.DBException {
+    public void testCustomComparator2() throws IOException, DBException {
         Options options = new Options().setCreateIfMissing(true);
         options.setComparator(new DBComparator() {
 
@@ -322,7 +322,7 @@ public class DBTest extends TestCase {
     }
 
     @Test
-    public void testLogger() throws IOException, InterruptedException, org.iq80.leveldb.api.DBException {
+    public void testLogger() throws IOException, InterruptedException, DBException {
         final List<String> messages = Collections.synchronizedList(new ArrayList<String>());
 
         Options options = new Options().setCreateIfMissing(true);
