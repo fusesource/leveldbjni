@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2011, FuseSource Corp.  All rights reserved.
+
+      http://fusesource.com
+
+  The software in this package is published under the terms of the
+  CDDL license a copy of which has been included with this distribution
+  in the license.txt file.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.fusesource.leveldbjni</groupId>
+    <artifactId>leveldbjni-project</artifactId>
+    <version>1.1-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.fusesource.leveldbjni</groupId>
+  <artifactId>leveldbjni-linux32</artifactId>
+  <version>1.1-SNAPSHOT</version>
+  
+  <name>${project.artifactId}</name>
+  <description>leveldbjni is a jni library for acessing leveldb.</description>
+      
+  <dependencies>
+    <dependency>
+      <groupId>org.fusesource.leveldbjni</groupId>
+      <artifactId>leveldbjni</artifactId>
+      <version>1.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <testSourceDirectory>${basedir}/../leveldbjni/src/test/java</testSourceDirectory>
+     
+    <plugins>
+      <plugin>
+        <groupId>org.fusesource.hawtjni</groupId>
+        <artifactId>maven-hawtjni-plugin</artifactId>
+        <version>${hawtjni-version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <name>leveldbjni</name>
+          <classified>false</classified>
+          <nativeSrcDependency>
+            <groupId>org.fusesource.leveldbjni</groupId>
+            <artifactId>leveldbjni</artifactId>
+            <version>${project.version}</version>
+            <classifier>native-src</classifier>
+            <type>zip</type>
+          </nativeSrcDependency>
+          <configureArgs>
+            <arg>--with-leveldb=${leveldb}</arg>
+            <arg>--with-snappy=${snappy}</arg>
+          </configureArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

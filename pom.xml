@@ -18,8 +18,9 @@
   </parent>
 
   <groupId>org.fusesource.leveldbjni</groupId>
-  <artifactId>leveldbjni</artifactId>
+  <artifactId>leveldbjni-project</artifactId>
   <version>1.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
   
   <name>${project.artifactId}</name>
   <description>leveldbjni is a jni library for acessing leveldb.</description>
@@ -30,6 +31,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hawtjni-version>1.4-SNAPSHOT</hawtjni-version>
   </properties>
+  
+  <modules>
+    <module>leveldbjni</module>
+  </modules>
   
   <url>http://${forge-project-id}.fusesource.org</url>
   <inceptionYear>2009</inceptionYear>
@@ -86,24 +91,13 @@
   
   <dependencies>
     <dependency>
-      <groupId>org.fusesource.hawtjni</groupId>
-      <artifactId>hawtjni-runtime</artifactId>
-      <version>${hawtjni-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.iq80.leveldb</groupId>
-      <artifactId>leveldb-api</artifactId>
-      <version>0.1-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.7</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
+  
   <build>
     <plugins>
     
@@ -114,52 +108,6 @@
         <version>2.3</version>
       </plugin>
       
-      <plugin>
-        <groupId>org.fusesource.hawtjni</groupId>
-        <artifactId>maven-hawtjni-plugin</artifactId>
-        <version>${hawtjni-version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-          </execution>
-        </executions>        
-        <configuration>
-          <name>leveldbjni</name>
-          <callbacks>false</callbacks>
-          <copyright><![CDATA[
-/*******************************************************************************
-* Copyright (C) 2011, FuseSource Corp.  All rights reserved.
-*
-*     http://fusesource.com
-*
-* The software in this package is published under the terms of the
-* CDDL license a copy of which has been included with this distribution
-* in the license.txt file.
-*******************************************************************************/
-          ]]></copyright>
-        </configuration>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.4.3</version>
-        <configuration>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <forkMode>once</forkMode>
-            <argLine>-ea</argLine>
-            <failIfNoTests>false</failIfNoTests>
-            <workingDirectory>${project.build.directory}</workingDirectory>
-            <excludes>
-                <exclude>**/*</exclude>
-            </excludes>
-            <includes>
-                <include>**/*Test.java</include>
-            </includes>
-        </configuration>
-      </plugin>
       
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -171,33 +119,20 @@
       </plugin>
       
       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.0.1</version>
-        <executions>
-          <execution>
-            <id>bundle-manifest</id>
-            <phase>process-classes</phase>
-            <goals>    
-              <goal>manifest</goal>
-            </goals>   
-            <configuration>
-              <instructions>
-                  <Import-Package>!org.fusesource.leveldbjni*,!org.fusesource.hawtjni*,sun.reflect;resolution:=optional,*</Import-Package>
-              </instructions>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.4.3</version>
         <configuration>
-          <archive>  
-            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-          </archive> 
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <forkMode>once</forkMode>
+          <argLine>-ea</argLine>
+          <failIfNoTests>false</failIfNoTests>
+          <workingDirectory>${project.build.directory}</workingDirectory>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
         </configuration>
-      </plugin>  
-      
+      </plugin>      
     </plugins>
   </build>
 
@@ -257,77 +192,6 @@
 
   <profiles>
     
-    <!-- Profile which enables Universal binaries on OS X -->
-    <profile>
-      <id>native</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.fusesource.hawtjni</groupId>
-            <artifactId>maven-hawtjni-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>build</goal>
-                  <goal>package-jar</goal>
-                  <goal>package-source</goal>
-                </goals>
-              </execution>
-            </executions>        
-            <configuration>
-              <configureArgs>
-                <arg>--with-leveldb=${leveldb}</arg>
-                <arg>--with-snappy=${snappy}</arg>
-              </configureArgs>
-            </configuration>
-          </plugin>
-          
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                  <exclude>**/Abstract*.java</exclude>
-                  <exclude>**/Test*.java</exclude>
-              </excludes>
-              <includes>
-                  <include>**/*Test.java</include>
-              </includes>
-            </configuration>
-          </plugin>
-          
-        </plugins>
-      </build>
-    </profile>
-    
-    <profile>
-      <id>mac</id>
-      <activation>
-        <os><family>mac</family></os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.fusesource.hawtjni</groupId>
-            <artifactId>maven-hawtjni-plugin</artifactId>
-            <configuration>
-              <platform>osx</platform>
-              <osgiPlatforms>
-                <osgiPlatform>osname=MacOS;processor=x86-64</osgiPlatform>
-                <osgiPlatform>osname=MacOS;processor=x86</osgiPlatform>
-                <osgiPlatform>*</osgiPlatform>
-              </osgiPlatforms>
-              <configureArgs>
-                <arg>--with-universal</arg>
-                <arg>--with-leveldb=${leveldb}</arg>
-                <arg>--with-snappy=${snappy}</arg>
-              </configureArgs>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
     <profile>
       <id>download</id>
       <repositories>
@@ -345,6 +209,44 @@
         </pluginRepository>
       </pluginRepositories>
     </profile>
+    
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os><family>mac</family></os>
+      </activation>
+      <modules>
+        <module>leveldbjni-osx</module>
+      </modules>
+    </profile>    
+    
+    <profile>
+      <id>linux32</id>
+      <activation>
+        <os><family>linux</family></os>
+        <property>
+          <name>sun.arch.data.model</name>
+          <value>32</value>
+        </property>
+      </activation>
+      <modules>
+        <module>leveldbjni-linux32</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>linux64</id>
+      <activation>
+        <os><family>linux</family></os>
+        <property>
+          <name>sun.arch.data.model</name>
+          <value>64</value>
+        </property>
+      </activation>
+      <modules>
+        <module>leveldbjni-linux64</module>
+      </modules>
+    </profile>    
     
   </profiles>
 </project>
