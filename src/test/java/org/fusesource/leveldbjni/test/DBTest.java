@@ -129,6 +129,7 @@ public class DBTest extends TestCase {
 
         db.put(bytes("Tampa"), bytes("green"));
         db.put(bytes("London"), bytes("red"));
+        db.delete(bytes("New York"));
 
         ReadOptions ro = new ReadOptions().setSnapshot(db.getSnapshot());
 
