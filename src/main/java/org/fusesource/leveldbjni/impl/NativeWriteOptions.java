@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.JniClass;
 import org.fusesource.hawtjni.runtime.JniField;
@@ -21,7 +21,7 @@ import static org.fusesource.hawtjni.runtime.ClassFlag.STRUCT;
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 @JniClass(name="leveldb::WriteOptions", flags={STRUCT, CPP})
-public class WriteOptions {
+public class NativeWriteOptions {
 
     @JniField
     boolean sync;
@@ -30,7 +30,7 @@ public class WriteOptions {
         return sync;
     }
 
-    public WriteOptions sync(boolean sync) {
+    public NativeWriteOptions sync(boolean sync) {
         this.sync = sync;
         return this;
     }

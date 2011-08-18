@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniClass;
@@ -27,14 +27,14 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class DB extends NativeObject {
+public class NativeDB extends NativeObject {
 
-    static final Library LIBRARY = new Library("leveldbjni", DB.class);
+    static final Library LIBRARY = new Library("leveldbjni", NativeDB.class);
 
     @JniClass(name="leveldb::DB", flags={CPP})
     static class DBJNI {
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
         }
 
         @JniMethod(flags={JNI, POINTER_RETURN}, cast="jobject")
@@ -64,44 +64,44 @@ public class DB extends NativeObject {
 
         @JniMethod(copy="leveldb::Status", accessor = "leveldb::DB::Open")
         static final native long Open(
-                @JniArg(flags={BY_VALUE, NO_OUT}) Options options,
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeOptions options,
                 @JniArg(cast="const char*") String path,
                 @JniArg(cast="leveldb::DB**") long[] self);
 
         @JniMethod(copy="leveldb::Status", flags={CPP_METHOD})
         static final native long Put(
                 long self,
-                @JniArg(flags={BY_VALUE, NO_OUT}) WriteOptions options,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Slice value
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeWriteOptions options,
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeSlice key,
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeSlice value
                 );
 
         @JniMethod(copy="leveldb::Status", flags={CPP_METHOD})
         static final native long Delete(
                 long self,
-                @JniArg(flags={BY_VALUE, NO_OUT}) WriteOptions options,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeWriteOptions options,
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeSlice key
                 );
 
         @JniMethod(copy="leveldb::Status", flags={CPP_METHOD})
         static final native long Write(
                 long self,
-                @JniArg(flags={BY_VALUE}) WriteOptions options,
+                @JniArg(flags={BY_VALUE}) NativeWriteOptions options,
                 @JniArg(cast="leveldb::WriteBatch *") long updates
                 );
 
         @JniMethod(copy="leveldb::Status", flags={CPP_METHOD})
         static final native long Get(
                 long self,
-                @JniArg(flags={NO_OUT, BY_VALUE}) ReadOptions options,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key,
+                @JniArg(flags={NO_OUT, BY_VALUE}) NativeReadOptions options,
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeSlice key,
                 @JniArg(cast="std::string *") long value
                 );
 
         @JniMethod(cast="leveldb::Iterator *", flags={CPP_METHOD})
         static final native long NewIterator(
                 long self,
-                @JniArg(flags={NO_OUT, BY_VALUE}) ReadOptions options
+                @JniArg(flags={NO_OUT, BY_VALUE}) NativeReadOptions options
                 );
 
         @JniMethod(cast="leveldb::Snapshot *", flags={CPP_METHOD})
@@ -125,19 +125,19 @@ public class DB extends NativeObject {
         @JniMethod(flags={CPP_METHOD})
         static final native boolean GetProperty(
                 long self,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Slice property,
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeSlice property,
                 @JniArg(cast="std::string *") long value
                 );
 
         @JniMethod(copy="leveldb::Status", accessor = "leveldb::DestroyDB")
         static final native long DestroyDB(
                 @JniArg(cast="const char*") String path,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Options options);
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeOptions options);
 
         @JniMethod(copy="leveldb::Status", accessor = "leveldb::RepairDB")
         static final native long RepairDB(
                 @JniArg(cast="const char*") String path,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Options options);
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeOptions options);
     }
 
     public void delete() {
@@ -146,7 +146,7 @@ public class DB extends NativeObject {
         self = 0;
     }
 
-    private DB(long self) {
+    private NativeDB(long self) {
         super(self);
     }
 
@@ -164,7 +164,7 @@ public class DB extends NativeObject {
     }
 
     static void checkStatus(long s) throws DBException {
-        Status status = new Status(s);
+        NativeStatus status = new NativeStatus(s);
         try {
             if( !status.isOk() ) {
                 throw new DBException(status.toString(), status.isNotFound());
@@ -180,7 +180,7 @@ public class DB extends NativeObject {
         }
     }
 
-    public static DB open(Options options, File path) throws IOException, DBException {
+    public static NativeDB open(NativeOptions options, File path) throws IOException, DBException {
         checkArgNotNull(options, "options");
         checkArgNotNull(path, "path");
         long rc[] = new long[1];
@@ -192,10 +192,10 @@ public class DB extends NativeObject {
             }
             throw e;
         }
-        return new DB(rc[0]);
+        return new NativeDB(rc[0]);
     }
 
-    public void put(WriteOptions options, byte[] key, byte[] value) throws DBException {
+    public void put(NativeWriteOptions options, byte[] key, byte[] value) throws DBException {
         checkArgNotNull(options, "options");
         checkArgNotNull(key, "key");
         checkArgNotNull(value, "value");
@@ -212,16 +212,16 @@ public class DB extends NativeObject {
         }
     }
 
-    private void put(WriteOptions options, NativeBuffer keyBuffer, NativeBuffer valueBuffer) throws DBException {
-        put(options, new Slice(keyBuffer), new Slice(valueBuffer));
+    private void put(NativeWriteOptions options, NativeBuffer keyBuffer, NativeBuffer valueBuffer) throws DBException {
+        put(options, new NativeSlice(keyBuffer), new NativeSlice(valueBuffer));
     }
 
-    private void put(WriteOptions options, Slice keySlice, Slice valueSlice) throws DBException {
+    private void put(NativeWriteOptions options, NativeSlice keySlice, NativeSlice valueSlice) throws DBException {
         assertAllocated();
         checkStatus(DBJNI.Put(self, options, keySlice, valueSlice));
     }
 
-    public void delete(WriteOptions options, byte[] key) throws DBException {
+    public void delete(NativeWriteOptions options, byte[] key) throws DBException {
         checkArgNotNull(options, "options");
         checkArgNotNull(key, "key");
         NativeBuffer keyBuffer = new NativeBuffer(key);
@@ -232,22 +232,22 @@ public class DB extends NativeObject {
         }
     }
 
-    private void delete(WriteOptions options, NativeBuffer keyBuffer) throws DBException {
-        delete(options, new Slice(keyBuffer));
+    private void delete(NativeWriteOptions options, NativeBuffer keyBuffer) throws DBException {
+        delete(options, new NativeSlice(keyBuffer));
     }
 
-    private void delete(WriteOptions options, Slice keySlice) throws DBException {
+    private void delete(NativeWriteOptions options, NativeSlice keySlice) throws DBException {
         assertAllocated();
         checkStatus(DBJNI.Delete(self, options, keySlice));
     }
 
-    public void write(WriteOptions options, WriteBatch updates) throws DBException {
+    public void write(NativeWriteOptions options, NativeWriteBatch updates) throws DBException {
         checkArgNotNull(options, "options");
         checkArgNotNull(updates, "updates");
         checkStatus(DBJNI.Write(self, options, updates.pointer()));
     }
 
-    public byte[] get(ReadOptions options, byte[] key) throws DBException {
+    public byte[] get(NativeReadOptions options, byte[] key) throws DBException {
         checkArgNotNull(options, "options");
         checkArgNotNull(key, "key");
         NativeBuffer keyBuffer = new NativeBuffer(key);
@@ -258,13 +258,13 @@ public class DB extends NativeObject {
         }
     }
 
-    private byte[] get(ReadOptions options, NativeBuffer keyBuffer) throws DBException {
-        return get(options, new Slice(keyBuffer));
+    private byte[] get(NativeReadOptions options, NativeBuffer keyBuffer) throws DBException {
+        return get(options, new NativeSlice(keyBuffer));
     }
 
-    private byte[] get(ReadOptions options, Slice keySlice) throws DBException {
+    private byte[] get(NativeReadOptions options, NativeSlice keySlice) throws DBException {
         assertAllocated();
-        StdString result = new StdString();
+        NativeStdString result = new NativeStdString();
         try {
             checkStatus(DBJNI.Get(self, options, keySlice, result.pointer()));
             return result.toByteArray();
@@ -273,55 +273,32 @@ public class DB extends NativeObject {
         }
     }
 
-    public Snapshot getSnapshot() {
-        return new Snapshot(DBJNI.GetSnapshot(self));
+    public NativeSnapshot getSnapshot() {
+        return new NativeSnapshot(DBJNI.GetSnapshot(self));
     }
 
-    public void releaseSnapshot(Snapshot snapshot) {
+    public void releaseSnapshot(NativeSnapshot snapshot) {
         checkArgNotNull(snapshot, "snapshot");
         DBJNI.ReleaseSnapshot(self, snapshot.pointer());
     }
 
-    public Iterator iterator(ReadOptions options) {
+    public NativeIterator iterator(NativeReadOptions options) {
         checkArgNotNull(options, "options");
-        return new Iterator(DBJNI.NewIterator(self, options));
+        return new NativeIterator(DBJNI.NewIterator(self, options));
     }
 
-    public static byte[] bytes(String value) {
-        checkArgNotNull(value, "value");
-        if( value == null) {
-            return null;
-        }
-        try {
-            return value.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String asString(byte value[]) {
-        if( value == null) {
-            return null;
-        }
-        try {
-            return new String(value, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public long[] getApproximateSizes(Range ... ranges) {
+    public long[] getApproximateSizes(NativeRange... ranges) {
         if( ranges==null ) {
             return null;
         }
 
         long rc[] = new long[ranges.length];
-        Range.RangeJNI structs[] = new Range.RangeJNI[ranges.length];
+        NativeRange.RangeJNI structs[] = new NativeRange.RangeJNI[ranges.length];
         if( rc.length> 0 ) {
-            NativeBuffer range_array = Range.RangeJNI.arrayCreate(ranges.length);
+            NativeBuffer range_array = NativeRange.RangeJNI.arrayCreate(ranges.length);
             try {
                 for(int i=0; i < ranges.length; i++) {
-                    structs[i] = new Range.RangeJNI(ranges[i]);
+                    structs[i] = new NativeRange.RangeJNI(ranges[i]);
                     structs[i].arrayWrite(range_array.pointer(), i);
                 }
                 DBJNI.GetApproximateSizes(self,range_array.pointer(), ranges.length, rc);
@@ -337,7 +314,7 @@ public class DB extends NativeObject {
         return rc;
     }
 
-    public String getProperty(String name) throws DBException {
+    public String getProperty(String name) {
         checkArgNotNull(name, "name");
         NativeBuffer keyBuffer = new NativeBuffer(name.getBytes());
         try {
@@ -352,13 +329,13 @@ public class DB extends NativeObject {
         }
     }
 
-    private byte[] getProperty(NativeBuffer nameBuffer) throws DBException {
-        return getProperty(new Slice(nameBuffer));
+    private byte[] getProperty(NativeBuffer nameBuffer) {
+        return getProperty(new NativeSlice(nameBuffer));
     }
 
-    private byte[] getProperty(Slice nameSlice) throws DBException {
+    private byte[] getProperty(NativeSlice nameSlice) {
         assertAllocated();
-        StdString result = new StdString();
+        NativeStdString result = new NativeStdString();
         try {
             if( DBJNI.GetProperty(self, nameSlice, result.pointer()) ) {
                 return result.toByteArray();
@@ -370,13 +347,13 @@ public class DB extends NativeObject {
         }
     }
 
-    static public void destroy(File path, Options options) throws IOException, DBException {
+    static public void destroy(File path, NativeOptions options) throws IOException, DBException {
         checkArgNotNull(options, "options");
         checkArgNotNull(path, "path");
         checkStatus(DBJNI.DestroyDB(path.getCanonicalPath(), options));
     }
 
-    static public void repair(File path, Options options) throws IOException, DBException {
+    static public void repair(File path, NativeOptions options) throws IOException, DBException {
         checkArgNotNull(options, "options");
         checkArgNotNull(path, "path");
         checkStatus(DBJNI.RepairDB(path.getCanonicalPath(), options));

@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniClass;
@@ -30,7 +30,7 @@ public class Util {
     static class UtilJNI {
 
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
         }
 
         @JniMethod()
@@ -72,7 +72,7 @@ public class Util {
     static String string(long ptr) {
         if( ptr == 0 )
             return null;
-        return new String(new Slice(ptr, UtilJNI.strlen(ptr)).toByteArray());
+        return new String(new NativeSlice(ptr, UtilJNI.strlen(ptr)).toByteArray());
     }
 
 }

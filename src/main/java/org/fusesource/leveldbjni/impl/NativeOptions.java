@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.JniClass;
 import org.fusesource.hawtjni.runtime.JniField;
@@ -25,10 +25,10 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 @JniClass(name="leveldb::Options", flags={STRUCT, CPP})
-public class Options {
+public class NativeOptions {
 
     static {
-        DB.LIBRARY.load();
+        NativeDB.LIBRARY.load();
         init();
     }
 
@@ -49,12 +49,12 @@ public class Options {
     private int block_restart_interval = 16;
 
     @JniField(flags={FIELD_SKIP})
-    private Comparator comparatorObject = Comparator.BYTEWISE_COMPARATOR;
+    private NativeComparator comparatorObject = NativeComparator.BYTEWISE_COMPARATOR;
     @JniField(cast="const leveldb::Comparator*")
     private long comparator = comparatorObject.pointer();
 
     @JniField(flags={FIELD_SKIP})
-    private Logger infoLogObject = null;
+    private NativeLogger infoLogObject = null;
     @JniField(cast="leveldb::Logger*")
     private long info_log = 0;
 
@@ -63,12 +63,12 @@ public class Options {
     @JniField(cast="leveldb::Cache*")
     private long block_cache = 0;
     @JniField(flags={FIELD_SKIP})
-    private Cache cache;
+    private NativeCache cache;
 
     @JniField(cast="leveldb::CompressionType")
-    private int compression = CompressionType.kSnappyCompression.value;
+    private int compression = NativeCompressionType.kSnappyCompression.value;
 
-    public Options createIfMissing(boolean value) {
+    public NativeOptions createIfMissing(boolean value) {
         this.create_if_missing = value;
         return this;
     }
@@ -76,7 +76,7 @@ public class Options {
         return create_if_missing;
     }
 
-    public Options errorIfExists(boolean value) {
+    public NativeOptions errorIfExists(boolean value) {
         this.error_if_exists = value;
         return this;
     }
@@ -84,7 +84,7 @@ public class Options {
         return error_if_exists;
     }
 
-    public Options paranoidChecks(boolean value) {
+    public NativeOptions paranoidChecks(boolean value) {
         this.paranoid_checks = value;
         return this;
     }
@@ -92,7 +92,7 @@ public class Options {
         return paranoid_checks;
     }
 
-    public Options writeBufferSize(long value) {
+    public NativeOptions writeBufferSize(long value) {
         this.write_buffer_size = value;
         return this;
     }
@@ -100,7 +100,7 @@ public class Options {
         return write_buffer_size;
     }
 
-    public Options maxOpenFiles(int value) {
+    public NativeOptions maxOpenFiles(int value) {
         this.max_open_files = value;
         return this;
     }
@@ -108,7 +108,7 @@ public class Options {
         return max_open_files;
     }
 
-    public Options blockRestartInterval(int value) {
+    public NativeOptions blockRestartInterval(int value) {
         this.block_restart_interval = value;
         return this;
     }
@@ -116,7 +116,7 @@ public class Options {
         return block_restart_interval;
     }
 
-    public Options blockSize(long value) {
+    public NativeOptions blockSize(long value) {
         this.block_size = value;
         return this;
     }
@@ -127,11 +127,11 @@ public class Options {
 //    @JniField(cast="Env*")
 //    private long env = DEFAULT_ENV;
 
-    public Comparator comparator() {
+    public NativeComparator comparator() {
         return comparatorObject;
     }
 
-    public Options comparator(Comparator comparator) {
+    public NativeOptions comparator(NativeComparator comparator) {
         if( comparator==null ) {
             throw new IllegalArgumentException("comparator cannot be null");
         }
@@ -140,11 +140,11 @@ public class Options {
         return this;
     }
 
-    public Logger infoLog() {
+    public NativeLogger infoLog() {
         return infoLogObject;
     }
 
-    public Options infoLog(Logger logger) {
+    public NativeOptions infoLog(NativeLogger logger) {
         this.infoLogObject = logger;
         if( logger ==null ) {
             this.info_log = 0;
@@ -154,26 +154,26 @@ public class Options {
         return this;
     }
 
-    public CompressionType compression() {
-        if(compression == CompressionType.kNoCompression.value) {
-            return CompressionType.kNoCompression;
-        } else if(compression == CompressionType.kSnappyCompression.value) {
-            return CompressionType.kSnappyCompression;
+    public NativeCompressionType compression() {
+        if(compression == NativeCompressionType.kNoCompression.value) {
+            return NativeCompressionType.kNoCompression;
+        } else if(compression == NativeCompressionType.kSnappyCompression.value) {
+            return NativeCompressionType.kSnappyCompression;
         } else {
-            return CompressionType.kSnappyCompression;
+            return NativeCompressionType.kSnappyCompression;
         }
     }
 
-    public Options compression(CompressionType compression) {
+    public NativeOptions compression(NativeCompressionType compression) {
         this.compression = compression.value;
         return this;
     }
 
-    public Cache cache() {
+    public NativeCache cache() {
         return cache;
     }
 
-    public Options cache(Cache cache) {
+    public NativeOptions cache(NativeCache cache) {
         this.cache = cache;
         if( cache!=null ) {
             this.block_cache = cache.pointer();

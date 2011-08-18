@@ -68,26 +68,26 @@ You just nee to add the following repositories and dependencies to your Maven po
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
         <artifactId>leveldbjni</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
       </dependency>
 
       <!-- Add one or more of the platform specific dependencies -->
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
         <artifactId>leveldbjni</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
         <classifier>osx</classifier>
       </dependency>
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
         <artifactId>leveldbjni</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
         <classifier>linux32</classifier>
       </dependency>
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
         <artifactId>leveldbjni</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
         <classifier>linux64</classifier>
       </dependency>
     </dependencies>
@@ -98,60 +98,55 @@ Where ${platform}
 
 Recommended Package imports:
 
-    import org.fusesource.leveldbjni.*;
-    import static org.fusesource.leveldbjni.DB.*;
+    import org.iq80.leveldb.api.*;
+    import static org.fusesource.leveldbjni.JniDBFactory.*;
     import java.io.*;
 
 Opening and closing the database.
 
     Options options = new Options();
     options.setCreateIfMissing(true);
-    DB db = DB.open(options, new File("example"));
+    DB db = factory.open(new File("example"), options);
     try {
       // Use the db in here....
     } finally {
-      // Make sure you delete the db to shutdown the 
+      // Make sure you close the db to shutdown the 
       // database and avoid resource leaks.
-      db.delete();
+      db.close();
     }
 
 Putting, Getting, and Deleting key/values.
 
-    WriteOptions wo = new WriteOptions();
-    ReadOptions ro = new ReadOptions();
-
-    db.put(wo, bytes("Tampa"), bytes("rocks"));
-    String value = asString(db.get(ro, bytes("Tampa")));
+    db.put(bytes("Tampa"), bytes("rocks"));
+    String value = asString(db.get(bytes("Tampa")));
     db.delete(wo, bytes("Tampa"));
 
 Performing Batch/Bulk/Atomic Updates.
 
-    WriteBatch batch = new WriteBatch();
+    WriteBatch batch = db.createWriteBatch();
     try {
       batch.delete(bytes("Denver"));
       batch.put(bytes("Tampa"), bytes("green"));
       batch.put(bytes("London"), bytes("red"));
 
-      WriteOptions wo = new WriteOptions();
-      db.write(wo, batch);
+      db.write(batch);
     } finally {
-      // Make sure you delete the batch to avoid resource leaks.
-      batch.delete();
+      // Make sure you close the batch to avoid resource leaks.
+      batch.close();
     }
 
 Iterating key/values.
 
-    ReadOptions ro = new ReadOptions();
-    Iterator iterator = db.iterator(ro);
+    DBIterator iterator = db.iterator();
     try {
-      for(iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-        String key = asString(iterator.key());
-        String value = asString(iterator.value());
+      for(iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
+        String key = asString(iterator.peakNext().getKey());
+        String value = asString(iterator.peakNext().getValue());
         System.out.println(key+" = "+value);
       }
     } finally {
-      // Make sure you delete the iterator to avoid resource leaks.
-      iterator.delete();
+      // Make sure you close the iterator to avoid resource leaks.
+      iterator.close();
     }
 
 Working against a Snapshot view of the Database.
@@ -163,49 +158,48 @@ Working against a Snapshot view of the Database.
       // All read operations will now use the same 
       // consistent view of the data.
       ... = db.iterator(ro);
-      ... = db.get(ro, bytes("Tampa"));
+      ... = db.get(bytes("Tampa"), ro);
 
     } finally {
-      // Make sure you release the snapshot to avoid resource leaks.
-      db.releaseSnapshot(ro.getSnapshot());
-      ro.setSnapshot(null);
+      // Make sure you close the snapshot to avoid resource leaks.
+      ro.getSnapshot().close()
     }
 
 Using a custom Comparator.
-    Comparator comparator = new Comparator(){
+
+    DBComparator comparator = new DBComparator(){
         public int compare(byte[] key1, byte[] key2) {
             return new String(key1).compareTo(new String(key2));
         }
         public String name() {
             return "simple";
         }
+        public byte[] findShortestSeparator(byte[] start, byte[] limit) {
+            return start;
+        }
+        public byte[] findShortSuccessor(byte[] key) {
+            return key;
+        }
     };
     Options options = new Options();
-    options.comparator(comparator);
-    DB db = DB.open(options, new File("example"));
-    ...
-    db.delete();
-    comparator.delete();
+    options.setComparator(comparator);
+    DB db = factory.open(new File("example"), options);
     
 Disabling Compression
 
     Options options = new Options();
-    options.compression(CompressionType.kNoCompression);
-    DB db = DB.open(options, new File("example"));
+    options.setCompressionType(CompressionType.NONE);
+    DB db = factory.open(new File("example"), options);
 
 Configuring the Cache
     
-    Cache cache = new Cache(100 * 1048576);  // 100MB cache
     Options options = new Options();
-    options.cache(cache);
-    DB db = DB.open(options, new File("example"));
-    ... use the db ...
-    db.delete()
-    cache.delete()
+    options.setCacheSize(100 * 1048576); // 100MB cache
+    DB db = factory.open(new File("example"), options);
 
 Getting approximate sizes.
 
-    long[] sizes = db.getApproximateSizes(new Range(bytes("a"), bytes("k")), new Range(bytes("l"), bytes("z")));
+    long[] sizes = db.getApproximateSizes(new Range(bytes("a"), bytes("k")), new Range(bytes("k"), bytes("z")));
     System.out.println("Size: "+sizes[0]+", "+sizes[1]);
     
 Getting database status.
@@ -221,19 +215,16 @@ Getting informational log messages.
       }
     };
     Options options = new Options();
-    options.infoLog(logger);
-    DB db = DB.open(options, new File("example"));
-    ...
-    db.close();
-    logger.delete();
+    options.setLogger(logger);
+    DB db = factory.open(new File("example"), options);
 
 Destroying a database.
     
     Options options = new Options();
-    DB.destroy(new File("example"), options);
+    factory.destroy(new File("example"), options);
 
 Repairing a database.
     
     Options options = new Options();
-    DB.repair(new File("example"), options);
+    factory.repair(new File("example"), options);
     

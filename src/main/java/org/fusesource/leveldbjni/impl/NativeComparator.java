@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.*;
 
@@ -23,13 +23,13 @@ import static org.fusesource.hawtjni.runtime.ClassFlag.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public abstract class Comparator extends NativeObject {
+public abstract class NativeComparator extends NativeObject {
 
     @JniClass(name="JNIComparator", flags={STRUCT, CPP})
     static public class ComparatorJNI {
 
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
             init();
         }
 
@@ -71,21 +71,21 @@ public abstract class Comparator extends NativeObject {
     private NativeBuffer name_buffer;
     private long globalRef;
 
-    public Comparator() {
+    public NativeComparator() {
         super(ComparatorJNI.create());
         try {
             name_buffer = new NativeBuffer(name());
-            globalRef = DB.DBJNI.NewGlobalRef(this);
+            globalRef = NativeDB.DBJNI.NewGlobalRef(this);
             if( globalRef==0 ) {
                 throw new RuntimeException("jni call failed: NewGlobalRef");
             }
-            long clz = DB.DBJNI.GetObjectClass(this);
+            long clz = NativeDB.DBJNI.GetObjectClass(this);
             if( clz==0 ) {
                 throw new RuntimeException("jni call failed: GetObjectClass");
             }
 
             ComparatorJNI struct = new ComparatorJNI();
-            struct.compare_method = DB.DBJNI.GetMethodID(clz, "compare", "(JJ)I");
+            struct.compare_method = NativeDB.DBJNI.GetMethodID(clz, "compare", "(JJ)I");
             if( struct.compare_method==0 ) {
                 throw new RuntimeException("jni call failed: GetMethodID");
             }
@@ -99,7 +99,7 @@ public abstract class Comparator extends NativeObject {
         }
     }
 
-    public static final Comparator BYTEWISE_COMPARATOR = new Comparator(ComparatorJNI.BYTEWISE_COMPARATOR) {
+    public static final NativeComparator BYTEWISE_COMPARATOR = new NativeComparator(ComparatorJNI.BYTEWISE_COMPARATOR) {
         @Override
         public void delete() {
             // we won't really delete this one since it's static.
@@ -114,7 +114,7 @@ public abstract class Comparator extends NativeObject {
         }
     };
 
-    Comparator(long ptr) {
+    NativeComparator(long ptr) {
         super(ptr);
     }
 
@@ -124,15 +124,15 @@ public abstract class Comparator extends NativeObject {
             name_buffer = null;
         }
         if( globalRef!=0 ) {
-            DB.DBJNI.DeleteGlobalRef(globalRef);
+            NativeDB.DBJNI.DeleteGlobalRef(globalRef);
             globalRef = 0;
         }
     }
 
     private int compare(long ptr1, long ptr2) {
-        Slice s1 = new Slice();
+        NativeSlice s1 = new NativeSlice();
         s1.read(ptr1, 0);
-        Slice s2 = new Slice();
+        NativeSlice s2 = new NativeSlice();
         s2.read(ptr2, 0);
         return compare(s1.toByteArray(), s2.toByteArray());
     }

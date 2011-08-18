@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniClass;
@@ -23,12 +23,12 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class WriteBatch extends NativeObject {
+public class NativeWriteBatch extends NativeObject {
 
     @JniClass(name="leveldb::WriteBatch", flags={CPP})
     private static class WriteBatchJNI {
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
         }
 
         @JniMethod(flags={CPP_NEW})
@@ -40,14 +40,14 @@ public class WriteBatch extends NativeObject {
         @JniMethod(flags={CPP_METHOD})
         static final native void Put(
                 long self,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Slice value
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeSlice key,
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeSlice value
                 );
 
         @JniMethod(flags={CPP_METHOD})
         static final native void Delete(
                 long self,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Slice key
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeSlice key
                 );
 
         @JniMethod(flags={CPP_METHOD})
@@ -57,7 +57,7 @@ public class WriteBatch extends NativeObject {
 
     }
 
-    public WriteBatch() {
+    public NativeWriteBatch() {
         super(WriteBatchJNI.create());
     }
 
@@ -68,8 +68,8 @@ public class WriteBatch extends NativeObject {
     }
 
     public void put(byte[] key, byte[] value) {
-        DB.checkArgNotNull(key, "key");
-        DB.checkArgNotNull(value, "value");
+        NativeDB.checkArgNotNull(key, "key");
+        NativeDB.checkArgNotNull(value, "value");
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
             NativeBuffer valueBuffer = new NativeBuffer(value);
@@ -84,17 +84,17 @@ public class WriteBatch extends NativeObject {
     }
 
     private void put(NativeBuffer keyBuffer, NativeBuffer valueBuffer) {
-        put(new Slice(keyBuffer), new Slice(valueBuffer));
+        put(new NativeSlice(keyBuffer), new NativeSlice(valueBuffer));
     }
 
-    private void put(Slice keySlice, Slice valueSlice) {
+    private void put(NativeSlice keySlice, NativeSlice valueSlice) {
         assertAllocated();
         WriteBatchJNI.Put(self, keySlice, valueSlice);
     }
 
 
     public void delete(byte[] key) {
-        DB.checkArgNotNull(key, "key");
+        NativeDB.checkArgNotNull(key, "key");
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
             delete(keyBuffer);
@@ -104,10 +104,10 @@ public class WriteBatch extends NativeObject {
     }
 
     private void delete(NativeBuffer keyBuffer) {
-        delete(new Slice(keyBuffer));
+        delete(new NativeSlice(keyBuffer));
     }
 
-    private void delete(Slice keySlice) {
+    private void delete(NativeSlice keySlice) {
         assertAllocated();
         WriteBatchJNI.Delete(self, keySlice);
     }

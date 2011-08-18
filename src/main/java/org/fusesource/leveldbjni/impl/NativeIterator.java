@@ -7,10 +7,10 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.*;
-import static org.fusesource.hawtjni.runtime.FieldFlag.*;
+
 import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 import static org.fusesource.hawtjni.runtime.ArgFlag.*;
 import static org.fusesource.hawtjni.runtime.ClassFlag.*;
@@ -20,12 +20,12 @@ import static org.fusesource.hawtjni.runtime.ClassFlag.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class Iterator extends NativeObject {
+public class NativeIterator extends NativeObject {
 
     @JniClass(name="leveldb::Iterator", flags={CPP})
     private static class IteratorJNI {
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
         }
 
         @JniMethod(flags={CPP_DELETE})
@@ -51,7 +51,7 @@ public class Iterator extends NativeObject {
         @JniMethod(flags={CPP_METHOD})
         static final native void Seek(
                 long self,
-                @JniArg(flags={BY_VALUE, NO_OUT}) Slice target
+                @JniArg(flags={BY_VALUE, NO_OUT}) NativeSlice target
                 );
 
         @JniMethod(flags={CPP_METHOD})
@@ -80,7 +80,7 @@ public class Iterator extends NativeObject {
                 );
     }
 
-    Iterator(long self) {
+    NativeIterator(long self) {
         super(self);
     }
 
@@ -95,8 +95,8 @@ public class Iterator extends NativeObject {
         return IteratorJNI.Valid(self);
     }
 
-    private void checkStatus() throws DB.DBException {
-        DB.checkStatus(IteratorJNI.status(self));
+    private void checkStatus() throws NativeDB.DBException {
+        NativeDB.checkStatus(IteratorJNI.status(self));
     }
 
     public void seekToFirst() {
@@ -109,8 +109,8 @@ public class Iterator extends NativeObject {
         IteratorJNI.SeekToLast(self);
     }
 
-    public void seek(byte[] key) throws DB.DBException {
-        DB.checkArgNotNull(key, "key");
+    public void seek(byte[] key) throws NativeDB.DBException {
+        NativeDB.checkArgNotNull(key, "key");
         NativeBuffer keyBuffer = new NativeBuffer(key);
         try {
             seek(keyBuffer);
@@ -119,51 +119,51 @@ public class Iterator extends NativeObject {
         }
     }
 
-    private void seek(NativeBuffer keyBuffer) throws DB.DBException {
-        seek(new Slice(keyBuffer));
+    private void seek(NativeBuffer keyBuffer) throws NativeDB.DBException {
+        seek(new NativeSlice(keyBuffer));
     }
 
-    private void seek(Slice keySlice) throws DB.DBException {
+    private void seek(NativeSlice keySlice) throws NativeDB.DBException {
         assertAllocated();
         IteratorJNI.Seek(self, keySlice);
         checkStatus();
     }
 
-    public void next() throws DB.DBException {
+    public void next() throws NativeDB.DBException {
         assertAllocated();
         IteratorJNI.Next(self);
         checkStatus();
     }
 
-    public void prev() throws DB.DBException {
+    public void prev() throws NativeDB.DBException {
         assertAllocated();
         IteratorJNI.Prev(self);
         checkStatus();
     }
 
-    public byte[] key() throws DB.DBException {
+    public byte[] key() throws NativeDB.DBException {
         assertAllocated();
         long slice_ptr = IteratorJNI.key(self);
         checkStatus();
         try {
-            Slice slice = new Slice();
+            NativeSlice slice = new NativeSlice();
             slice.read(slice_ptr, 0);
             return slice.toByteArray();
         } finally {
-            Slice.SliceJNI.delete(slice_ptr);
+            NativeSlice.SliceJNI.delete(slice_ptr);
         }
     }
 
-    public byte[] value() throws DB.DBException {
+    public byte[] value() throws NativeDB.DBException {
         assertAllocated();
         long slice_ptr = IteratorJNI.value(self);
         checkStatus();
         try {
-            Slice slice = new Slice();
+            NativeSlice slice = new NativeSlice();
             slice.read(slice_ptr, 0);
             return slice.toByteArray();
         } finally {
-            Slice.SliceJNI.delete(slice_ptr);
+            NativeSlice.SliceJNI.delete(slice_ptr);
         }
     }
 }

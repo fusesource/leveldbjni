@@ -10,17 +10,16 @@
 package org.fusesource.leveldbjni.test;
 
 import junit.framework.TestCase;
-import org.fusesource.leveldbjni.*;
+import org.fusesource.leveldbjni.JniDBFactory;
+import org.iq80.leveldb.api.*;
 import org.junit.Test;
 
-import javax.swing.text.html.Option;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.Comparator;
-import java.util.Iterator;
 
-import static org.fusesource.leveldbjni.DB.*;
+import static org.fusesource.leveldbjni.JniDBFactory.asString;
+import static org.fusesource.leveldbjni.JniDBFactory.bytes;
 
 /**
  * A Unit test for the DB class implementation.
@@ -28,10 +27,11 @@ import static org.fusesource.leveldbjni.DB.*;
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 public class DBTest extends TestCase {
+    DBFactory factory = JniDBFactory.factory;
 
     File getTestDirectory(String name) throws IOException {
         File rc = new File(new File("test-data"), name);
-        DB.destroy(rc, new Options().createIfMissing(true));
+        factory.destroy(rc, new Options().setCreateIfMissing(true));
         rc.mkdirs();
         return rc;
     }
@@ -39,78 +39,68 @@ public class DBTest extends TestCase {
     @Test
     public void testOpen() throws IOException {
 
-        Options options = new Options().createIfMissing(true);
+        Options options = new Options().setCreateIfMissing(true);
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
+        DB db = factory.open(path, options);
 
-        db.delete();
+        db.close();
 
         // Try again.. this time we expect a failure since it exists.
-        options = new Options().errorIfExists(true);
+        options = new Options().setErrorIfExists(true);
         try {
-            DB.open(options, path);
+            factory.open(path, options);
             fail("Expected exception.");
-        } catch (DB.DBException e) {
+        } catch (IOException e) {
         }
 
     }
 
     @Test
-    public void testRepair() throws IOException {
-
+    public void testRepair() throws IOException, org.iq80.leveldb.api.DBException {
         testCRUD();
-        DB.repair(new File(new File("test-data"), getName()), new Options());
-
+        factory.repair(new File(new File("test-data"), getName()), new Options());
     }
 
     @Test
-    public void testCRUD() throws IOException {
+    public void testCRUD() throws IOException, org.iq80.leveldb.api.DBException {
 
-        Options options = new Options().createIfMissing(true);
+        Options options = new Options().setCreateIfMissing(true);
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
+        DB db = factory.open(path, options);
 
-        WriteOptions wo = new WriteOptions().sync(false);
-        ReadOptions ro = new ReadOptions().fillCache(true).verifyChecksums(true);
+        WriteOptions wo = new WriteOptions().setSync(false);
+        ReadOptions ro = new ReadOptions().setFillCache(true).setVerifyChecksums(true);
 
+        db.put(bytes("Tampa"), bytes("green"));
+        db.put(bytes("London"), bytes("red"));
+        db.put(bytes("New York"), bytes("blue"));
 
-        db.put(wo, bytes("Tampa"), bytes("green"));
-        db.put(wo, bytes("London"), bytes("red"));
-        db.put(wo, bytes("New York"), bytes("blue"));
+        assertEquals(db.get(bytes("Tampa"), ro), bytes("green"));
+        assertEquals(db.get(bytes("London"), ro), bytes("red"));
+        assertEquals(db.get(bytes("New York"), ro), bytes("blue"));
 
-        assertEquals(db.get(ro, bytes("Tampa")), bytes("green"));
-        assertEquals(db.get(ro, bytes("London")), bytes("red"));
-        assertEquals(db.get(ro, bytes("New York")), bytes("blue"));
-
-        db.delete(wo, bytes("New York"));
-        try {
-            db.get(ro, bytes("New York"));
-            fail("Expecting exception");
-        } catch (DB.DBException e) {
-        }
+        db.delete(bytes("New York"), wo);
+        assertNull(db.get(bytes("New York"), ro));
 
         // leveldb does not consider deleting something that does not exist an error.
-        db.delete(wo, bytes("New York"));
+        db.delete(bytes("New York"), wo);
 
-        db.delete();
+        db.close();
     }
 
     @Test
-    public void testIterator() throws IOException {
+    public void testIterator() throws IOException, org.iq80.leveldb.api.DBException {
 
-        Options options = new Options().createIfMissing(true);
+        Options options = new Options().setCreateIfMissing(true);
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
+        DB db = factory.open(path, options);
 
-        WriteOptions wo = new WriteOptions();
-        ReadOptions ro = new ReadOptions();
-
-        db.put(wo, bytes("Tampa"), bytes("green"));
-        db.put(wo, bytes("London"), bytes("red"));
-        db.put(wo, bytes("New York"), bytes("blue"));
+        db.put(bytes("Tampa"), bytes("green"));
+        db.put(bytes("London"), bytes("red"));
+        db.put(bytes("New York"), bytes("blue"));
 
         ArrayList<String> expecting = new ArrayList<String>();
         expecting.add("London");
@@ -119,71 +109,64 @@ public class DBTest extends TestCase {
 
         ArrayList<String> actual = new ArrayList<String>();
 
-        org.fusesource.leveldbjni.Iterator iterator = db.iterator(ro);
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            actual.add(asString(iterator.key()));
+        DBIterator iterator = db.iterator();
+        for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
+            actual.add(asString(iterator.peekNext().getKey()));
         }
-        iterator.delete();
+        iterator.close();
         assertEquals(expecting, actual);
 
-        db.delete();
+        db.close();
     }
 
     @Test
-    public void testSnapshot() throws IOException {
+    public void testSnapshot() throws IOException, org.iq80.leveldb.api.DBException {
 
-        Options options = new Options().createIfMissing(true);
+        Options options = new Options().setCreateIfMissing(true);
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
+        DB db = factory.open(path, options);
 
-        WriteOptions wo = new WriteOptions().sync(false);
+        db.put(bytes("Tampa"), bytes("green"));
+        db.put(bytes("London"), bytes("red"));
 
-        db.put(wo, bytes("Tampa"), bytes("green"));
-        db.put(wo, bytes("London"), bytes("red"));
+        ReadOptions ro = new ReadOptions().setSnapshot(db.getSnapshot());
 
-        ReadOptions ro = new ReadOptions().snapshot(db.getSnapshot());
+        db.put(bytes("New York"), bytes("blue"));
 
-        db.put(wo, bytes("New York"), bytes("blue"));
-
-        assertEquals(db.get(ro, bytes("Tampa")), bytes("green"));
-        assertEquals(db.get(ro, bytes("London")), bytes("red"));
+        assertEquals(db.get(bytes("Tampa"), ro), bytes("green"));
+        assertEquals(db.get(bytes("London"), ro), bytes("red"));
 
         // Should not be able to get "New York" since it was added
         // after the snapshot
-        try {
-            db.get(ro, bytes("New York"));
-            fail("Expecting exception");
-        } catch (DB.DBException e) {
-        }
+        assertNull(db.get(bytes("New York"), ro));
 
-        db.releaseSnapshot(ro.snapshot());
+        ro.getSnapshot().close();
 
         // Now try again without the snapshot..
-        ro.snapshot(null);
-        assertEquals(db.get(ro, bytes("New York")), bytes("blue"));
+        ro.setSnapshot(null);
+        assertEquals(db.get(bytes("New York"), ro), bytes("blue"));
 
-        db.delete();
+        db.close();
     }
 
     @Test
-    public void testWriteBatch() throws IOException {
+    public void testWriteBatch() throws IOException, org.iq80.leveldb.api.DBException {
 
-        Options options = new Options().createIfMissing(true);
+        Options options = new Options().setCreateIfMissing(true);
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
-        WriteOptions wo = new WriteOptions().sync(false);
+        DB db = factory.open(path, options);
 
-        db.put(wo, bytes("NA"), bytes("Na"));
+        db.put(bytes("NA"), bytes("Na"));
 
-        WriteBatch batch = new WriteBatch();
+        WriteBatch batch = db.createWriteBatch();
         batch.delete(bytes("NA"));
         batch.put(bytes("Tampa"), bytes("green"));
         batch.put(bytes("London"), bytes("red"));
         batch.put(bytes("New York"), bytes("blue"));
-        db.write(wo, batch);
-        batch.delete();
+        db.write(batch);
+        batch.close();
 
         ArrayList<String> expecting = new ArrayList<String>();
         expecting.add("London");
@@ -192,23 +175,22 @@ public class DBTest extends TestCase {
 
         ArrayList<String> actual = new ArrayList<String>();
 
-        org.fusesource.leveldbjni.Iterator iterator = db.iterator(new ReadOptions());
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            actual.add(asString(iterator.key()));
+        DBIterator iterator = db.iterator();
+        for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
+            actual.add(asString(iterator.peekNext().getKey()));
         }
-        iterator.delete();
+        iterator.close();
         assertEquals(expecting, actual);
 
-        db.delete();
+        db.close();
     }
 
     @Test
-    public void testApproximateSizes() throws IOException {
-        Options options = new Options().createIfMissing(true);
+    public void testApproximateSizes() throws IOException, org.iq80.leveldb.api.DBException {
+        Options options = new Options().setCreateIfMissing(true);
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
-        WriteOptions wo = new WriteOptions().sync(false);
+        DB db = factory.open(path, options);
 
         Random r = new Random(0);
         String data="";
@@ -216,7 +198,7 @@ public class DBTest extends TestCase {
             data+= 'a'+r.nextInt(26);
         }
         for(int i=0; i < 5*1024; i++) {
-            db.put(wo, bytes("row"+i), bytes(data));
+            db.put(bytes("row"+i), bytes(data));
         }
 
         long[] approximateSizes = db.getApproximateSizes(new Range(bytes("row"), bytes("s")));
@@ -224,16 +206,15 @@ public class DBTest extends TestCase {
         assertEquals(1, approximateSizes.length);
         assertTrue("Wrong size", approximateSizes[0] > 0);
 
-        db.delete();
+        db.close();
     }
 
     @Test
-    public void testGetProperty() throws IOException {
-        Options options = new Options().createIfMissing(true);
+    public void testGetProperty() throws IOException, org.iq80.leveldb.api.DBException {
+        Options options = new Options().setCreateIfMissing(true);
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
-        WriteOptions wo = new WriteOptions().sync(false);
+        DB db = factory.open(path, options);
 
         Random r = new Random(0);
         String data="";
@@ -241,108 +222,118 @@ public class DBTest extends TestCase {
             data+= 'a'+r.nextInt(26);
         }
         for(int i=0; i < 5*1024; i++) {
-            db.put(wo, bytes("row"+i), bytes(data));
+            db.put(bytes("row"+i), bytes(data));
         }
 
         String stats = db.getProperty("leveldb.stats");
         assertNotNull(stats);
         assertTrue(stats.contains("Compactions"));
 
-        db.delete();
+        db.close();
     }
 
     @Test
-    public void testCustomComparator1() throws IOException {
-        Options options = new Options().createIfMissing(true);
-        options.comparator(new org.fusesource.leveldbjni.Comparator(){
-            @Override
+    public void testCustomComparator1() throws IOException, org.iq80.leveldb.api.DBException {
+        Options options = new Options().setCreateIfMissing(true);
+        options.setComparator(new DBComparator() {
+
             public int compare(byte[] key1, byte[] key2) {
                 return new String(key1).compareTo(new String(key2));
             }
 
-            @Override
             public String name() {
                 return getName();
+            }
+
+            public byte[] findShortestSeparator(byte[] start, byte[] limit) {
+                return start;
+            }
+
+            public byte[] findShortSuccessor(byte[] key) {
+                return key;
             }
         });
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
-        WriteOptions wo = new WriteOptions().sync(false);
+        DB db = factory.open(path, options);
 
         ArrayList<String> expecting = new ArrayList<String>();
         for(int i=0; i < 26; i++) {
             String t = ""+ ((char) ('a' + i));
             expecting.add(t);
-            db.put(wo, bytes(t), bytes(t));
+            db.put(bytes(t), bytes(t));
         }
 
         ArrayList<String> actual = new ArrayList<String>();
 
-        org.fusesource.leveldbjni.Iterator iterator = db.iterator(new ReadOptions());
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            actual.add(asString(iterator.key()));
+        DBIterator iterator = db.iterator();
+        for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
+            actual.add(asString(iterator.peekNext().getKey()));
         }
-        iterator.delete();
+        iterator.close();
         assertEquals(expecting, actual);
 
 
-        db.delete();
+        db.close();
     }
 
     @Test
-    public void testCustomComparator2() throws IOException {
-        Options options = new Options().createIfMissing(true);
-        options.comparator(new org.fusesource.leveldbjni.Comparator(){
-            @Override
+    public void testCustomComparator2() throws IOException, org.iq80.leveldb.api.DBException {
+        Options options = new Options().setCreateIfMissing(true);
+        options.setComparator(new DBComparator() {
+
             public int compare(byte[] key1, byte[] key2) {
                 return new String(key1).compareTo(new String(key2)) * -1;
             }
 
-            @Override
             public String name() {
                 return getName();
+            }
+
+            public byte[] findShortestSeparator(byte[] start, byte[] limit) {
+                return start;
+            }
+
+            public byte[] findShortSuccessor(byte[] key) {
+                return key;
             }
         });
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
-        WriteOptions wo = new WriteOptions().sync(false);
+        DB db = factory.open(path, options);
 
         ArrayList<String> expecting = new ArrayList<String>();
         for(int i=0; i < 26; i++) {
             String t = ""+ ((char) ('a' + i));
             expecting.add(t);
-            db.put(wo, bytes(t), bytes(t));
+            db.put(bytes(t), bytes(t));
         }
         Collections.reverse(expecting);
 
         ArrayList<String> actual = new ArrayList<String>();
-        org.fusesource.leveldbjni.Iterator iterator = db.iterator(new ReadOptions());
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
-            actual.add(asString(iterator.key()));
+        DBIterator iterator = db.iterator();
+        for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
+            actual.add(asString(iterator.peekNext().getKey()));
         }
-        iterator.delete();
+        iterator.close();
         assertEquals(expecting, actual);
 
-        db.delete();
+        db.close();
     }
 
     @Test
-    public void testLogger() throws IOException, InterruptedException {
+    public void testLogger() throws IOException, InterruptedException, org.iq80.leveldb.api.DBException {
         final List<String> messages = Collections.synchronizedList(new ArrayList<String>());
 
-        Options options = new Options().createIfMissing(true);
-        options.infoLog(new Logger(){
-            @Override
+        Options options = new Options().setCreateIfMissing(true);
+        options.setLogger(new Logger() {
             public void log(String message) {
                 messages.add(message);
             }
         });
 
         File path = getTestDirectory(getName());
-        DB db = DB.open(options, path);
-        WriteOptions wo = new WriteOptions().sync(false);
+        DB db = factory.open(path, options);
 
         for( int j=0; j < 5; j++) {
             Random r = new Random(0);
@@ -351,12 +342,12 @@ public class DBTest extends TestCase {
                 data+= 'a'+r.nextInt(26);
             }
             for(int i=0; i < 5*1024; i++) {
-                db.put(wo, bytes("row"+i), bytes(data));
+                db.put(bytes("row"+i), bytes(data));
             }
             Thread.sleep(100);
         }
 
-        db.delete();
+        db.close();
 
         assertFalse(messages.isEmpty());
 

@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniClass;
@@ -29,13 +29,13 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public abstract class Logger extends NativeObject {
+public abstract class NativeLogger extends NativeObject {
 
     @JniClass(name="JNILogger", flags={STRUCT, CPP})
     static public class LoggerJNI {
 
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
             init();
         }
 
@@ -67,20 +67,20 @@ public abstract class Logger extends NativeObject {
 
     private long globalRef;
 
-    public Logger() {
+    public NativeLogger() {
         super(LoggerJNI.create());
         try {
-            globalRef = DB.DBJNI.NewGlobalRef(this);
+            globalRef = NativeDB.DBJNI.NewGlobalRef(this);
             if( globalRef==0 ) {
                 throw new RuntimeException("jni call failed: NewGlobalRef");
             }
-            long clz = DB.DBJNI.GetObjectClass(this);
+            long clz = NativeDB.DBJNI.GetObjectClass(this);
             if( clz==0 ) {
                 throw new RuntimeException("jni call failed: GetObjectClass");
             }
 
             LoggerJNI struct = new LoggerJNI();
-            struct.log_method = DB.DBJNI.GetMethodID(clz, "log", "(Ljava/lang/String;)V");
+            struct.log_method = NativeDB.DBJNI.GetMethodID(clz, "log", "(Ljava/lang/String;)V");
             if( struct.log_method ==0 ) {
                 throw new RuntimeException("jni call failed: GetMethodID");
             }
@@ -93,13 +93,13 @@ public abstract class Logger extends NativeObject {
         }
     }
 
-    Logger(long ptr) {
+    NativeLogger(long ptr) {
         super(ptr);
     }
 
     public void delete() {
         if( globalRef!=0 ) {
-            DB.DBJNI.DeleteGlobalRef(globalRef);
+            NativeDB.DBJNI.DeleteGlobalRef(globalRef);
             globalRef = 0;
         }
     }

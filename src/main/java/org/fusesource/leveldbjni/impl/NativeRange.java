@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.*;
 
@@ -23,13 +23,13 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class Range {
+public class NativeRange {
 
     @JniClass(name="leveldb::Range", flags={STRUCT, CPP})
     static public class RangeJNI {
 
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
             init();
         }
 
@@ -51,16 +51,16 @@ public class Range {
         static int SIZEOF;
 
         @JniField
-        Slice start = new Slice();
+        NativeSlice start = new NativeSlice();
         @JniField(flags={FIELD_SKIP})
         NativeBuffer start_buffer;
 
         @JniField
-        Slice limit = new Slice();
+        NativeSlice limit = new NativeSlice();
         @JniField(flags={FIELD_SKIP})
         NativeBuffer limit_buffer;
 
-        public RangeJNI(Range range) {
+        public RangeJNI(NativeRange range) {
             start_buffer = new NativeBuffer(range.start());
             start.set(start_buffer);
             try {
@@ -102,9 +102,9 @@ public class Range {
         return start;
     }
 
-    public Range(byte[] start, byte[] limit) {
-        DB.checkArgNotNull(start, "start");
-        DB.checkArgNotNull(limit, "limit");
+    public NativeRange(byte[] start, byte[] limit) {
+        NativeDB.checkArgNotNull(start, "start");
+        NativeDB.checkArgNotNull(limit, "limit");
         this.limit = limit;
         this.start = start;
     }

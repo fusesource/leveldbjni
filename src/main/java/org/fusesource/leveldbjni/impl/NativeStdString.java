@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.JniClass;
 import org.fusesource.hawtjni.runtime.JniMethod;
@@ -20,12 +20,12 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-class StdString extends NativeObject {
+class NativeStdString extends NativeObject {
 
     @JniClass(name="std::string", flags={CPP})
     private static class StdStringJNI {
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
         }
 
         @JniMethod(flags={CPP_NEW})
@@ -48,11 +48,11 @@ class StdString extends NativeObject {
 
     }
 
-    public StdString(long self) {
+    public NativeStdString(long self) {
         super(self);
     }
 
-    public StdString() {
+    public NativeStdString() {
         super(StdStringJNI.create());
     }
 

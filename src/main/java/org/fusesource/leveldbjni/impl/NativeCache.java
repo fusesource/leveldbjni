@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniClass;
@@ -21,12 +21,12 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CPP_DELETE;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class Cache extends NativeObject {
+public class NativeCache extends NativeObject {
 
     @JniClass(name="leveldb::Cache", flags={CPP})
     private static class CacheJNI {
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
         }
 
         @JniMethod(cast="leveldb::Cache *", accessor="leveldb::NewLRUCache")
@@ -37,7 +37,7 @@ public class Cache extends NativeObject {
         public static final native void delete(long self);
     }
 
-    public Cache(long capacity) {
+    public NativeCache(long capacity) {
         super(CacheJNI.NewLRUCache(capacity));
     }
 

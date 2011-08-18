@@ -7,17 +7,20 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 /**
- * Provides a java interface to the C++ leveldb::Snapshot class.
+ * Provides a java interface to the C++ leveldb::CompressionType enum.
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-public class Snapshot extends NativeObject {
+public enum NativeCompressionType {
+    kNoCompression(0x0), kSnappyCompression(0x1);
 
-    Snapshot(long self) {
-        super(self);
+    static final int t = kNoCompression.value;
+    final int value;
+
+    NativeCompressionType(int value) {
+        this.value = value;
     }
-
 }

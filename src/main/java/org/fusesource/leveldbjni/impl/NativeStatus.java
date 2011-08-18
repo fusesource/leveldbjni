@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.JniClass;
 import org.fusesource.hawtjni.runtime.JniMethod;
@@ -21,12 +21,12 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CPP_METHOD;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-class Status extends NativeObject{
+class NativeStatus extends NativeObject{
 
     @JniClass(name="leveldb::Status", flags={CPP})
     static class StatusJNI {
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
         }
 
         @JniMethod(flags={CPP_DELETE})
@@ -46,7 +46,7 @@ class Status extends NativeObject{
                 long self);
     }
 
-    public Status(long self) {
+    public NativeStatus(long self) {
         super(self);
     }
 
@@ -72,7 +72,7 @@ class Status extends NativeObject{
         if( strptr==0 ) {
             return null;
         } else {
-            StdString rc = new StdString(strptr);
+            NativeStdString rc = new NativeStdString(strptr);
             try {
                 return rc.toString();
             } finally {

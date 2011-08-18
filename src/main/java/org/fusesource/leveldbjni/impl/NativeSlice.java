@@ -7,7 +7,7 @@
  * CDDL license a copy of which has been included with this distribution
  * in the license.txt file.
  */
-package org.fusesource.leveldbjni;
+package org.fusesource.leveldbjni.impl;
 
 import org.fusesource.hawtjni.runtime.*;
 
@@ -24,12 +24,12 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.CPP_DELETE;
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
 @JniClass(name="leveldb::Slice", flags={STRUCT, CPP})
-class Slice {
+class NativeSlice {
 
     @JniClass(name="leveldb::Slice", flags={CPP})
     static class SliceJNI {
         static {
-            DB.LIBRARY.load();
+            NativeDB.LIBRARY.load();
             init();
         }
 
@@ -40,11 +40,11 @@ class Slice {
 
         public static final native void memmove (
                 @JniArg(cast="void *") long dest,
-                @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) Slice src,
+                @JniArg(cast="const void *", flags={NO_OUT, CRITICAL}) NativeSlice src,
                 @JniArg(cast="size_t") long size);
 
         public static final native void memmove (
-                @JniArg(cast="void *", flags={NO_IN, CRITICAL}) Slice dest,
+                @JniArg(cast="void *", flags={NO_IN, CRITICAL}) NativeSlice dest,
                 @JniArg(cast="const void *") long src,
                 @JniArg(cast="size_t") long size);
 
@@ -63,15 +63,15 @@ class Slice {
     @JniField(cast="size_t")
     private long size_;
 
-    public Slice() {
+    public NativeSlice() {
     }
 
-    public Slice(long data, long length) {
+    public NativeSlice(long data, long length) {
         this.data_ = data;
         this.size_ = length;
     }
 
-    public Slice(NativeBuffer buffer) {
+    public NativeSlice(NativeBuffer buffer) {
         this(buffer.pointer(), buffer.capacity());
     }
 
@@ -79,7 +79,7 @@ class Slice {
         return data_;
     }
 
-    public Slice data(long data) {
+    public NativeSlice data(long data) {
         this.data_ = data;
         return this;
     }
@@ -88,18 +88,18 @@ class Slice {
         return size_;
     }
 
-    public Slice size(long size) {
+    public NativeSlice size(long size) {
         this.size_ = size;
         return this;
     }
 
-    public Slice set(Slice buffer) {
+    public NativeSlice set(NativeSlice buffer) {
         this.size_ = buffer.size_;
         this.data_ = buffer.data_;
         return this;
     }
 
-    public Slice set(NativeBuffer buffer) {
+    public NativeSlice set(NativeBuffer buffer) {
         this.size_ = buffer.capacity();
         this.data_ = buffer.pointer();
         return this;
