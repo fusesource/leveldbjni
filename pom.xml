@@ -211,6 +211,15 @@
     </profile>
     
     <profile>
+      <id>all</id>
+      <modules>
+        <module>leveldbjni-osx</module>
+        <module>leveldbjni-linux32</module>
+        <module>leveldbjni-linux64</module>
+      </modules>
+    </profile>    
+
+    <profile>
       <id>mac</id>
       <activation>
         <os><family>mac</family></os>
@@ -222,13 +231,6 @@
     
     <profile>
       <id>linux32</id>
-      <activation>
-        <os><family>linux</family></os>
-        <property>
-          <name>sun.arch.data.model</name>
-          <value>32</value>
-        </property>
-      </activation>
       <modules>
         <module>leveldbjni-linux32</module>
       </modules>
@@ -236,13 +238,6 @@
 
     <profile>
       <id>linux64</id>
-      <activation>
-        <os><family>linux</family></os>
-        <property>
-          <name>sun.arch.data.model</name>
-          <value>64</value>
-        </property>
-      </activation>
       <modules>
         <module>leveldbjni-linux64</module>
       </modules>
