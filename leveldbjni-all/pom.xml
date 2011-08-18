@@ -22,7 +22,7 @@
   <version>1.1-SNAPSHOT</version>
   
   <name>${project.artifactId}</name>
-  <description>leveldbjni is a jni library for acessing leveldb.</description>
+  <description>An uber jar which contains all the leveldbjni platform libraries and dependencies</description>
       
   <dependencies>
     <dependency>
@@ -53,17 +53,6 @@
           <execution>
             <phase>package</phase>
             <goals><goal>uberize</goal></goals>
-            <!-- <configuration>
-              <artifactSet>
-                <includes>
-                  <include>org.fusesource.leveldbjni:leveldbjni</include>
-                  <include>org.fusesource.leveldbjni:leveldbjni:osx</include>
-                  <include>org.fusesource.leveldbjni:leveldbjni:linux32</include>
-                  <include>org.fusesource.leveldbjni:leveldbjni:linux64</include>
-                  <include>org.fusesource.hawtjni:hawtjni-runtime</include>
-                </includes>
-              </artifactSet>
-            </configuration> -->
           </execution>
         </executions>
       </plugin>
