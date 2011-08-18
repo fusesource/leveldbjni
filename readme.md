@@ -105,7 +105,7 @@ Recommended Package imports:
 Opening and closing the database.
 
     Options options = new Options();
-    options.setCreateIfMissing(true);
+    options.createIfMissing(true);
     DB db = factory.open(new File("example"), options);
     try {
       // Use the db in here....
@@ -152,7 +152,7 @@ Iterating key/values.
 Working against a Snapshot view of the Database.
 
     ReadOptions ro = new ReadOptions();
-    ro.setSnapshot(db.getSnapshot());
+    ro.snapshot(db.getSnapshot());
     try {
       
       // All read operations will now use the same 
@@ -162,7 +162,7 @@ Working against a Snapshot view of the Database.
 
     } finally {
       // Make sure you close the snapshot to avoid resource leaks.
-      ro.getSnapshot().close()
+      ro.snapshot().close()
     }
 
 Using a custom Comparator.
@@ -182,19 +182,19 @@ Using a custom Comparator.
         }
     };
     Options options = new Options();
-    options.setComparator(comparator);
+    options.comparator(comparator);
     DB db = factory.open(new File("example"), options);
     
 Disabling Compression
 
     Options options = new Options();
-    options.setCompressionType(CompressionType.NONE);
+    options.compressionType(CompressionType.NONE);
     DB db = factory.open(new File("example"), options);
 
 Configuring the Cache
     
     Options options = new Options();
-    options.setCacheSize(100 * 1048576); // 100MB cache
+    options.cacheSize(100 * 1048576); // 100MB cache
     DB db = factory.open(new File("example"), options);
 
 Getting approximate sizes.
@@ -215,7 +215,7 @@ Getting informational log messages.
       }
     };
     Options options = new Options();
-    options.setLogger(logger);
+    options.logger(logger);
     DB db = factory.open(new File("example"), options);
 
 Destroying a database.

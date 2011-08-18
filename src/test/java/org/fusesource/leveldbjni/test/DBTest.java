@@ -31,7 +31,7 @@ public class DBTest extends TestCase {
 
     File getTestDirectory(String name) throws IOException {
         File rc = new File(new File("test-data"), name);
-        factory.destroy(rc, new Options().setCreateIfMissing(true));
+        factory.destroy(rc, new Options().createIfMissing(true));
         rc.mkdirs();
         return rc;
     }
@@ -39,7 +39,7 @@ public class DBTest extends TestCase {
     @Test
     public void testOpen() throws IOException {
 
-        Options options = new Options().setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = factory.open(path, options);
@@ -47,7 +47,7 @@ public class DBTest extends TestCase {
         db.close();
 
         // Try again.. this time we expect a failure since it exists.
-        options = new Options().setErrorIfExists(true);
+        options = new Options().errorIfExists(true);
         try {
             factory.open(path, options);
             fail("Expected exception.");
@@ -65,13 +65,13 @@ public class DBTest extends TestCase {
     @Test
     public void testCRUD() throws IOException, DBException {
 
-        Options options = new Options().setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = factory.open(path, options);
 
-        WriteOptions wo = new WriteOptions().setSync(false);
-        ReadOptions ro = new ReadOptions().setFillCache(true).setVerifyChecksums(true);
+        WriteOptions wo = new WriteOptions().sync(false);
+        ReadOptions ro = new ReadOptions().fillCache(true).verifyChecksums(true);
 
         db.put(bytes("Tampa"), bytes("green"));
         db.put(bytes("London"), bytes("red"));
@@ -93,7 +93,7 @@ public class DBTest extends TestCase {
     @Test
     public void testIterator() throws IOException, DBException {
 
-        Options options = new Options().setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = factory.open(path, options);
@@ -122,7 +122,7 @@ public class DBTest extends TestCase {
     @Test
     public void testSnapshot() throws IOException, DBException {
 
-        Options options = new Options().setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = factory.open(path, options);
@@ -131,7 +131,7 @@ public class DBTest extends TestCase {
         db.put(bytes("London"), bytes("red"));
         db.delete(bytes("New York"));
 
-        ReadOptions ro = new ReadOptions().setSnapshot(db.getSnapshot());
+        ReadOptions ro = new ReadOptions().snapshot(db.getSnapshot());
 
         db.put(bytes("New York"), bytes("blue"));
 
@@ -142,10 +142,10 @@ public class DBTest extends TestCase {
         // after the snapshot
         assertNull(db.get(bytes("New York"), ro));
 
-        ro.getSnapshot().close();
+        ro.snapshot().close();
 
         // Now try again without the snapshot..
-        ro.setSnapshot(null);
+        ro.snapshot(null);
         assertEquals(db.get(bytes("New York"), ro), bytes("blue"));
 
         db.close();
@@ -154,7 +154,7 @@ public class DBTest extends TestCase {
     @Test
     public void testWriteBatch() throws IOException, DBException {
 
-        Options options = new Options().setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = factory.open(path, options);
@@ -188,7 +188,7 @@ public class DBTest extends TestCase {
 
     @Test
     public void testApproximateSizes() throws IOException, DBException {
-        Options options = new Options().setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = factory.open(path, options);
@@ -212,7 +212,7 @@ public class DBTest extends TestCase {
 
     @Test
     public void testGetProperty() throws IOException, DBException {
-        Options options = new Options().setCreateIfMissing(true);
+        Options options = new Options().createIfMissing(true);
 
         File path = getTestDirectory(getName());
         DB db = factory.open(path, options);
@@ -235,8 +235,8 @@ public class DBTest extends TestCase {
 
     @Test
     public void testCustomComparator1() throws IOException, DBException {
-        Options options = new Options().setCreateIfMissing(true);
-        options.setComparator(new DBComparator() {
+        Options options = new Options().createIfMissing(true);
+        options.comparator(new DBComparator() {
 
             public int compare(byte[] key1, byte[] key2) {
                 return new String(key1).compareTo(new String(key2));
@@ -280,8 +280,8 @@ public class DBTest extends TestCase {
 
     @Test
     public void testCustomComparator2() throws IOException, DBException {
-        Options options = new Options().setCreateIfMissing(true);
-        options.setComparator(new DBComparator() {
+        Options options = new Options().createIfMissing(true);
+        options.comparator(new DBComparator() {
 
             public int compare(byte[] key1, byte[] key2) {
                 return new String(key1).compareTo(new String(key2)) * -1;
@@ -326,8 +326,8 @@ public class DBTest extends TestCase {
     public void testLogger() throws IOException, InterruptedException, DBException {
         final List<String> messages = Collections.synchronizedList(new ArrayList<String>());
 
-        Options options = new Options().setCreateIfMissing(true);
-        options.setLogger(new Logger() {
+        Options options = new Options().createIfMissing(true);
+        options.logger(new Logger() {
             public void log(String message) {
                 messages.add(message);
             }

@@ -52,15 +52,15 @@ public class JniDBFactory implements DBFactory {
         NativeLogger logger=null;
         try {
             NativeOptions o = new NativeOptions();
-            o.blockRestartInterval(options.getBlockRestartInterval());
-            o.blockSize(options.getBlockSize());
-            o.createIfMissing(options.isCreateIfMissing());
-            o.errorIfExists(options.isErrorIfExists());
-            o.maxOpenFiles(options.getMaxOpenFiles());
-            o.paranoidChecks(options.isParanoidChecks());
-            o.writeBufferSize(options.getWriteBufferSize());
+            o.blockRestartInterval(options.blockRestartInterval());
+            o.blockSize(options.blockSize());
+            o.createIfMissing(options.createIfMissing());
+            o.errorIfExists(options.errorIfExists());
+            o.maxOpenFiles(options.maxOpenFiles());
+            o.paranoidChecks(options.paranoidChecks());
+            o.writeBufferSize(options.writeBufferSize());
 
-            switch(options.getCompressionType()) {
+            switch(options.compressionType()) {
                 case NONE:
                     o.compression(NativeCompressionType.kNoCompression);
                     break;
@@ -70,12 +70,12 @@ public class JniDBFactory implements DBFactory {
             }
 
 
-            if(options.getCacheSize()>0 ) {
-                cache = new NativeCache(options.getCacheSize());
+            if(options.cacheSize()>0 ) {
+                cache = new NativeCache(options.cacheSize());
                 o.cache(cache);
             }
 
-            final DBComparator userComparator = options.getComparator();
+            final DBComparator userComparator = options.comparator();
             if(userComparator!=null) {
                 comparator = new NativeComparator() {
                     @Override
@@ -91,7 +91,7 @@ public class JniDBFactory implements DBFactory {
                 o.comparator(comparator);
             }
 
-            final Logger userLogger = options.getLogger();
+            final Logger userLogger = options.logger();
             if(userLogger!=null) {
                 logger = new NativeLogger() {
                     @Override

@@ -129,10 +129,10 @@ public class JniDB implements DB {
             return null;
         }
         NativeReadOptions rc = new NativeReadOptions();
-        rc.fillCache(options.isFillCache());
-        rc.verifyChecksums(options.isVerifyChecksums());
-        if(options.getSnapshot()!=null) {
-            rc.snapshot(((JniSnapshot) options.getSnapshot()).snapshot());
+        rc.fillCache(options.fillCache());
+        rc.verifyChecksums(options.verifyChecksums());
+        if(options.snapshot()!=null) {
+            rc.snapshot(((JniSnapshot) options.snapshot()).snapshot());
         }
         return rc;
     }
@@ -142,8 +142,8 @@ public class JniDB implements DB {
             return null;
         }
         NativeWriteOptions rc = new NativeWriteOptions();
-        rc.sync(options.isSync());
-        if(options.isSnapshot()) {
+        rc.sync(options.sync());
+        if(options.snapshot()) {
             throw new UnsupportedOperationException("WriteOptions snapshot not supported");
         }
         return rc;
