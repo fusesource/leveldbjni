@@ -275,9 +275,6 @@
               </execution>
             </executions>        
             <configuration>
-              <downloadUrl><![CDATA[
-                http://repo.fusesource.com/nexus/service/local/artifact/maven/redirect?r=snapshots&g=${project.groupId}&a=${project.artifactId}&v=${project.version}&c=native-src&e=zip
-              ]]></downloadUrl>              
               <configureArgs>
                 <arg>--with-leveldb=${leveldb}</arg>
                 <arg>--with-snappy=${snappy}</arg>
