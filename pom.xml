@@ -211,11 +211,19 @@
     </profile>
     
     <profile>
-      <id>all</id>
+      <id>full</id>
       <modules>
         <module>leveldbjni-osx</module>
         <module>leveldbjni-linux32</module>
         <module>leveldbjni-linux64</module>
+        <module>leveldbjni-all</module>
+      </modules>
+    </profile>    
+
+    <profile>
+      <id>all</id>
+      <modules>
+        <module>leveldbjni-all</module>
       </modules>
     </profile>    
 

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2011, FuseSource Corp.  All rights reserved.
+
+      http://fusesource.com
+
+  The software in this package is published under the terms of the
+  CDDL license a copy of which has been included with this distribution
+  in the license.txt file.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.fusesource.leveldbjni</groupId>
+    <artifactId>leveldbjni-project</artifactId>
+    <version>1.1-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.fusesource.leveldbjni</groupId>
+  <artifactId>leveldbjni-all</artifactId>
+  <version>1.1-SNAPSHOT</version>
+  
+  <name>${project.artifactId}</name>
+  <description>leveldbjni is a jni library for acessing leveldb.</description>
+      
+  <dependencies>
+    <dependency>
+      <groupId>org.fusesource.leveldbjni</groupId>
+      <artifactId>leveldbjni-osx</artifactId>
+      <version>1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.fusesource.leveldbjni</groupId>
+      <artifactId>leveldbjni-linux32</artifactId>
+      <version>1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.fusesource.leveldbjni</groupId>
+      <artifactId>leveldbjni-linux64</artifactId>
+      <version>1.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+     
+    <plugins>
+      <plugin>
+        <groupId>org.fusesource.mvnplugins</groupId>
+        <artifactId>maven-uberize-plugin</artifactId>
+        <version>1.15</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals><goal>uberize</goal></goals>
+            <!-- <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.fusesource.leveldbjni:leveldbjni</include>
+                  <include>org.fusesource.leveldbjni:leveldbjni:osx</include>
+                  <include>org.fusesource.leveldbjni:leveldbjni:linux32</include>
+                  <include>org.fusesource.leveldbjni:leveldbjni:linux64</include>
+                  <include>org.fusesource.hawtjni:hawtjni-runtime</include>
+                </includes>
+              </artifactSet>
+            </configuration> -->
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

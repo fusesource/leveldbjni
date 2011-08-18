@@ -37,6 +37,14 @@
      
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <classesDirectory>${basedir}/target/generated-sources/hawtjni/lib</classesDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.fusesource.hawtjni</groupId>
         <artifactId>maven-hawtjni-plugin</artifactId>
         <version>${hawtjni-version}</version>
