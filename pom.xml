@@ -29,7 +29,8 @@
     <forge-project-id>leveldbjni</forge-project-id>
     <forge-project-id-uc>LEVELDBJNI</forge-project-id-uc>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hawtjni-version>1.4-SNAPSHOT</hawtjni-version>
+    <hawtjni-version>1.4</hawtjni-version>
+    <leveldb-api-version>0.1-SNAPSHOT</leveldb-api-version>
   </properties>
   
   <modules>
