@@ -201,6 +201,13 @@
           <name>FuseSource Community Snapshot Repository</name>
           <url>http://repo.fusesource.com/nexus/content/groups/public-snapshots</url>
         </repository>
+        <repository>
+          <id>sonatype-nexus-snapshots</id>
+          <name>Sonatype Nexus Snapshots</name>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
