@@ -50,7 +50,7 @@ import static org.fusesource.hawtjni.runtime.MethodFlag.*;
  */
 public class NativeDB extends NativeObject {
 
-    static final Library LIBRARY = new Library("leveldbjni", NativeDB.class);
+    public static final Library LIBRARY = new Library("leveldbjni", NativeDB.class);
 
     @JniClass(name="leveldb::DB", flags={CPP})
     static class DBJNI {

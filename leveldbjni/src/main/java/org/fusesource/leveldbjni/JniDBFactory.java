@@ -44,6 +44,9 @@ import java.io.UnsupportedEncodingException;
 public class JniDBFactory implements DBFactory {
 
     public static final JniDBFactory factory = new JniDBFactory();
+    static {
+        NativeDB.LIBRARY.load();
+    }
 
     public static byte[] bytes(String value) {
         if( value == null) {
