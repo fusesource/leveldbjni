@@ -121,7 +121,7 @@ class NativeBuffer extends NativeObject {
         super(NativeBufferJNI.malloc(length));
         this.capacity = length;
         this.retained = new AtomicInteger(1);
-        write(0, data, 0, length);
+        write(0, data, offset, length);
     }
 
     private NativeBuffer(NativeBuffer other, long offset, long capacity) {
