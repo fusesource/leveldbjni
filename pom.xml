@@ -36,7 +36,7 @@
   <parent>
     <groupId>org.fusesource</groupId>
     <artifactId>fusesource-pom</artifactId>
-    <version>1.8</version>
+    <version>1.9</version>
   </parent>
 
   <groupId>org.fusesource.leveldbjni</groupId>
@@ -45,14 +45,14 @@
   <packaging>pom</packaging>
   
   <name>${project.artifactId}</name>
-  <description>leveldbjni is a jni library for acessing leveldb.</description>
+  <description>leveldbjni is a jni library for accessing leveldb.</description>
   
   <properties>
     <forge-project-id>leveldbjni</forge-project-id>
     <forge-project-id-uc>LEVELDBJNI</forge-project-id-uc>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hawtjni-version>1.4</hawtjni-version>
-    <leveldb-api-version>0.1-SNAPSHOT</leveldb-api-version>
+    <leveldb-api-version>0.1</leveldb-api-version>
   </properties>
   
   <modules>
@@ -224,10 +224,10 @@
           <url>http://repo.fusesource.com/nexus/content/groups/public-snapshots</url>
         </repository>
         <repository>
-          <id>sonatype-nexus-snapshots</id>
-          <name>Sonatype Nexus Snapshots</name>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-          <releases><enabled>false</enabled></releases>
+          <id>sonatype-nexus</id>
+          <name>Sonatype Nexus</name>
+          <url>https://oss.sonatype.org/content/repositories/public</url>
+          <releases><enabled>true</enabled></releases>
           <snapshots><enabled>true</enabled></snapshots>
         </repository>
       </repositories>
