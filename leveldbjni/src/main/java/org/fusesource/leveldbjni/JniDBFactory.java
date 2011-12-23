@@ -34,9 +34,8 @@ package org.fusesource.leveldbjni;
 import org.fusesource.leveldbjni.internal.*;
 import org.iq80.leveldb.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.URL;
 
 /**
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
@@ -46,6 +45,22 @@ public class JniDBFactory implements DBFactory {
     public static final JniDBFactory factory = new JniDBFactory();
     static {
         NativeDB.LIBRARY.load();
+    }
+
+    public static final String VERSION;
+    static {
+        String v="unknown";
+        InputStream is = JniDBFactory.class.getResourceAsStream("version.txt");
+        try {
+            v = new BufferedReader(new InputStreamReader(is, "UTF-8")).readLine();
+        } catch (Throwable e) {
+        } finally {
+            try {
+                is.close();
+            } catch (Throwable e) {
+            }
+        }
+        VERSION = v;
     }
 
     public static byte[] bytes(String value) {
@@ -178,6 +193,11 @@ public class JniDBFactory implements DBFactory {
         } finally {
             holder.close();
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("leveldbjni version %s", VERSION);
     }
 
 }
