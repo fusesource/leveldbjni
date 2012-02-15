@@ -199,7 +199,7 @@ Patch and Compile the leveldb project.  This produces a static library.
     export LIBRARY_PATH=`cd ../snappy-1.0.3; pwd`
     export C_INCLUDE_PATH=${LIBRARY_PATH}
     export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
-    patch -p 0 < ../leveldbjni/leveldb.patch
+    git apply ../leveldbjni/leveldb.patch
     make
 
 Now use maven to build the leveldbjni project.    
@@ -211,7 +211,7 @@ Replace ${platform} with one of the following platform identifiers (depending on
 
 * linux32
 * linux64
-* osx
+* mac
 
 ### Build Results
 

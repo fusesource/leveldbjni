@@ -1,8 +1,21 @@
-Index: include/leveldb/slice.h
-===================================================================
---- include/leveldb/slice.h	(revision 47)
-+++ include/leveldb/slice.h	(working copy)
-@@ -77,7 +77,6 @@
+diff --git a/build_detect_platform b/build_detect_platform
+index d8d9ba1..a71f692 100644
+--- a/build_detect_platform
++++ b/build_detect_platform
+@@ -26,7 +26,7 @@ case `uname -s` in
+         ;;
+     Linux)
+         PLATFORM=OS_LINUX
+-        echo "PLATFORM_CFLAGS=-pthread -DOS_LINUX" >> build_config.mk
++        echo "PLATFORM_CFLAGS=-pthread -fPIC -DOS_LINUX" >> build_config.mk
+         echo "PLATFORM_LDFLAGS=-pthread"  >> build_config.mk
+         ;;
+     SunOS)
+diff --git a/include/leveldb/slice.h b/include/leveldb/slice.h
+index 74ea8fa..135bbd7 100644
+--- a/include/leveldb/slice.h
++++ b/include/leveldb/slice.h
+@@ -77,7 +77,6 @@ class Slice {
              (memcmp(data_, x.data_, x.size_) == 0));
    }
  
@@ -10,16 +23,3 @@ Index: include/leveldb/slice.h
    const char* data_;
    size_t size_;
  
-Index: build_detect_platform
-===================================================================
---- build_detect_platform	(revision 47)
-+++ build_detect_platform	(working copy)
-@@ -22,7 +22,7 @@
-         ;;
-     Linux)
-         PLATFORM=OS_LINUX
--        echo "PLATFORM_CFLAGS=-pthread -DOS_LINUX" >> build_config.mk
-+        echo "PLATFORM_CFLAGS=-pthread -fPIC -DOS_LINUX" >> build_config.mk
-         echo "PLATFORM_LDFLAGS=-lpthread"  >> build_config.mk
-         ;;
-     SunOS)
