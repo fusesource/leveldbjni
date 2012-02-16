@@ -24,7 +24,7 @@ You just nee to add the following repositories and dependencies to your Maven po
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
         <artifactId>leveldbjni-all</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
       </dependency>
     </dependencies>
 
