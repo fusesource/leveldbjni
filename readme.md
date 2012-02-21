@@ -74,8 +74,8 @@ Iterating key/values.
     DBIterator iterator = db.iterator();
     try {
       for(iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
-        String key = asString(iterator.peakNext().getKey());
-        String value = asString(iterator.peakNext().getValue());
+        String key = asString(iterator.peekNext().getKey());
+        String value = asString(iterator.peekNext().getValue());
         System.out.println(key+" = "+value);
       }
     } finally {
