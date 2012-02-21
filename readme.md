@@ -96,7 +96,7 @@ Working against a Snapshot view of the Database.
 
     } finally {
       // Make sure you close the snapshot to avoid resource leaks.
-      ro.snapshot().close()
+      ro.snapshot().close();
     }
 
 Using a custom Comparator.
