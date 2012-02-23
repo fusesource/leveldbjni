@@ -46,6 +46,20 @@
   <name>${project.artifactId}</name>
   <description>The leveldbjni OS X universal native libraries</description>
 
+   <distributionManagement>
+     <repository>
+       <uniqueVersion>false</uniqueVersion>
+       <id>nexus.reportgrid.com</id>
+       <name>RG Nexus</name>
+       <url>http://nexus.reportgrid.com/content/repositories/releases</url>
+     </repository>
+     <snapshotRepository>
+       <uniqueVersion>false</uniqueVersion>
+       <id>nexus.reportgrid.com</id>
+       <name>RG Nexus</name>
+       <url>http://nexus.reportgrid.com/content/repositories/snapshots</url>
+     </snapshotRepository>
+   </distributionManagement>
   <dependencies>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
