@@ -32,12 +32,16 @@
 package org.fusesource.leveldbjni.test;
 
 import junit.framework.TestCase;
+import org.fusesource.leveldbjni.DataWidth;
 import org.fusesource.leveldbjni.JniDBFactory;
+import org.fusesource.leveldbjni.KeyValueChunk;
+import org.fusesource.leveldbjni.internal.JniDBIterator;
 import org.iq80.leveldb.*;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import static org.fusesource.leveldbjni.JniDBFactory.asString;
@@ -135,6 +139,47 @@ public class DBTest extends TestCase {
         for (iterator.seekToFirst(); iterator.hasNext(); iterator.next()) {
             actual.add(asString(iterator.peekNext().getKey()));
         }
+        iterator.close();
+        assertEquals(expecting, actual);
+
+        db.close();
+    }
+
+    @Test
+    public void testChunk() throws IOException, DBException {
+
+        Options options = new Options().createIfMissing(true);
+
+        File path = getTestDirectory(getName());
+        DB db = factory.open(path, options);
+
+        db.put(bytes("Tampa"), bytes("green"));
+        db.put(bytes("London"), bytes("red"));
+        db.put(bytes("New York"), bytes("blue"));
+
+        ArrayList<String> expecting = new ArrayList<String>();
+        expecting.add("London");
+        expecting.add("New York");
+        expecting.add("Tampa");
+
+        ArrayList<String> actual = new ArrayList<String>();
+
+        DBIterator iterator = db.iterator();
+        iterator.seekToFirst();
+
+        ByteBuffer buffer = ByteBuffer.allocate(1000);
+        
+        KeyValueChunk chunk = ((JniDBIterator)iterator).nextChunk(buffer, DataWidth.VARIABLE, DataWidth.VARIABLE);
+
+        assertEquals(3, chunk.getSize());
+
+        Iterator<KeyValueChunk.KeyValuePair> chunkIterator = chunk.getIterator();
+
+        while (chunkIterator.hasNext()) {
+            KeyValueChunk.KeyValuePair pair = chunkIterator.next();
+            actual.add(asString(pair.getKey()));
+        }
+
         iterator.close();
         assertEquals(expecting, actual);
 
