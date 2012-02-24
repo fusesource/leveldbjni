@@ -31,6 +31,11 @@
  */
 package org.fusesource.leveldbjni.internal;
 
+import java.nio.ByteBuffer;
+
+import org.fusesource.leveldbjni.DataWidth;
+import org.fusesource.leveldbjni.KeyValueChunk;
+
 import org.fusesource.hawtjni.runtime.*;
 
 import static org.fusesource.hawtjni.runtime.MethodFlag.*;
@@ -100,6 +105,24 @@ public class NativeIterator extends NativeObject {
         static final native long status(
                 long self
                 );
+
+        @JniMethod(accessor="chunk_pairs")
+        static final native void nextChunk(
+                @JniArg(cast = "void *") long self,
+                ChunkMetadata meta,
+                int maxByteSize,
+                @JniArg(cast = "char *", flags={CRITICAL}) byte[] buffer,
+                boolean encodeKeys,
+                boolean encodeVals,
+                int keyWidth,
+                int valWidth
+                );
+    }
+
+    @JniClass(flags={STRUCT})
+    public static class ChunkMetadata {
+        public int byteLength;
+        public int pairLength;
     }
 
     NativeIterator(long self) {
@@ -155,6 +178,32 @@ public class NativeIterator extends NativeObject {
         assertAllocated();
         IteratorJNI.Next(self);
         checkStatus();
+    }
+
+    /**
+     * Consume the next chunk of key/value pairs into the specified buffer. The buffer will be cleared prior
+     * to the read, and on return will have position == 0, limit = total bytes read.
+     *
+     * @param buffer The buffer to read the chunk into
+     * @param keyWidth The encoding to use for key data
+     * @param valWidth The encoding to use for value data
+     */
+    public KeyValueChunk nextChunk(ByteBuffer buffer, DataWidth keyWidth, DataWidth valWidth) throws NativeDB.DBException {
+        assertAllocated();
+        ChunkMetadata meta = new ChunkMetadata();
+        buffer.clear();
+        IteratorJNI.nextChunk(self,
+                              meta,
+                              buffer.capacity(),
+                              buffer.array(),
+                              keyWidth.isRunLengthEncoded(),
+                              valWidth.isRunLengthEncoded(),
+                              keyWidth.getEncodingWidth(),
+                              valWidth.getEncodingWidth());
+        buffer.limit(meta.byteLength);
+        KeyValueChunk retVal = new KeyValueChunk(buffer, meta.pairLength, keyWidth, valWidth);
+        checkStatus();
+        return retVal;
     }
 
     public void prev() throws NativeDB.DBException {

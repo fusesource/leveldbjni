@@ -33,11 +33,16 @@ package org.fusesource.leveldbjni.internal;
 
 import org.fusesource.leveldbjni.internal.NativeDB;
 import org.fusesource.leveldbjni.internal.NativeIterator;
+import org.fusesource.leveldbjni.DataWidth;
+import org.fusesource.leveldbjni.KeyValueChunk;
+
 import org.iq80.leveldb.DBIterator;
 
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import java.nio.ByteBuffer;
 
 /**
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
@@ -102,6 +107,18 @@ public class JniDBIterator implements DBIterator {
             throw new RuntimeException(e);
         }
         return rc;
+    }
+
+    /**
+     * Retrieve the next chunk of key/value pairs into the given buffer, using
+     * the provided key/value encodings.
+     */
+    public KeyValueChunk nextChunk(ByteBuffer buffer, DataWidth keyWidth, DataWidth valWidth) {
+        try {
+            return iterator.nextChunk(buffer, keyWidth, valWidth);
+        } catch (NativeDB.DBException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean hasPrev() {

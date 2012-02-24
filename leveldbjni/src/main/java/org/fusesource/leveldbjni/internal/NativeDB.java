@@ -305,6 +305,7 @@ public class NativeDB extends NativeObject {
 
     public NativeIterator iterator(NativeReadOptions options) {
         checkArgNotNull(options, "options");
+        this.assertAllocated();
         return new NativeIterator(DBJNI.NewIterator(self, options));
     }
 
