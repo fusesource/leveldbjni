@@ -161,6 +161,15 @@ Repairing a database.
     
     Options options = new Options();
     factory.repair(new File("example"), options);
+
+Using a memory pool to make native memory allocations more efficient:
+
+    JniDBFactory.pushMemoryPool(1024 * 512);
+    try {
+        // .. work with the DB in here, 
+    } finally {
+        JniDBFactory.popMemoryPool();
+    }
     
 ## Building
 
