@@ -36,6 +36,7 @@ import org.iq80.leveldb.*;
 
 import java.io.*;
 import java.net.URL;
+import java.util.concurrent.Callable;
 
 /**
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
@@ -200,4 +201,12 @@ public class JniDBFactory implements DBFactory {
         return String.format("leveldbjni version %s", VERSION);
     }
 
+
+    public static void pushMemoryPool(int size) {
+        NativeBuffer.pushMemoryPool(size);
+    }
+
+    public static void popMemoryPool() {
+        NativeBuffer.popMemoryPool();
+    }
 }

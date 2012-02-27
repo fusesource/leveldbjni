@@ -133,7 +133,7 @@ public class NativeIterator extends NativeObject {
 
     public void seek(byte[] key) throws NativeDB.DBException {
         NativeDB.checkArgNotNull(key, "key");
-        NativeBuffer keyBuffer = new NativeBuffer(key);
+        NativeBuffer keyBuffer = NativeBuffer.create(key);
         try {
             seek(keyBuffer);
         } finally {

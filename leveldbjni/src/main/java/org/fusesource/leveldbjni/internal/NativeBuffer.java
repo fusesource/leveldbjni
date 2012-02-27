@@ -36,6 +36,7 @@ import org.fusesource.hawtjni.runtime.JniClass;
 import org.fusesource.hawtjni.runtime.JniMethod;
 import org.fusesource.hawtjni.runtime.PointerMath;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.fusesource.hawtjni.runtime.ArgFlag.*;
@@ -48,7 +49,7 @@ import static org.fusesource.hawtjni.runtime.ArgFlag.*;
  *
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
  */
-class NativeBuffer extends NativeObject {
+public class NativeBuffer extends NativeObject {
 
     @JniClass
     static class NativeBufferJNI {
@@ -92,43 +93,128 @@ class NativeBuffer extends NativeObject {
 
     }
 
+    private static class Allocation extends NativeObject {
+        private final AtomicInteger retained = new AtomicInteger(0);
+
+        private Allocation(long size) {
+            super(NativeBufferJNI.malloc(size));
+        }
+
+        void retain() {
+            assertAllocated();
+            retained.incrementAndGet();
+        }
+
+        void release() {
+            assertAllocated();
+            int r = retained.decrementAndGet();
+            if( r < 0 ) {
+                throw new Error("The object has already been deleted.");
+            } else if( r==0 ) {
+                NativeBufferJNI.free(self);
+            }
+            self = 0;
+        }
+    }
+
+    private static class Pool {
+        private final NativeBuffer.Pool prev;
+        Allocation allocation;
+        long pos;
+        long remaining;
+        int chunk;
+
+        public Pool(int chunk, Pool prev) {
+            this.chunk = chunk;
+            this.prev = prev;
+        }
+
+        NativeBuffer create(long size) {
+            if( size >= chunk ) {
+                Allocation allocation = new Allocation(size);
+                return new NativeBuffer(allocation, allocation.self, size);
+            }
+
+            if( remaining < size ) {
+                delete();
+            }
+
+            if( allocation == null ) {
+                allocate();
+            }
+
+            NativeBuffer rc = new NativeBuffer(allocation, pos, size);
+            pos = PointerMath.add(pos, size);
+            remaining -= size;
+            return rc;
+        }
+
+        private void allocate() {
+            allocation = new NativeBuffer.Allocation(chunk);
+            allocation.retain();
+            remaining = chunk;
+            pos = allocation.self;
+        }
+
+        public void delete() {
+            if( allocation!=null ) {
+                allocation.release();
+                allocation = null;
+            }
+        }
+    }
+
+    private final Allocation allocation;
     private final long capacity;
-    private final AtomicInteger retained;
 
-    public NativeBuffer(long capacity) {
-        super(NativeBufferJNI.malloc(capacity));
-        this.capacity = capacity;
-        this.retained = new AtomicInteger(1);
+    static final private ThreadLocal<Pool> CURRENT_POOL = new ThreadLocal<Pool>();
+
+    static public NativeBuffer create(long capacity) {
+        Pool pool = CURRENT_POOL.get();
+        if( pool == null ) {
+            Allocation allocation = new Allocation(capacity);
+            return new NativeBuffer(allocation, allocation.self, capacity);
+        } else {
+            return pool.create(capacity);
+        }
     }
 
-    public NativeBuffer(byte data[]) {
-        this(data, 0, data.length);
+
+    public static void pushMemoryPool(int size) {
+        Pool original = CURRENT_POOL.get();
+        Pool next = new Pool(size, original);
+        CURRENT_POOL.set(next);
     }
 
-    public NativeBuffer(String name) {
-        this(cbytes(name));
+    public static void popMemoryPool() {
+        Pool next = CURRENT_POOL.get();
+        next.delete();
+        if( next.prev == null ) {
+            CURRENT_POOL.remove();
+        } else {
+            CURRENT_POOL.set(next.prev);
+        }
     }
 
-    static byte[] cbytes(String strvalue) {
-        byte[] value = strvalue.getBytes();
-        // expand by 1 so we get a null at the end.
-        byte[] rc = new byte[value.length+1];
-        System.arraycopy(value, 0, rc, 0, value.length);
+    static public NativeBuffer create(byte[] data) {
+        return create(data, 0 , data.length);
+    }
+    
+    static public NativeBuffer create(String data) {
+        return create(cbytes(data));
+    }
+
+    static public NativeBuffer create(byte[] data, int offset, int length) {
+        NativeBuffer rc = create(length);
+        rc.write(0, data, offset, length);
         return rc;
     }
-
-    public NativeBuffer(byte data[], int offset, int length) {
-        super(NativeBufferJNI.malloc(length));
-        this.capacity = length;
-        this.retained = new AtomicInteger(1);
-        write(0, data, offset, length);
-    }
-
-    private NativeBuffer(NativeBuffer other, long offset, long capacity) {
-        super(PointerMath.add(other.self, offset));
-        this.retained = other.retained;
+    
+    private NativeBuffer(Allocation allocation, long self, long capacity) {
+        super(self);
         this.capacity = capacity;
-        retained.incrementAndGet();
+        this.allocation = allocation;
+        this.allocation.retain();
     }
 
     public NativeBuffer slice(long offset, long length) {
@@ -136,7 +222,15 @@ class NativeBuffer extends NativeObject {
         if( length < 0 ) throw new IllegalArgumentException("length cannot be negative");
         if( offset < 0 ) throw new IllegalArgumentException("offset cannot be negative");
         if( offset+length >= capacity) throw new ArrayIndexOutOfBoundsException("offset + length exceed the length of this buffer");
-        return new NativeBuffer(this, offset, length);
+        return new NativeBuffer(allocation, PointerMath.add(self, offset), length);
+    }
+    
+    static byte[] cbytes(String strvalue) {
+        byte[] value = strvalue.getBytes();
+        // expand by 1 so we get a null at the end.
+        byte[] rc = new byte[value.length+1];
+        System.arraycopy(value, 0, rc, 0, value.length);
+        return rc;
     }
 
     public NativeBuffer head(long length) {
@@ -149,14 +243,7 @@ class NativeBuffer extends NativeObject {
     }
 
     public void delete() {
-        assertAllocated();
-        int r = retained.decrementAndGet();
-        if( r < 0 ) {
-            throw new Error("The object has already been deleted.");
-        } else if( r==0 ) {
-            NativeBufferJNI.free(self);
-        }
-        self = 0;
+        allocation.release();
     }
 
     public long capacity() {

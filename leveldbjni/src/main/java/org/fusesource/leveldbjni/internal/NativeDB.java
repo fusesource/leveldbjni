@@ -220,9 +220,9 @@ public class NativeDB extends NativeObject {
         checkArgNotNull(options, "options");
         checkArgNotNull(key, "key");
         checkArgNotNull(value, "value");
-        NativeBuffer keyBuffer = new NativeBuffer(key);
+        NativeBuffer keyBuffer = NativeBuffer.create(key);
         try {
-            NativeBuffer valueBuffer = new NativeBuffer(value);
+            NativeBuffer valueBuffer = NativeBuffer.create(value);
             try {
                 put(options, keyBuffer, valueBuffer);
             } finally {
@@ -245,7 +245,7 @@ public class NativeDB extends NativeObject {
     public void delete(NativeWriteOptions options, byte[] key) throws DBException {
         checkArgNotNull(options, "options");
         checkArgNotNull(key, "key");
-        NativeBuffer keyBuffer = new NativeBuffer(key);
+        NativeBuffer keyBuffer = NativeBuffer.create(key);
         try {
             delete(options, keyBuffer);
         } finally {
@@ -271,7 +271,7 @@ public class NativeDB extends NativeObject {
     public byte[] get(NativeReadOptions options, byte[] key) throws DBException {
         checkArgNotNull(options, "options");
         checkArgNotNull(key, "key");
-        NativeBuffer keyBuffer = new NativeBuffer(key);
+        NativeBuffer keyBuffer = NativeBuffer.create(key);
         try {
             return get(options, keyBuffer);
         } finally {
@@ -337,7 +337,7 @@ public class NativeDB extends NativeObject {
 
     public String getProperty(String name) {
         checkArgNotNull(name, "name");
-        NativeBuffer keyBuffer = new NativeBuffer(name.getBytes());
+        NativeBuffer keyBuffer = NativeBuffer.create(name.getBytes());
         try {
             byte[] property = getProperty(keyBuffer);
             if( property==null ) {

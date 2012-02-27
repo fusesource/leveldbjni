@@ -137,7 +137,7 @@ class NativeSlice {
     }
     
     static NativeBuffer arrayCreate(int dimension) {
-        return new NativeBuffer(dimension*SliceJNI.SIZEOF);
+        return NativeBuffer.create(dimension*SliceJNI.SIZEOF);
     }
 
     void write(long buffer, int index) {

@@ -62,6 +62,21 @@
       <artifactId>leveldbjni-linux64</artifactId>
       <version>1.2-SNAPSHOT</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.iq80.leveldb</groupId>
+      <artifactId>leveldb</artifactId>
+      <version>${leveldb-version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.iq80.leveldb</groupId>
+      <artifactId>leveldb</artifactId>
+      <version>${leveldb-version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    
   </dependencies>
 
   <build>

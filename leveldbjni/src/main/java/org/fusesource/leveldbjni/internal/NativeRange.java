@@ -83,10 +83,10 @@ public class NativeRange {
         NativeBuffer limit_buffer;
 
         public RangeJNI(NativeRange range) {
-            start_buffer = new NativeBuffer(range.start());
+            start_buffer = NativeBuffer.create(range.start());
             start.set(start_buffer);
             try {
-                limit_buffer = new NativeBuffer(range.limit());
+                limit_buffer = NativeBuffer.create(range.limit());
             } catch (OutOfMemoryError e) {
                 start_buffer.delete();
                 throw e;
@@ -100,7 +100,7 @@ public class NativeRange {
         }
 
         static NativeBuffer arrayCreate(int dimension) {
-            return new NativeBuffer(dimension*SIZEOF);
+            return NativeBuffer.create(dimension*SIZEOF);
         }
 
         void arrayWrite(long buffer, int index) {

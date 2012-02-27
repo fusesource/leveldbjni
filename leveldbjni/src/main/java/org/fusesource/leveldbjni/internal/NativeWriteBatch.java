@@ -92,9 +92,9 @@ public class NativeWriteBatch extends NativeObject {
     public void put(byte[] key, byte[] value) {
         NativeDB.checkArgNotNull(key, "key");
         NativeDB.checkArgNotNull(value, "value");
-        NativeBuffer keyBuffer = new NativeBuffer(key);
+        NativeBuffer keyBuffer = NativeBuffer.create(key);
         try {
-            NativeBuffer valueBuffer = new NativeBuffer(value);
+            NativeBuffer valueBuffer = NativeBuffer.create(value);
             try {
                 put(keyBuffer, valueBuffer);
             } finally {
@@ -117,7 +117,7 @@ public class NativeWriteBatch extends NativeObject {
 
     public void delete(byte[] key) {
         NativeDB.checkArgNotNull(key, "key");
-        NativeBuffer keyBuffer = new NativeBuffer(key);
+        NativeBuffer keyBuffer = NativeBuffer.create(key);
         try {
             delete(keyBuffer);
         } finally {

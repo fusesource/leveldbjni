@@ -96,7 +96,7 @@ public abstract class NativeComparator extends NativeObject {
     public NativeComparator() {
         super(ComparatorJNI.create());
         try {
-            name_buffer = new NativeBuffer(name());
+            name_buffer = NativeBuffer.create(name());
             globalRef = NativeDB.DBJNI.NewGlobalRef(this);
             if( globalRef==0 ) {
                 throw new RuntimeException("jni call failed: NewGlobalRef");
