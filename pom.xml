@@ -53,7 +53,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hawtjni-version>1.5</hawtjni-version>
     <leveldb-api-version>0.2</leveldb-api-version>
-    <leveldb-version>0.3-SNAPSHOT</leveldb-version>
   </properties>
   
   <modules>
