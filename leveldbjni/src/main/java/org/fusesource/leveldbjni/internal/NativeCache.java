@@ -63,10 +63,8 @@ public class NativeCache extends NativeObject {
         super(CacheJNI.NewLRUCache(capacity));
     }
 
-    public void delete() {
-        assertAllocated();
+    protected void doRealDelete() {
         CacheJNI.delete(self);
-        self = 0;
     }
 
 }

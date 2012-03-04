@@ -78,10 +78,8 @@ class NativeStdString extends NativeObject {
         super(StdStringJNI.create());
     }
 
-    public void delete() {
-        assertAllocated();
+    protected void doRealDelete() {
         StdStringJNI.delete(self);
-        self = 0;
     }
 
     public String toString() {

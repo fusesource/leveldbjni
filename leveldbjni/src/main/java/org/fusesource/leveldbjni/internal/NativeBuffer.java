@@ -148,15 +148,13 @@ class NativeBuffer extends NativeObject {
         return slice(capacity-length, length);
     }
 
-    public void delete() {
-        assertAllocated();
+    protected void doRealDelete() {
         int r = retained.decrementAndGet();
         if( r < 0 ) {
             throw new Error("The object has already been deleted.");
         } else if( r==0 ) {
             NativeBufferJNI.free(self);
         }
-        self = 0;
     }
 
     public long capacity() {

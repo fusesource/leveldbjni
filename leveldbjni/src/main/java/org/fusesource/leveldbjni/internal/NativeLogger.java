@@ -119,7 +119,7 @@ public abstract class NativeLogger extends NativeObject {
         super(ptr);
     }
 
-    public void delete() {
+    protected void doRealDelete() {
         if( globalRef!=0 ) {
             NativeDB.DBJNI.DeleteGlobalRef(globalRef);
             globalRef = 0;
