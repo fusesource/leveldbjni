@@ -139,7 +139,7 @@ struct ChunkMetadata {
   int pairLength;
 };
 
-void chunk_pairs(void *iterPtr, struct ChunkMetadata* meta, int maxByteSize, char* buffer, int encodeKeys, int encodeVals, int keyWidth, int valWidth);
+int chunk_pairs(void *iterPtr, struct ChunkMetadata* meta, int maxByteSize, char* buffer, int encodeKeys, int encodeVals, int keyWidth, int valWidth);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -107,7 +107,7 @@ public class NativeIterator extends NativeObject {
                 );
 
         @JniMethod(accessor="chunk_pairs")
-        static final native void nextChunk(
+        static final native int nextChunk(
                 @JniArg(cast = "void *") long self,
                 ChunkMetadata meta,
                 int maxByteSize,
@@ -190,14 +190,25 @@ public class NativeIterator extends NativeObject {
         assertAllocated();
         ChunkMetadata meta = new ChunkMetadata();
         buffer.clear();
-        IteratorJNI.nextChunk(self,
-                              meta,
-                              buffer.capacity(),
-                              buffer.array(),
-                              keyWidth.isRunLengthEncoded(),
-                              valWidth.isRunLengthEncoded(),
-                              keyWidth.getEncodingWidth(),
-                              valWidth.getEncodingWidth());
+        int ret = IteratorJNI.nextChunk(self,
+                                        meta,
+                                        buffer.capacity(),
+                                        buffer.array(),
+                                        keyWidth.isRunLengthEncoded(),
+                                        valWidth.isRunLengthEncoded(),
+                                        keyWidth.getEncodingWidth(),
+                                        valWidth.getEncodingWidth());
+        
+        // Check for errors based on ret
+        switch (ret) {
+        case -1:
+            throw new NativeDB.DBException("Invalid metadata, chunk retrieval failed", false);
+        case -2:
+            throw new NativeDB.DBException("Invalid iterator, chunk retrieval failed", false);
+        case -3:
+            throw new NativeDB.DBException("Invalid buffer, chunk retrieval failed", false);
+        }
+
         buffer.limit(meta.byteLength);
         KeyValueChunk retVal = new KeyValueChunk(buffer, meta.pairLength, keyWidth, valWidth);
         checkStatus();
