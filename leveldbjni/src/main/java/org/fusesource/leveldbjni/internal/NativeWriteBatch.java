@@ -83,10 +83,8 @@ public class NativeWriteBatch extends NativeObject {
         super(WriteBatchJNI.create());
     }
 
-    public void delete() {
-        assertAllocated();
+    protected void doRealDelete() {
         WriteBatchJNI.delete(self);
-        self = 0;
     }
 
     public void put(byte[] key, byte[] value) {

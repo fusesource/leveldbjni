@@ -161,10 +161,8 @@ public class NativeDB extends NativeObject {
                 @JniArg(flags={BY_VALUE, NO_OUT}) NativeOptions options);
     }
 
-    public void delete() {
-        assertAllocated();
+    protected void doRealDelete() {
         DBJNI.delete(self);
-        self = 0;
     }
 
     private NativeDB(long self) {

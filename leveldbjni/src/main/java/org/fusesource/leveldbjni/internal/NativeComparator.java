@@ -123,7 +123,7 @@ public abstract class NativeComparator extends NativeObject {
 
     public static final NativeComparator BYTEWISE_COMPARATOR = new NativeComparator(ComparatorJNI.BYTEWISE_COMPARATOR) {
         @Override
-        public void delete() {
+        protected void doRealDelete() {
             // we won't really delete this one since it's static.
         }
         @Override
@@ -140,7 +140,7 @@ public abstract class NativeComparator extends NativeObject {
         super(ptr);
     }
 
-    public void delete() {
+    protected void doRealDelete() {
         if( name_buffer!=null ) {
             name_buffer.delete();
             name_buffer = null;

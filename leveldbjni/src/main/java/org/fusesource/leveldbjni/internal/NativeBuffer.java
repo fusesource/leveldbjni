@@ -97,7 +97,7 @@ public class NativeBuffer extends NativeObject {
         private final AtomicInteger retained = new AtomicInteger(0);
 
         private Allocation(long size) {
-            super(NativeBufferJNI.malloc(size));
+            super(NativeBufferJNI.malloc(size), false);
         }
 
         void retain() {
@@ -115,6 +115,8 @@ public class NativeBuffer extends NativeObject {
             }
             self = 0;
         }
+
+        protected void doRealDelete() {}; // All work is in release
     }
 
     private static class Pool {
@@ -242,7 +244,7 @@ public class NativeBuffer extends NativeObject {
         return slice(capacity-length, length);
     }
 
-    public void delete() {
+    protected void doRealDelete() {
         allocation.release();
     }
 

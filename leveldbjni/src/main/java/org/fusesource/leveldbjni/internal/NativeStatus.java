@@ -72,10 +72,8 @@ class NativeStatus extends NativeObject{
         super(self);
     }
 
-    public void delete() {
-        assertAllocated();
+    protected void doRealDelete() {
         StatusJNI.delete(self);
-        self = 0;
     }
 
     public boolean isOk() {

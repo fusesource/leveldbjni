@@ -129,10 +129,8 @@ public class NativeIterator extends NativeObject {
         super(self);
     }
 
-    public void delete() {
-        assertAllocated();
+    protected void doRealDelete() {
         IteratorJNI.delete(self);
-        self = 0;
     }
 
     public boolean isValid() {
