@@ -207,6 +207,8 @@ public class NativeIterator extends NativeObject {
             throw new NativeDB.DBException("Invalid iterator, chunk retrieval failed", false);
         case -3:
             throw new NativeDB.DBException("Invalid buffer, chunk retrieval failed", false);
+        case -4:
+            throw new NativeDB.DBException("Requested fixed-width chunk encoding, but key/value data has insufficient bytes", false);
         }
 
         buffer.limit(meta.byteLength);

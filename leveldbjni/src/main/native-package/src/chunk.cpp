@@ -2,7 +2,7 @@
 #include <jni.h>
 
 #include <iostream>
-#include <list>
+#include <algorithm>
 
 #include <arpa/inet.h>
 
@@ -46,35 +46,43 @@ extern "C" {
 
       ++count;
       
-      // Compact key and value onto the end of the buffer if they exist
-      if (ks.size() > 0) {
-        if (encodeKeys) {
-          *(int *)(buffer + usedBufferSize) = htonl(ks.size());
-          usedBufferSize += 4;
-        }
+      // Compact key and value onto the end of the buffer
+      if (encodeKeys) {
+        *(int *)(buffer + usedBufferSize) = htonl(ks.size());
+        usedBufferSize += 4;
+      }
+      
+      int keyDataWidth = encodeKeys ? ks.size() : (keyWidth == 0 ? ks.size() : keyWidth);
 
-        int keyDataWidth = encodeKeys ? ks.size() : (keyWidth == 0 ? ks.size() : keyWidth);
-
-        memcpy(buffer + usedBufferSize, ks.data(), keyDataWidth);
-        usedBufferSize += keyDataWidth;
+      // If we don't have enough bytes to fulfill (fixed width but insufficient data size), return an error
+      if (ks.size() < keyDataWidth) {
+        return -4;
       }
 
-      if (vs.size() > 0) {
-        if (encodeVals) {
-          *(int *)(buffer + usedBufferSize) = htonl(vs.size());
-          usedBufferSize += 4;
-        }
+      memcpy(buffer + usedBufferSize, ks.data(), keyDataWidth);
+      usedBufferSize += keyDataWidth;
+
+      if (encodeVals) {
+        *(int *)(buffer + usedBufferSize) = htonl(vs.size());
+        usedBufferSize += 4;
+      }
         
-        int valDataWidth = encodeVals ? vs.size() : (valWidth == 0 ? vs.size() : valWidth);
-        memcpy(buffer + usedBufferSize, vs.data(), valDataWidth);
-        usedBufferSize += valDataWidth;
+      int valDataWidth = encodeVals ? vs.size() : (valWidth == 0 ? vs.size() : valWidth);
+
+      if (vs.size() < valDataWidth) {
+        return -4;
       }
+
+      memcpy(buffer + usedBufferSize, vs.data(), valDataWidth);
+      usedBufferSize += valDataWidth;
 
       iter->Next();
     }
 
     meta->byteLength = usedBufferSize;
     meta->pairLength = count;
+
+    return usedBufferSize;
 }
 
 #ifdef __cplusplus
