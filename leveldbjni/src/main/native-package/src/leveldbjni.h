@@ -135,11 +135,12 @@ extern "C" {
 void buffer_copy(const void *source, size_t source_pos, void *dest, size_t dest_pos, size_t length);
 
 struct ChunkMetadata {
-  int byteLength;
+  int keyByteLength;
+  int valByteLength;
   int pairLength;
 };
 
-int chunk_pairs(void *iterPtr, struct ChunkMetadata* meta, int maxByteSize, char* buffer, int encodeKeys, int encodeVals, int keyWidth, int valWidth);
+  int chunk_pairs(void *iterPtr, struct ChunkMetadata* meta, int keyLimit, int valLimit, char* keyBuffer, char* valBuffer, int encodeKeys, int encodeVals, int keyWidth, int valWidth);
 
 #ifdef __cplusplus
 } /* extern "C" */

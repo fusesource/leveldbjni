@@ -110,8 +110,10 @@ public class NativeIterator extends NativeObject {
         static final native int nextChunk(
                 @JniArg(cast = "void *") long self,
                 ChunkMetadata meta,
-                int maxByteSize,
-                @JniArg(cast = "char *", flags={CRITICAL}) byte[] buffer,
+                int keyLimit,
+                int valLimit,
+                @JniArg(cast = "char *", flags={CRITICAL, NO_IN}) byte[] keyBuffer,
+                @JniArg(cast = "char *", flags={CRITICAL, NO_IN}) byte[] valBuffer,
                 boolean encodeKeys,
                 boolean encodeVals,
                 int keyWidth,
@@ -121,7 +123,8 @@ public class NativeIterator extends NativeObject {
 
     @JniClass(flags={STRUCT})
     public static class ChunkMetadata {
-        public int byteLength;
+        public int keyByteLength;
+        public int valByteLength;
         public int pairLength;
     }
 
@@ -179,21 +182,23 @@ public class NativeIterator extends NativeObject {
     }
 
     /**
-     * Consume the next chunk of key/value pairs into the specified buffer. The buffer will be cleared prior
+     * Consume the next chunk of key/value pairs into the specified buffers. The buffers will be cleared prior
      * to the read, and on return will have position == 0, limit = total bytes read.
      *
      * @param buffer The buffer to read the chunk into
      * @param keyWidth The encoding to use for key data
      * @param valWidth The encoding to use for value data
      */
-    public KeyValueChunk nextChunk(ByteBuffer buffer, DataWidth keyWidth, DataWidth valWidth) throws NativeDB.DBException {
+    public KeyValueChunk nextChunk(ByteBuffer keyBuffer, ByteBuffer valBuffer, DataWidth keyWidth, DataWidth valWidth) throws NativeDB.DBException {
         assertAllocated();
         ChunkMetadata meta = new ChunkMetadata();
-        buffer.clear();
+        keyBuffer.clear(); valBuffer.clear();
         int ret = IteratorJNI.nextChunk(self,
                                         meta,
-                                        buffer.capacity(),
-                                        buffer.array(),
+                                        keyBuffer.capacity(),
+                                        valBuffer.capacity(),
+                                        keyBuffer.array(),
+                                        valBuffer.array(),
                                         keyWidth.isRunLengthEncoded(),
                                         valWidth.isRunLengthEncoded(),
                                         keyWidth.getEncodingWidth(),
@@ -211,8 +216,9 @@ public class NativeIterator extends NativeObject {
             throw new NativeDB.DBException("Requested fixed-width chunk encoding, but key/value data has insufficient bytes", false);
         }
 
-        buffer.limit(meta.byteLength);
-        KeyValueChunk retVal = new KeyValueChunk(buffer, meta.pairLength, keyWidth, valWidth);
+        keyBuffer.limit(meta.keyByteLength);
+        valBuffer.limit(meta.valByteLength);
+        KeyValueChunk retVal = new KeyValueChunk(keyBuffer, valBuffer, meta.pairLength, keyWidth, valWidth);
         checkStatus();
         return retVal;
     }

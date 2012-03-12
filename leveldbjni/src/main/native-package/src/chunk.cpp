@@ -10,11 +10,14 @@
 extern "C" {
 #endif
 
-  int chunk_pairs(void *iterPtr, struct ChunkMetadata* meta, int maxByteSize, char* buffer, int encodeKeys, int encodeVals, int keyWidth, int valWidth) {
+  int chunk_pairs(void *iterPtr, struct ChunkMetadata* meta, int keyLimit, int valLimit, char* keyBuffer, char* valBuffer, int encodeKeys, int encodeVals, int keyWidth, int valWidth) {
+    std::cout << "Starting chunk fill" << std::endl;
+
     leveldb::Iterator *iter = (leveldb::Iterator *) iterPtr;
 
     int count = 0;
-    long usedBufferSize = 0;
+    long usedKeyBufferSize = 0;
+    long usedValBufferSize = 0;
 
     // Error check first
     if (meta == NULL) {
@@ -25,9 +28,11 @@ extern "C" {
       return -2;
     }
 
-    if (buffer == NULL) {
+    if (keyBuffer == NULL || valBuffer == NULL) {
       return -3;
     }
+
+    std::cout << "Safety checks complete" << std::endl
 
     // We simply iterate as long as the iterator is valid. We do free space checks on our buffers later
     for (int i = 0; iter->Valid(); ++i) {
@@ -40,16 +45,18 @@ extern "C" {
       int valByteWidth = encodeVals ? 4 + vs.size() : (valWidth == 0 ? vs.size() : valWidth);
 
       // We have to stop if the combine key/value pair would exceed our chunk buffer
-      if ((usedBufferSize + keyByteWidth + valByteWidth) > maxByteSize) {
+      if ((usedKeyBufferSize + keyByteWidth) > keyLimit || (usedValBufferSize  + valByteWidth) > valLimit) {
         break;
       }
+
+      std::cout << "Space OK" << std::endl
 
       ++count;
       
       // Compact key and value onto the end of the buffer
       if (encodeKeys) {
-        *(int *)(buffer + usedBufferSize) = htonl(ks.size());
-        usedBufferSize += 4;
+        *(int *)(keyBuffer + usedKeyBufferSize) = htonl(ks.size());
+        usedKeyBufferSize += 4;
       }
       
       int keyDataWidth = encodeKeys ? ks.size() : (keyWidth == 0 ? ks.size() : keyWidth);
@@ -59,12 +66,14 @@ extern "C" {
         return -4;
       }
 
-      memcpy(buffer + usedBufferSize, ks.data(), keyDataWidth);
-      usedBufferSize += keyDataWidth;
+      memcpy(keyBuffer + usedKeyBufferSize, ks.data(), keyDataWidth);
+      usedKeyBufferSize += keyDataWidth;
+
+      std::cout << "  Key encoded" << std::endl;
 
       if (encodeVals) {
-        *(int *)(buffer + usedBufferSize) = htonl(vs.size());
-        usedBufferSize += 4;
+        *(int *)(valBuffer + usedValBufferSize) = htonl(vs.size());
+        usedValBufferSize += 4;
       }
         
       int valDataWidth = encodeVals ? vs.size() : (valWidth == 0 ? vs.size() : valWidth);
@@ -73,16 +82,21 @@ extern "C" {
         return -4;
       }
 
-      memcpy(buffer + usedBufferSize, vs.data(), valDataWidth);
-      usedBufferSize += valDataWidth;
+      memcpy(valBuffer + usedValBufferSize, vs.data(), valDataWidth);
+      usedValBufferSize += valDataWidth;
+
+      std::cout << "  Val encoded" << std::endl;
 
       iter->Next();
     }
 
-    meta->byteLength = usedBufferSize;
+    std::cout << "Chunk filled" << std::endl;
+
+    meta->keyByteLength = usedKeyBufferSize;
+    meta->valByteLength = usedValBufferSize;
     meta->pairLength = count;
 
-    return usedBufferSize;
+    return count;
 }
 
 #ifdef __cplusplus

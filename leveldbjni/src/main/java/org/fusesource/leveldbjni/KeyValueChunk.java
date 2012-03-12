@@ -57,11 +57,15 @@ public class KeyValueChunk {
     /** The encoding to use for value data extraction */
     public DataWidth valueWidth;
 
-    /** The backing store */
-    public ByteBuffer data;
+    /** The key backing store */
+    public ByteBuffer keyData;
 
-    public KeyValueChunk(ByteBuffer data, int pairLength, DataWidth keyWidth, DataWidth valueWidth) {
-        this.data = data;
+    /** The value backing store */
+    public ByteBuffer valueData;
+
+    public KeyValueChunk(ByteBuffer keyData, ByteBuffer valueData, int pairLength, DataWidth keyWidth, DataWidth valueWidth) {
+        this.keyData = keyData;
+        this.valueData = valueData;
         this.pairLength = pairLength;
         this.keyWidth = keyWidth;
         this.valueWidth = valueWidth;
@@ -91,24 +95,25 @@ public class KeyValueChunk {
 
     public Iterator<KeyValuePair> getIterator() {
         return new Iterator<KeyValuePair>() {
-            private ByteBuffer backing = data.asReadOnlyBuffer();
+            private ByteBuffer keyBacking = keyData.asReadOnlyBuffer();
+            private ByteBuffer valueBacking = valueData.asReadOnlyBuffer();
 
             public boolean hasNext() {
-                return backing.hasRemaining();
+                return keyBacking.hasRemaining();
             }
 
             public KeyValuePair next() {
-                if (! backing.hasRemaining()) {
+                if (! keyBacking.hasRemaining()) {
                     throw new NoSuchElementException("Chunk limit reached");
                 }
 
-                int keyLen = keyWidth.getWidth(backing);
+                int keyLen = keyWidth.getWidth(keyBacking);
                 byte[] key = new byte[keyLen];
-                backing.get(key, 0, keyLen);
+                keyBacking.get(key, 0, keyLen);
                 
-                int valueLen = valueWidth.getWidth(backing);
+                int valueLen = valueWidth.getWidth(valueBacking);
                 byte[] value = new byte[valueLen];
-                backing.get(value, 0, valueLen);
+                valueBacking.get(value, 0, valueLen);
 
                 return new KeyValuePair(key, value);
             }

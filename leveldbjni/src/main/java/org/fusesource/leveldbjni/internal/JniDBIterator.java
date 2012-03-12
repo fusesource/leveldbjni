@@ -110,12 +110,12 @@ public class JniDBIterator implements DBIterator {
     }
 
     /**
-     * Retrieve the next chunk of key/value pairs into the given buffer, using
+     * Retrieve the next chunk of key/value pairs into the given key and value buffers, using
      * the provided key/value encodings.
      */
-    public KeyValueChunk nextChunk(ByteBuffer buffer, DataWidth keyWidth, DataWidth valWidth) {
+    public KeyValueChunk nextChunk(ByteBuffer keyBuffer, ByteBuffer valueBuffer, DataWidth keyWidth, DataWidth valWidth) {
         try {
-            return iterator.nextChunk(buffer, keyWidth, valWidth);
+            return iterator.nextChunk(keyBuffer, valueBuffer, keyWidth, valWidth);
         } catch (NativeDB.DBException e) {
             throw new RuntimeException(e);
         }
