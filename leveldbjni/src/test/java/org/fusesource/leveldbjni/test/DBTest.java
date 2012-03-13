@@ -167,7 +167,7 @@ public class DBTest extends TestCase {
         DBIterator iterator = db.iterator();
         iterator.seekToFirst();
 
-        ByteBuffer keyBuffer = ByteBuffer.allocate(1000);
+        ByteBuffer keyBuffer = ByteBuffer.allocateDirect(1000);
         ByteBuffer valueBuffer = ByteBuffer.allocate(1000);
         
         KeyValueChunk chunk = ((JniDBIterator)iterator).nextChunk(keyBuffer, valueBuffer, DataWidth.VARIABLE, DataWidth.VARIABLE);

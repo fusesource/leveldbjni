@@ -127,6 +127,13 @@ struct JNILogger : public leveldb::Logger {
 
 #endif
 
+#define ERR_INVALID_META       -1
+#define ERR_INVALID_ITER       -2
+#define ERR_INVALID_BUFFER     -3
+#define ERR_INSUFFICIENT_BYTES -4
+#define ERR_JNI_INTERNAL       -5
+
+#include "org_fusesource_leveldbjni_internal_ChunkWorker.h"
 
 #ifdef __cplusplus
 extern "C" {
