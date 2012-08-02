@@ -184,28 +184,30 @@ The following worked for me on:
 
  * OS X Lion with X Code 4
  * CentOS 5.6 (32 and 64 bit)
- * Ubuntu 10.04 (32 and 64 bit)
+ * Ubuntu 12.04 (32 and 64 bit)
+    * apt-get install autoconf libtool
 
 ### Build Procedure
 
 Then download the snappy, leveldb, and leveldbjni project source code:
 
-    wget http://snappy.googlecode.com/files/snappy-1.0.3.tar.gz
-    tar -zxvf snappy-1.0.3.tar.gz
+    wget http://snappy.googlecode.com/files/snappy-1.0.5.tar.gz
+    tar -zxvf snappy-1.0.5.tar.gz
+
     git clone https://code.google.com/p/leveldb
-    cd leveldb; git checkout 239ac9d2dea0ac1708b7d903a3d80d3883e0781b ; cd -
+    cd leveldb; git checkout dd0d562b4d4fbd07db6a44f9e221f8d368fee8e4 ; cd -
     git clone git://github.com/fusesource/leveldbjni.git
 
 Compile the snappy project.  This produces a static library.    
 
-    cd snappy-1.0.3 
+    cd snappy-1.0.5 
     ./configure --disable-shared --with-pic
     make
     
 Patch and Compile the leveldb project.  This produces a static library.    
     
     cd ../leveldb
-    export LIBRARY_PATH=`cd ../snappy-1.0.3; pwd`
+    export LIBRARY_PATH=`cd ../snappy-1.0.5/.libs/; pwd`
     export C_INCLUDE_PATH=${LIBRARY_PATH}
     export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
     git apply ../leveldbjni/leveldb.patch
@@ -214,7 +216,7 @@ Patch and Compile the leveldb project.  This produces a static library.
 Now use maven to build the leveldbjni project.    
     
     cd ../leveldbjni
-    mvn clean install -Dleveldb=`cd ../leveldb; pwd` -Dsnappy=`cd ../snappy-1.0.3; pwd` -P download -P ${platform}
+    mvn clean install -Dleveldb=`cd ../leveldb; pwd` -Dsnappy=`cd ../snappy-1.0.5; pwd` -P download -P ${platform}
 
 Replace ${platform} with one of the following platform identifiers (depending on the platform your building on):
 

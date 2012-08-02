@@ -1,16 +1,20 @@
 diff --git a/build_detect_platform b/build_detect_platform
-index d8d9ba1..a71f692 100644
+index 959a7d6..388d225 100755
 --- a/build_detect_platform
 +++ b/build_detect_platform
-@@ -26,7 +26,7 @@ case `uname -s` in
-         ;;
-     Linux)
-         PLATFORM=OS_LINUX
--        echo "PLATFORM_CFLAGS=-pthread -DOS_LINUX" >> build_config.mk
-+        echo "PLATFORM_CFLAGS=-pthread -fPIC -DOS_LINUX" >> build_config.mk
-         echo "PLATFORM_LDFLAGS=-pthread"  >> build_config.mk
-         ;;
-     SunOS)
+@@ -171,9 +171,9 @@ echo "CC=$CC" >> $OUTPUT
+ echo "CXX=$CXX" >> $OUTPUT
+ echo "PLATFORM=$PLATFORM" >> $OUTPUT
+ echo "PLATFORM_LDFLAGS=$PLATFORM_LDFLAGS" >> $OUTPUT
+-echo "PLATFORM_CCFLAGS=$PLATFORM_CCFLAGS" >> $OUTPUT
+-echo "PLATFORM_CXXFLAGS=$PLATFORM_CXXFLAGS" >> $OUTPUT
+-echo "PLATFORM_SHARED_CFLAGS=$PLATFORM_SHARED_CFLAGS" >> $OUTPUT
++echo "PLATFORM_CCFLAGS=$PLATFORM_CCFLAGS $PLATFORM_SHARED_CFLAGS" >> $OUTPUT
++echo "PLATFORM_CXXFLAGS=$PLATFORM_CXXFLAGS $PLATFORM_SHARED_CFLAGS" >> $OUTPUT
++echo "PLATFORM_SHARED_CFLAGS=" >> $OUTPUT
+ echo "PLATFORM_SHARED_EXT=$PLATFORM_SHARED_EXT" >> $OUTPUT
+ echo "PLATFORM_SHARED_LDFLAGS=$PLATFORM_SHARED_LDFLAGS" >> $OUTPUT
+ echo "PLATFORM_SHARED_VERSIONED=$PLATFORM_SHARED_VERSIONED" >> $OUTPUT
 diff --git a/include/leveldb/slice.h b/include/leveldb/slice.h
 index 74ea8fa..135bbd7 100644
 --- a/include/leveldb/slice.h
