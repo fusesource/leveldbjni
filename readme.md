@@ -207,11 +207,11 @@ Compile the snappy project.  This produces a static library.
 Patch and Compile the leveldb project.  This produces a static library.    
     
     cd ../leveldb
-    export LIBRARY_PATH=`cd ../snappy-1.0.5/.libs/; pwd`
+    export LIBRARY_PATH=`cd ../snappy-1.0.5; pwd`
     export C_INCLUDE_PATH=${LIBRARY_PATH}
     export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
     git apply ../leveldbjni/leveldb.patch
-    make
+    make libleveldb.a
 
 Now use maven to build the leveldbjni project.    
     
