@@ -112,8 +112,8 @@ public class NativeBuffer extends NativeObject {
                 throw new Error("The object has already been deleted.");
             } else if( r==0 ) {
                 NativeBufferJNI.free(self);
+                self = 0;
             }
-            self = 0;
         }
     }
 
