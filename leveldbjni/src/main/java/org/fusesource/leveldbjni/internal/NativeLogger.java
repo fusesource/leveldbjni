@@ -96,13 +96,8 @@ public abstract class NativeLogger extends NativeObject {
             if( globalRef==0 ) {
                 throw new RuntimeException("jni call failed: NewGlobalRef");
             }
-            long clz = NativeDB.DBJNI.GetObjectClass(this);
-            if( clz==0 ) {
-                throw new RuntimeException("jni call failed: GetObjectClass");
-            }
-
             LoggerJNI struct = new LoggerJNI();
-            struct.log_method = NativeDB.DBJNI.GetMethodID(clz, "log", "(Ljava/lang/String;)V");
+            struct.log_method = NativeDB.DBJNI.GetMethodID(this.getClass(), "log", "(Ljava/lang/String;)V");
             if( struct.log_method ==0 ) {
                 throw new RuntimeException("jni call failed: GetMethodID");
             }

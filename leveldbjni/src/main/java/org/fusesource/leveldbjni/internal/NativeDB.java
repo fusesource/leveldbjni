@@ -67,14 +67,10 @@ public class NativeDB extends NativeObject {
                 @JniArg(cast="jobject", flags={POINTER_ARG})
                 long target);
 
-        @JniMethod(flags={JNI, POINTER_RETURN}, cast="jclass")
-        public static final native long GetObjectClass(
-                Object target);
-
         @JniMethod(flags={JNI, POINTER_RETURN}, cast="jmethodID")
         public static final native long GetMethodID(
                 @JniArg(cast="jclass", flags={POINTER_ARG})
-                long clazz,
+                Class clazz,
                 String name,
                 String signature);
 

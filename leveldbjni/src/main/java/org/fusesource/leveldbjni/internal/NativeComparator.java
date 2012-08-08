@@ -101,13 +101,8 @@ public abstract class NativeComparator extends NativeObject {
             if( globalRef==0 ) {
                 throw new RuntimeException("jni call failed: NewGlobalRef");
             }
-            long clz = NativeDB.DBJNI.GetObjectClass(this);
-            if( clz==0 ) {
-                throw new RuntimeException("jni call failed: GetObjectClass");
-            }
-
             ComparatorJNI struct = new ComparatorJNI();
-            struct.compare_method = NativeDB.DBJNI.GetMethodID(clz, "compare", "(JJ)I");
+            struct.compare_method = NativeDB.DBJNI.GetMethodID(this.getClass(), "compare", "(JJ)I");
             if( struct.compare_method==0 ) {
                 throw new RuntimeException("jni call failed: GetMethodID");
             }
