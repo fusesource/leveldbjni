@@ -97,6 +97,14 @@ class NativeSlice {
         this(buffer.pointer(), buffer.capacity());
     }
 
+    public static NativeSlice create(NativeBuffer buffer) {
+        if(buffer == null ) {
+            return null;
+        } else {
+            return new NativeSlice(buffer);
+        }
+    }
+
     public long data() {
         return data_;
     }

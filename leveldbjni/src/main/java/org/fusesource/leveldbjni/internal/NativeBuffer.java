@@ -197,7 +197,11 @@ public class NativeBuffer extends NativeObject {
     }
 
     static public NativeBuffer create(byte[] data) {
-        return create(data, 0 , data.length);
+        if( data == null ) {
+            return null;
+        } else {
+            return create(data, 0 , data.length);
+        }
     }
     
     static public NativeBuffer create(String data) {

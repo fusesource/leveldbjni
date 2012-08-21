@@ -170,4 +170,9 @@ public class JniDB implements DB {
         }
         return rc;
     }
+
+    public void compactRange(byte[] begin, byte[] end) throws DBException {
+        db.compactRange(begin, end);
+    }
+
 }

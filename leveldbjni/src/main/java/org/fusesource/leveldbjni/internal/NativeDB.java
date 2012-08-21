@@ -155,6 +155,14 @@ public class NativeDB extends NativeObject {
         static final native long RepairDB(
                 @JniArg(cast="const char*") String path,
                 @JniArg(flags={BY_VALUE, NO_OUT}) NativeOptions options);
+
+        @JniMethod(flags={CPP_METHOD})
+        static final native void CompactRange(
+                long self,
+                @JniArg(flags={NO_OUT}) NativeSlice begin,
+                @JniArg(flags={NO_OUT}) NativeSlice end
+                );
+
     }
 
     public void delete() {
@@ -363,6 +371,34 @@ public class NativeDB extends NativeObject {
             result.delete();
         }
     }
+
+    public void compactRange(byte[] begin, byte[] end) {
+        NativeBuffer keyBuffer = NativeBuffer.create(begin);
+        try {
+            NativeBuffer valueBuffer = NativeBuffer.create(end);
+            try {
+                compactRange(keyBuffer, valueBuffer);
+            } finally {
+                if( valueBuffer!=null ) {
+                    valueBuffer.delete();
+                }
+            }
+        } finally {
+            if( keyBuffer!=null ) {
+                keyBuffer.delete();
+            }
+        }
+    }
+
+    private void compactRange( NativeBuffer beginBuffer, NativeBuffer endBuffer) {
+        compactRange(NativeSlice.create(beginBuffer), NativeSlice.create(endBuffer));
+    }
+
+    private void compactRange( NativeSlice beginSlice, NativeSlice endSlice) {
+        assertAllocated();
+        DBJNI.CompactRange(self, beginSlice, endSlice);
+    }
+
 
     static public void destroy(File path, NativeOptions options) throws IOException, DBException {
         checkArgNotNull(options, "options");
