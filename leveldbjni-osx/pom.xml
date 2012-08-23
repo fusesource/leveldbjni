@@ -98,11 +98,9 @@
           </nativeSrcDependency>
           <platform>osx</platform>
           <configureArgs>
-            <arg>--with-leveldb=${leveldb}</arg>
-            <arg>--with-snappy=${snappy}</arg>
+            <arg>--with-leveldb=${env.LEVELDB_HOME}</arg>
+            <arg>--with-snappy=${env.SNAPPY_HOME}</arg>
             <arg>--with-universal</arg>
-            <arg>--with-leveldb=${leveldb}</arg>
-            <arg>--with-snappy=${snappy}</arg>
           </configureArgs>
         </configuration>
       </plugin>

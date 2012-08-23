@@ -259,10 +259,7 @@
       </modules>
     </profile>    
     <profile>
-      <id>mac</id>
-      <!-- <activation>
-        <os><family>mac</family></os>
-      </activation> -->
+      <id>osx</id>
       <modules>
         <module>leveldbjni-osx</module>
       </modules>

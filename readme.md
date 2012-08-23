@@ -216,13 +216,17 @@ Patch and Compile the leveldb project.  This produces a static library.
 Now use maven to build the leveldbjni project.    
     
     cd ../leveldbjni
-    mvn clean install -Dleveldb=`cd ../leveldb; pwd` -Dsnappy=`cd ../snappy-1.0.5; pwd` -P download -P ${platform}
+    export LEVELDB_HOME=`cd ../leveldb; pwd`
+    export SNAPPY_HOME=`cd ../snappy-1.0.5; pwd`
+    mvn clean install -P download -P ${platform}
 
 Replace ${platform} with one of the following platform identifiers (depending on the platform your building on):
 
+* osx
 * linux32
 * linux64
-* mac
+* win32
+* win64
 
 If your platform does not have the right auto-tools levels available
 just copy the `leveldbjni-${version}-SNAPSHOT-native-src.zip` artifact
