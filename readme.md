@@ -193,19 +193,22 @@ Then download the snappy, leveldb, and leveldbjni project source code:
 
     wget http://snappy.googlecode.com/files/snappy-1.0.5.tar.gz
     tar -zxvf snappy-1.0.5.tar.gz
-    git clone https://code.google.com/p/leveldb
+    git clone git://github.com/chirino/leveldb.git
     git clone git://github.com/fusesource/leveldbjni.git
+    export SNAPPY_HOME=`cd snappy-1.0.5; pwd`
+    export LEVELDB_HOME=`cd leveldb; pwd`
+    export LEVELDBJNI_HOME=`cd leveldbjni; pwd`
 
 Compile the snappy project.  This produces a static library.    
 
-    cd snappy-1.0.5 
+    cd ${SNAPPY_HOME}
     ./configure --disable-shared --with-pic
     make
     
 Patch and Compile the leveldb project.  This produces a static library.    
     
-    cd ../leveldb
-    export LIBRARY_PATH=`cd ../snappy-1.0.5; pwd`
+    cd ${LEVELDB_HOME}
+    export LIBRARY_PATH=${SNAPPY_HOME}
     export C_INCLUDE_PATH=${LIBRARY_PATH}
     export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
     git apply ../leveldbjni/leveldb.patch
@@ -213,9 +216,7 @@ Patch and Compile the leveldb project.  This produces a static library.
 
 Now use maven to build the leveldbjni project.    
     
-    cd ../leveldbjni
-    export LEVELDB_HOME=`cd ../leveldb; pwd`
-    export SNAPPY_HOME=`cd ../snappy-1.0.5; pwd`
+    cd ${LEVELDBJNI_HOME}
     mvn clean install -P download -P ${platform}
 
 Replace ${platform} with one of the following platform identifiers (depending on the platform your building on):
