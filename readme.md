@@ -193,9 +193,7 @@ Then download the snappy, leveldb, and leveldbjni project source code:
 
     wget http://snappy.googlecode.com/files/snappy-1.0.5.tar.gz
     tar -zxvf snappy-1.0.5.tar.gz
-
     git clone https://code.google.com/p/leveldb
-    cd leveldb; git checkout dd0d562b4d4fbd07db6a44f9e221f8d368fee8e4 ; cd -
     git clone git://github.com/fusesource/leveldbjni.git
 
 Compile the snappy project.  This produces a static library.    
