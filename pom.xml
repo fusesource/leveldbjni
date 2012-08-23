@@ -246,6 +246,8 @@
         <module>leveldbjni-osx</module>
         <module>leveldbjni-linux32</module>
         <module>leveldbjni-linux64</module>
+        <module>leveldbjni-win32</module>
+        <module>leveldbjni-win64</module>
         <module>leveldbjni-all</module>
       </modules>
     </profile>    
@@ -279,5 +281,26 @@
         <module>leveldbjni-linux64</module>
       </modules>
     </profile>
+
+    <profile>
+      <id>win32</id>
+      <properties>
+        <skipAutogen>true</skipAutogen>
+      </properties>
+      <modules>
+        <module>leveldbjni-win32</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>win64</id>
+      <properties>
+        <skipAutogen>true</skipAutogen>
+      </properties>
+      <modules>
+        <module>leveldbjni-win64</module>
+      </modules>
+    </profile>
+
   </profiles>
 </project>

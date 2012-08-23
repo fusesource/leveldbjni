@@ -47,6 +47,10 @@
   <name>${project.artifactId}</name>
   <description>leveldbjni is a jni library for acessing leveldb.</description>
       
+  <properties>
+    <skipAutogen>false</skipAutogen>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.fusesource.hawtjni</groupId>
@@ -97,6 +101,7 @@
           </execution>
         </executions>        
         <configuration>
+          <skipAutogen>${skipAutogen}</skipAutogen>
           <name>leveldbjni</name>
           <callbacks>false</callbacks>
           <copyright><![CDATA[

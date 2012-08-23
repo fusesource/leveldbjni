@@ -40,54 +40,55 @@
   </parent>
 
   <groupId>org.fusesource.leveldbjni</groupId>
-  <artifactId>leveldbjni-all</artifactId>
+  <artifactId>leveldbjni-win64</artifactId>
   <version>99-master-SNAPSHOT</version>
   
   <name>${project.artifactId}</name>
-  <description>An uber jar which contains all the leveldbjni platform libraries and dependencies</description>
+  <description>The leveldbjni Windows 64 bit native libraries</description>
       
   <dependencies>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni-osx</artifactId>
+      <artifactId>leveldbjni</artifactId>
       <version>99-master-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni-linux32</artifactId>
-      <version>99-master-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni-linux64</artifactId>
-      <version>99-master-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni-win32</artifactId>
-      <version>99-master-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni-win64</artifactId>
-      <version>99-master-SNAPSHOT</version>
-    </dependency>
-    
   </dependencies>
 
   <build>
+    <testSourceDirectory>${basedir}/../leveldbjni/src/test/java</testSourceDirectory>
      
     <plugins>
       <plugin>
-        <groupId>org.fusesource.mvnplugins</groupId>
-        <artifactId>maven-uberize-plugin</artifactId>
-        <version>1.15</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <classesDirectory>${basedir}/target/generated-sources/hawtjni/lib</classesDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.fusesource.hawtjni</groupId>
+        <artifactId>maven-hawtjni-plugin</artifactId>
+        <version>${hawtjni-version}</version>
         <executions>
           <execution>
-            <phase>package</phase>
-            <goals><goal>uberize</goal></goals>
+            <goals>
+              <goal>build</goal>
+            </goals>
           </execution>
         </executions>
+        <configuration>
+          <name>leveldbjni</name>
+          <classified>false</classified>
+          <nativeSrcDependency>
+            <groupId>org.fusesource.leveldbjni</groupId>
+            <artifactId>leveldbjni</artifactId>
+            <version>${project.version}</version>
+            <classifier>native-src</classifier>
+            <type>zip</type>
+          </nativeSrcDependency>
+          <packageDirectory>${basedir}/../leveldbjni/target/generated-sources/hawtjni/native-package</packageDirectory>
+        </configuration>
       </plugin>
     </plugins>
   </build>

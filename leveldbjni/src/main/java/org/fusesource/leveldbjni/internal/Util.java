@@ -55,7 +55,7 @@ public class Util {
             NativeDB.LIBRARY.load();
         }
 
-        @JniMethod()
+        @JniMethod(conditional="!defined(_WIN32) && !defined(_WIN64)")
         static final native int link(
                 @JniArg(cast="const char*") String source,
                 @JniArg(cast="const char*") String target);
