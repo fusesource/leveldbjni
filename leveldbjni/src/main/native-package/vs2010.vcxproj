@@ -80,8 +80,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ExceptionHandling>
-      </ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -89,8 +88,6 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <CallingConvention>StdCall</CallingConvention>
-      
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -107,8 +104,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ExceptionHandling>
-      </ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -116,8 +112,6 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <CallingConvention>StdCall</CallingConvention>
-      
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -134,8 +128,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
-      <ExceptionHandling>
-      </ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -143,8 +136,6 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <CallingConvention>StdCall</CallingConvention>
-      
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -159,8 +150,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <PreprocessorDefinitions>WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
-      <ExceptionHandling>
-      </ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -168,8 +158,6 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <CallingConvention>StdCall</CallingConvention>
-      
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -183,9 +171,7 @@
     <ClCompile Include=".\src\leveldbjni_structs.cpp"/>
     <ClCompile Include=".\src\buffer.c"/>
     <ClCompile Include=".\src\hawtjni.c"/>
-
   </ItemGroup>
-
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>SNAPPY;LEVELDB_PLATFORM_WINDOWS;OS_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
