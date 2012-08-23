@@ -40,6 +40,7 @@ import java.io.IOException;
 
 import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
 import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_GETTER;
+import static org.fusesource.hawtjni.runtime.ArgFlag.*;
 
 /**
  * Some miscellaneous utility functions.
@@ -59,6 +60,12 @@ public class Util {
         static final native int link(
                 @JniArg(cast="const char*") String source,
                 @JniArg(cast="const char*") String target);
+
+        @JniMethod(conditional="defined(_WIN32) || defined(_WIN64)")
+        static final native int CreateHardLinkW(
+                @JniArg(cast="LPCTSTR", flags={POINTER_ARG, UNICODE}) String source,
+                @JniArg(cast="LPCTSTR", flags={POINTER_ARG, UNICODE}) String target,
+                @JniArg(cast="LPSECURITY_ATTRIBUTES", flags={POINTER_ARG}) long lpSecurityAttributes);
 
         @JniMethod(flags={CONSTANT_GETTER})
         public static final native int errno();
