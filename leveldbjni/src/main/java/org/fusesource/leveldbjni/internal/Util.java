@@ -33,13 +33,15 @@ package org.fusesource.leveldbjni.internal;
 
 import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniField;
 import org.fusesource.hawtjni.runtime.JniMethod;
 
 import java.io.File;
 import java.io.IOException;
 
 import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
-import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_GETTER;
+import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
+import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 import static org.fusesource.hawtjni.runtime.ArgFlag.*;
 
 /**
@@ -54,7 +56,15 @@ public class Util {
 
         static {
             NativeDB.LIBRARY.load();
+            init();
         }
+
+        @JniMethod(flags={CONSTANT_INITIALIZER})
+        private static final native void init();
+
+        @JniField(flags={CONSTANT}, accessor="1", conditional="defined(_WIN32) || defined(_WIN64)")
+        static int ON_WINDOWS;
+
 
         @JniMethod(conditional="!defined(_WIN32) && !defined(_WIN64)")
         static final native int link(
@@ -63,8 +73,8 @@ public class Util {
 
         @JniMethod(conditional="defined(_WIN32) || defined(_WIN64)")
         static final native int CreateHardLinkW(
-                @JniArg(cast="LPCTSTR", flags={POINTER_ARG, UNICODE}) String source,
                 @JniArg(cast="LPCTSTR", flags={POINTER_ARG, UNICODE}) String target,
+                @JniArg(cast="LPCTSTR", flags={POINTER_ARG, UNICODE}) String source,
                 @JniArg(cast="LPSECURITY_ATTRIBUTES", flags={POINTER_ARG}) long lpSecurityAttributes);
 
         @JniMethod(flags={CONSTANT_GETTER})
@@ -85,8 +95,14 @@ public class Util {
      * @return
      */
     public static void link(File source, File target) throws IOException {
-        if( UtilJNI.link(source.getCanonicalPath(), target.getCanonicalPath()) != 0 ) {
-            throw new IOException("link failed: "+strerror());
+        if( UtilJNI.ON_WINDOWS == 1 ) {
+            if( UtilJNI.CreateHardLinkW(target.getCanonicalPath(), source.getCanonicalPath(), 0) == 0) {
+                throw new IOException("link failed");
+            }
+        } else {
+            if( UtilJNI.link(source.getCanonicalPath(), target.getCanonicalPath()) != 0 ) {
+                throw new IOException("link failed: "+strerror());
+            }
         }
     }
 
