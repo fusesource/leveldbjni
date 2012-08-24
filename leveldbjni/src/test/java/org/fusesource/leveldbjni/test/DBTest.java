@@ -401,16 +401,16 @@ public class DBTest extends TestCase {
             //                                     Compactions
             //                         Level  Files Size(MB) Time(sec) Read(MB) Write(MB)
             //                         --------------------------------------------------
-            assertTrue(stats.contains("1        2        8         0        0         8"));
-            assertTrue(stats.contains("2        1        4         0        0         4"));
+            assertFalse(stats.contains("1        0        0         0"));
+            assertFalse(stats.contains("2        0        0         0"));
 
             // After the compaction, level 1 and 2 should not have any files in it..
             ((JniDB) db).compactRange(null, null);
 
             stats = db.getProperty("leveldb.stats");
             System.out.println(stats);
-            assertTrue(stats.contains("1        0        0         0       11         8"));
-            assertTrue(stats.contains("2        0        0         0        4         4"));
+            assertTrue(stats.contains("1        0        0         0"));
+            assertTrue(stats.contains("2        0        0         0"));
 
         }
         db.close();
