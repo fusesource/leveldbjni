@@ -31,7 +31,10 @@
  */
 package org.fusesource.leveldbjni.internal;
 
+import org.fusesource.hawtjni.runtime.Callback;
 import org.iq80.leveldb.*;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
@@ -175,4 +178,51 @@ public class JniDB implements DB {
         db.compactRange(begin, end);
     }
 
+
+    private static class Suspension {
+        static long env = Util.EnvJNI.Default();
+
+        CountDownLatch suspended = new CountDownLatch(1);
+        CountDownLatch resumed = new CountDownLatch(1);
+        Callback callback = new Callback(this, "suspended", 1);
+
+        public Suspension() {
+            Util.EnvJNI.Schedule(env, callback.getAddress(), 0);
+        }
+
+        private long suspended(long arg) {
+            suspended.countDown();
+            try {
+                resumed.await();
+            } catch (InterruptedException e) {
+            } finally {
+                callback.dispose();
+            }
+            return 0;
+        }
+    }
+
+    int suspendCounter = 0;
+    Suspension suspension = null;
+
+    public void suspendCompactions() throws InterruptedException {
+        Suspension s = null;
+        synchronized (this) {
+            suspendCounter++;
+            if( suspendCounter==1 ) {
+                suspension = new Suspension();
+            }
+            s = suspension;
+        }
+        // Don't return until the compactions have suspended.
+        s.suspended.await();
+    }
+
+    synchronized public void resumeCompactions() {
+        suspendCounter--;
+        if( suspendCounter==0 ) {
+            suspension.resumed.countDown();
+            suspension = null;
+        }
+    }
 }

@@ -51,6 +51,24 @@ import static org.fusesource.hawtjni.runtime.ArgFlag.*;
  */
 public class Util {
 
+    @JniClass(name="leveldb::Env", flags={CPP})
+    static class EnvJNI {
+
+        static {
+            NativeDB.LIBRARY.load();
+        }
+
+        @JniMethod(cast = "leveldb::Env *", accessor = "leveldb::Env::Default")
+        public static final native long Default();
+
+        @JniMethod(flags = {CPP_METHOD})
+        public static final native void Schedule(
+                long self,
+                @JniArg(cast = "void (*)(void*)") long fp,
+                @JniArg(cast = "void *") long arg);
+
+    }
+
     @JniClass(flags={CPP})
     static class UtilJNI {
 
