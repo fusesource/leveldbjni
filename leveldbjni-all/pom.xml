@@ -41,7 +41,7 @@
 
   <groupId>org.fusesource.leveldbjni</groupId>
   <artifactId>leveldbjni-all</artifactId>
-  <version>1.4</version>
+  <version>1.4.1</version>
   
   <name>${project.artifactId}</name>
   <description>An uber jar which contains all the leveldbjni platform libraries and dependencies</description>
@@ -65,12 +65,12 @@
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-win32</artifactId>
-      <version>1.4</version>
+      <version>1.4.1</version>
     </dependency>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-win64</artifactId>
-      <version>1.4</version>
+      <version>1.4.1</version>
     </dependency>
     
   </dependencies>

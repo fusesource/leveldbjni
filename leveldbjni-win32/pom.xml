@@ -41,7 +41,7 @@
 
   <groupId>org.fusesource.leveldbjni</groupId>
   <artifactId>leveldbjni-win32</artifactId>
-  <version>1.4</version>
+  <version>1.4.1</version>
   
   <name>${project.artifactId}</name>
   <description>The leveldbjni Windows 32 bit native libraries</description>
