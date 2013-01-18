@@ -1,11 +1,11 @@
 diff --git a/build_detect_platform b/build_detect_platform
-index 959a7d6..388d225 100755
+index 5801d20..517db04 100755
 --- a/build_detect_platform
 +++ b/build_detect_platform
-@@ -171,9 +171,9 @@ echo "CC=$CC" >> $OUTPUT
- echo "CXX=$CXX" >> $OUTPUT
+@@ -195,9 +195,9 @@ echo "CXX=$CXX" >> $OUTPUT
  echo "PLATFORM=$PLATFORM" >> $OUTPUT
  echo "PLATFORM_LDFLAGS=$PLATFORM_LDFLAGS" >> $OUTPUT
+ echo "PLATFORM_LIBS=$PLATFORM_LIBS" >> $OUTPUT
 -echo "PLATFORM_CCFLAGS=$PLATFORM_CCFLAGS" >> $OUTPUT
 -echo "PLATFORM_CXXFLAGS=$PLATFORM_CXXFLAGS" >> $OUTPUT
 -echo "PLATFORM_SHARED_CFLAGS=$PLATFORM_SHARED_CFLAGS" >> $OUTPUT
