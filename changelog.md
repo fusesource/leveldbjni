@@ -1,5 +1,11 @@
 # [LevelDBJNI](https://github.com/fusesource/leveldbjni)
 
+## [leveldbjni 1.5][1_5], released 2012-10-31
+[1_5]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni/1.5
+
+* Switch to leveldb-api version 0.5
+* Update to leveldb 1.9 code
+
 ## [leveldbjni 1.4][1_4], released 2012-10-31
 [1_4]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni/1.4
 
