@@ -7,19 +7,15 @@ LevelDB JNI gives you a Java interface to the
 which is a fast key-value storage library written at Google 
 that provides an ordered mapping from string keys to string values.. 
 
+# Getting the JAR
+
+Just add the following jar to your java project:
+[leveldbjni-all-1.5.jar](http://repo2.maven.org/maven2/org/fusesource/leveldbjni/leveldbjni-all/1.5/leveldbjni-all-1.5.jar)
 
 ## Using as a Maven Dependency
 
-You just nee to add the following repositories and dependencies to your Maven pom.
+You just nee to add the following dependency to your Maven pom.
 
-    <repositories>
-      <repository>
-        <id>fusesource.nexus.snapshot</id>
-        <name>FuseSource Community Snapshot Repository</name>
-        <url>http://repo.fusesource.com/nexus/content/groups/public-snapshots</url>
-      </repository>
-    </repositories>
-    
     <dependencies>
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
