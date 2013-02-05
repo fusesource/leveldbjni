@@ -91,8 +91,8 @@ public class Util {
 
         @JniMethod(conditional="defined(_WIN32) || defined(_WIN64)")
         static final native int CreateHardLinkW(
-                @JniArg(cast="LPCTSTR", flags={POINTER_ARG, UNICODE}) String target,
-                @JniArg(cast="LPCTSTR", flags={POINTER_ARG, UNICODE}) String source,
+                @JniArg(cast="LPCWSTR", flags={POINTER_ARG, UNICODE}) String target,
+                @JniArg(cast="LPCWSTR", flags={POINTER_ARG, UNICODE}) String source,
                 @JniArg(cast="LPSECURITY_ATTRIBUTES", flags={POINTER_ARG}) long lpSecurityAttributes);
 
         @JniMethod(flags={CONSTANT_GETTER})
