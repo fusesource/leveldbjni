@@ -35,13 +35,15 @@
 #ifdef HAVE_CONFIG_H
   /* configure based build.. we will use what it discovered about the platform */
   #include "config.h"
-#else
-  #if defined(_WIN32) || defined(_WIN64)
+#endif
+#if defined(_WIN32) || defined(_WIN64)
     /* Windows based build */
+    #define _WIN32_WINNT 0x0501
+    #include <windows.h>
+#endif
+#if !defined(HAVE_CONFIG_H) && (defined(_WIN32) || defined(_WIN64))
     #define HAVE_STDLIB_H 1
     #define HAVE_STRINGS_H 1
-    #include <windows.h>
-  #endif
 #endif
 
 #ifdef HAVE_UNISTD_H
