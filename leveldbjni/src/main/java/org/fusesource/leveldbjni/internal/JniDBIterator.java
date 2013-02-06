@@ -112,7 +112,11 @@ public class JniDBIterator implements DBIterator {
             try {
                 return iterator.isValid();
             } finally {
-                iterator.next();
+                if (iterator.isValid()) {
+                    iterator.next();
+                } else {
+                    iterator.seekToFirst();
+                }
             }
         } catch (NativeDB.DBException e) {
             throw new RuntimeException(e);
@@ -125,7 +129,11 @@ public class JniDBIterator implements DBIterator {
             try {
                 return peekNext();
             } finally {
-                iterator.next();
+                if (iterator.isValid()) {
+                    iterator.next();
+                } else {
+                    iterator.seekToFirst();
+                }
             }
         } catch (NativeDB.DBException e) {
             throw new RuntimeException(e);
