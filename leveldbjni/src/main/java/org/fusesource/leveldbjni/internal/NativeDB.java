@@ -304,8 +304,19 @@ public class NativeDB extends NativeObject {
         assertAllocated();
         NativeStdString result = new NativeStdString();
         try {
-            checkStatus(DBJNI.Get(self, options, keySlice, result.pointer()));
-            return result.toByteArray();
+            long s = DBJNI.Get(self, options, keySlice, result.pointer());
+            NativeStatus status = new NativeStatus(s);
+            try {
+                if(status.isOk()) {
+                    return result.toByteArray();
+                }
+                if(status.isNotFound()) {
+                    return null;
+                }
+                throw new DBException(status.toString(), status.isNotFound());
+            } finally {
+                status.delete();
+            }
         } finally {
             result.delete();
         }
