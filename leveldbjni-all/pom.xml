@@ -36,12 +36,12 @@
   <parent>
     <groupId>org.fusesource.leveldbjni</groupId>
     <artifactId>leveldbjni-project</artifactId>
-    <version>99-master-SNAPSHOT</version>
+    <version>1.6</version>
   </parent>
 
   <groupId>org.fusesource.leveldbjni</groupId>
   <artifactId>leveldbjni-all</artifactId>
-  <version>99-master-SNAPSHOT</version>
+  <version>1.6</version>
   <packaging>bundle</packaging>
   
   <name>${project.artifactId}</name>
