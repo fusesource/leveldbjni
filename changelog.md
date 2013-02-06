@@ -1,20 +1,28 @@
 # [LevelDBJNI](https://github.com/fusesource/leveldbjni)
 
+## [leveldbjni 1.6][1_6], released 2013-02-06
+[1_6]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni-all/1.6
+
+* Added OSGi meta-data to the -all jar
+* Optimize for when values are not found.
+* Fixed Memory leak with pooled memory
+* Fixed DBIterator.hasPrev() causes invalid memory access exception
+
 ## [leveldbjni 1.5][1_5], released 2012-10-31
-[1_5]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni/1.5
+[1_5]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni-all/1.5
 
 * Switch to leveldb-api version 0.5
 * Update to leveldb 1.9 code
 
 ## [leveldbjni 1.4][1_4], released 2012-10-31
-[1_4]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni/1.4
+[1_4]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni-all/1.4
 
 * Switch to leveldb-api version 0.4
 * Checking the results of autotool chain into the source tree so that folks building don't have to have the autotools installed.
 * Support suspending the background compaction thread.
 
 ## [leveldbjni 1.3][1_3], released 2012-09-24
-[1_3]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni/1.3
+[1_3]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni-all/1.3
 
 * Make Util.link work on windows too.
 * Expose the CreateHardLinkW windows API call.
@@ -24,7 +32,7 @@
 * Fixed bug need to get leveldbjni workin on the Zing JVM
 
 ## [leveldbjni 1.2][1_2], released 2012-02-27
-[1_2]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni/1.2
+[1_2]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni-all/1.2
 
 * Document how to use the memory pools.
 * Fixes issue #6 Support using a memory pool to reduce native memory allocation overhead.
@@ -33,7 +41,7 @@
 * Added a release guide.
 
 ## [leveldbjni 1.1][1_1], released 2011-09-29
-[1_1]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni/1.1
+[1_1]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni-all/1.1
 
 * the all module needs at least one java file so that it produces a javadoc and src.zip
 * Try to load the native lib when the JniDBFactory class is loaded.
