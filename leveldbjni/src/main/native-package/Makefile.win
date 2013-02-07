@@ -1,0 +1,23 @@
+CC = gcc
+CXX = g++
+
+JDK = /c/java/jdk7
+PLATFORM = win32
+
+CPPFLAGS = -I/usr/local/include -I$(JDK)/include -I$(JDK)/include/$(PLATFORM)
+LDFLAGS = -L/usr/local/lib
+
+OBJS = src/leveldbjni.o src/leveldbjni_stats.o src/leveldbjni_structs.o \
+	src/buffer.o src/hawtjni.o
+
+.cc.o:
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+
+.c.o:
+	$(CC) $(CPPFLAGS) -c $< -o $@
+
+leveldbjni.dll: $(OBJS)
+	$(CC) -shared -o $@ -Wl,"--strip-all" -Wl,"--export-all-symbols" $(OBJS) -lleveldb $(LDFLAGS) -lstdc++
+
+clean:
+	rm -f $(OBJS) *.dll
