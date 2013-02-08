@@ -1,23 +1,24 @@
-CC = gcc
-CXX = g++
+CC  ?= gcc
+CXX ?= g++
 
-JDK = /c/java/jdk7
-PLATFORM = win32
+JDK ?= /c/java/jdk7
+PLATFORM ?= win32
 
 CPPFLAGS = -I/usr/local/include -I$(JDK)/include -I$(JDK)/include/$(PLATFORM)
 LDFLAGS = -L/usr/local/lib
+SHARED_CFLAGS = -fPIC
 
 OBJS = src/leveldbjni.o src/leveldbjni_stats.o src/leveldbjni_structs.o \
 	src/buffer.o src/hawtjni.o
 
-.cc.o:
-	$(CXX) $(CPPFLAGS) -c $< -o $@
+.cpp.o:
+	$(CXX) $(CPPFLAGS) $(SHARED_CFLAGS) -c $< -o $@
 
 .c.o:
-	$(CC) $(CPPFLAGS) -c $< -o $@
+	$(CC)  $(CPPFLAGS) $(SHARED_CFLAGS) -c $< -o $@
 
-leveldbjni.dll: $(OBJS)
-	$(CC) -shared -o $@ -Wl,"--strip-all" -Wl,"--export-all-symbols" $(OBJS) -lleveldb $(LDFLAGS) -lstdc++
+leveldbjni.dll: $(OBJS) Makefile.win
+	$(CC) -shared -o $@ -Wl,--kill-at $(OBJS) -lleveldb $(LDFLAGS) -lstdc++
 
 clean:
 	rm -f $(OBJS) *.dll
