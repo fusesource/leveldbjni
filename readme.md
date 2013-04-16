@@ -20,7 +20,7 @@ You just nee to add the following dependency to your Maven pom.
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
         <artifactId>leveldbjni-all</artifactId>
-        <version>1.5</version>
+        <version>1.6.1</version>
       </dependency>
     </dependencies>
 
