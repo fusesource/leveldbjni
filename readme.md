@@ -10,7 +10,7 @@ that provides an ordered mapping from string keys to string values..
 # Getting the JAR
 
 Just add the following jar to your java project:
-[leveldbjni-all-1.5.jar](http://repo2.maven.org/maven2/org/fusesource/leveldbjni/leveldbjni-all/1.5/leveldbjni-all-1.5.jar)
+[leveldbjni-all-1.6.1.jar](http://repo2.maven.org/maven2/org/fusesource/leveldbjni/leveldbjni-all/1.6.1/leveldbjni-all-1.6.1.jar)
 
 ## Using as a Maven Dependency
 
