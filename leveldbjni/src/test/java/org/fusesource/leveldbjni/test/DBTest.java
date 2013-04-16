@@ -39,6 +39,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import static org.fusesource.leveldbjni.JniDBFactory.asString;
@@ -429,4 +430,28 @@ public class DBTest extends TestCase {
     public void assertEquals(byte[] arg1, byte[] arg2) {
         assertTrue(Arrays.equals(arg1, arg2));
     }
+
+    @Test
+    public void testIssue26() throws IOException {
+
+        JniDBFactory.pushMemoryPool(1024 * 512);
+        try {
+            Options options = new Options();
+            options.createIfMissing(true);
+
+            DB db = factory.open(getTestDirectory(getName()), options);
+
+            for (int i = 0; i < 1024 * 1024; i++) {
+                byte[] key = ByteBuffer.allocate(4).putInt(i).array();
+                byte[] value = ByteBuffer.allocate(4).putInt(-i).array();
+                db.put(key, value);
+                assertTrue(Arrays.equals(db.get(key), value));
+            }
+            db.close();
+        } finally {
+            JniDBFactory.popMemoryPool();
+        }
+
+    }
+
 }
