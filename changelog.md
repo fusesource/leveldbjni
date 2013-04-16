@@ -1,5 +1,10 @@
 # [LevelDBJNI](https://github.com/fusesource/leveldbjni)
 
+## [leveldbjni 1.6.1][1_6_1], released 2013-04-16
+[1_6_1]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni-all/1.6.1
+
+* Rebuilding as the uber jar for the 'leveldb-all' module did not actually include the changes in the 1.6 release.
+
 ## [leveldbjni 1.6][1_6], released 2013-02-06
 [1_6]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni-all/1.6
 
