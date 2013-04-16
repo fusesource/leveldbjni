@@ -50,6 +50,11 @@
   <dependencies>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
+      <artifactId>leveldbjni</artifactId>
+      <version>99-master-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-osx</artifactId>
       <version>1.5</version>
     </dependency>
