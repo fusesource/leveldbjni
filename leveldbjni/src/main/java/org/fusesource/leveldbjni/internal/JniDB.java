@@ -38,10 +38,10 @@ import org.iq80.leveldb.*;
  */
 public class JniDB implements DB {
 
-    private final NativeDB db;
-    private final NativeCache cache;
-    private final NativeComparator comparator;
-    private final NativeLogger logger;
+    private NativeDB db;
+    private NativeCache cache;
+    private NativeComparator comparator;
+    private NativeLogger logger;
 
     public JniDB(NativeDB db, NativeCache cache, NativeComparator comparator, NativeLogger logger) {
         this.db = db;
@@ -51,24 +51,36 @@ public class JniDB implements DB {
     }
 
     public void close() {
-        db.delete();
-        if(cache!=null) {
-            cache.delete();
-        }
-        if(comparator!=null){
-            comparator.delete();
-        }
-        if(logger!=null) {
-            logger.delete();
+        if( db!=null ) {
+            db.delete();
+            db = null;
+            if(cache!=null) {
+                cache.delete();
+                cache = null;
+            }
+            if(comparator!=null){
+                comparator.delete();
+                comparator = null;
+            }
+            if(logger!=null) {
+                logger.delete();
+                logger = null;
+            }
         }
     }
 
 
     public byte[] get(byte[] key) throws DBException {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         return get(key, new ReadOptions());
     }
 
     public byte[] get(byte[] key, ReadOptions options) throws DBException {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         try {
             return db.get(convert(options), key);
         } catch (NativeDB.DBException e) {
@@ -84,6 +96,9 @@ public class JniDB implements DB {
     }
 
     public DBIterator iterator(ReadOptions options) {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         return new JniDBIterator(db.iterator(convert(options)));
     }
 
@@ -104,6 +119,9 @@ public class JniDB implements DB {
     }
 
     public Snapshot put(byte[] key, byte[] value, WriteOptions options) throws DBException {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         try {
             db.put(convert(options), key, value);
             return null;
@@ -113,6 +131,9 @@ public class JniDB implements DB {
     }
 
     public Snapshot delete(byte[] key, WriteOptions options) throws DBException {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         try {
             db.delete(convert(options), key);
             return null;
@@ -122,6 +143,9 @@ public class JniDB implements DB {
     }
 
     public Snapshot write(WriteBatch updates, WriteOptions options) throws DBException {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         try {
             db.write(convert(options), ((JniWriteBatch) updates).writeBatch());
             return null;
@@ -131,10 +155,16 @@ public class JniDB implements DB {
     }
 
     public Snapshot getSnapshot() {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         return new JniSnapshot(db, db.getSnapshot());
     }
 
     public long[] getApproximateSizes(Range... ranges) {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         NativeRange args[] = new NativeRange[ranges.length];
         for (int i = 0; i < args.length; i++) {
             args[i] = new NativeRange(ranges[i].start(), ranges[i].limit());
@@ -143,6 +173,9 @@ public class JniDB implements DB {
     }
 
     public String getProperty(String name) {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         return db.getProperty(name);
     }
 
@@ -172,6 +205,9 @@ public class JniDB implements DB {
     }
 
     public void compactRange(byte[] begin, byte[] end) throws DBException {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         db.compactRange(begin, end);
     }
 
@@ -180,9 +216,15 @@ public class JniDB implements DB {
 //  having to callback into java.
 //
     public void suspendCompactions() throws InterruptedException {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         db.suspendCompactions();
     }
     public void resumeCompactions() {
+        if( db==null ) {
+            throw new DBException("Closed");
+        }
         db.resumeCompactions();
     }
 

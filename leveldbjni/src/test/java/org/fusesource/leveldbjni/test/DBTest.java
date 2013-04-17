@@ -454,4 +454,20 @@ public class DBTest extends TestCase {
 
     }
 
+    @Test
+    public void testIssue27() throws IOException {
+
+        Options options = new Options();
+        options.createIfMissing(true);
+        DB db = factory.open(getTestDirectory(getName()), options);
+        db.close();
+
+        try {
+            db.iterator();
+            fail("Expected a DBException");
+        } catch(DBException e) {
+        }
+
+    }
+
 }
