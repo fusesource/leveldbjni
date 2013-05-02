@@ -49,7 +49,7 @@ Putting, Getting, and Deleting key/values.
 
     db.put(bytes("Tampa"), bytes("rocks"));
     String value = asString(db.get(bytes("Tampa")));
-    db.delete(wo, bytes("Tampa"));
+    db.delete(bytes("Tampa"));
 
 Performing Batch/Bulk/Atomic Updates.
 
