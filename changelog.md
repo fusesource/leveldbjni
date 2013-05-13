@@ -1,5 +1,13 @@
 # [LevelDBJNI](https://github.com/fusesource/leveldbjni)
 
+## [leveldbjni 1.7][1_7], released 2013-05-13
+
+* Fixes issues #27: SIGSEGV when creating iterator after DB was closed
+* fixe the mac os error on osgi container
+* Fix linking under mingw. Native functions not exported into dll correctly
+* attach generated sources
+* Add windows makefile (no autotools)
+
 ## [leveldbjni 1.6.1][1_6_1], released 2013-04-16
 [1_6_1]: http://repo.fusesource.com/nexus/content/groups/public/org/fusesource/leveldbjni/leveldbjni-all/1.6.1
 
