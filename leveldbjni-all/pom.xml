@@ -52,31 +52,59 @@
       <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni</artifactId>
       <version>99-master-SNAPSHOT</version>
+      <classifier>sources</classifier>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.iq80.leveldb</groupId>
+      <artifactId>leveldb-api</artifactId>
+      <version>${leveldb-api-version}</version>
+      <classifier>sources</classifier>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.fusesource.hawtjni</groupId>
+      <artifactId>hawtjni-runtime</artifactId>
+      <version>${hawtjni-version}</version>
+      <classifier>sources</classifier>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fusesource.leveldbjni</groupId>
+      <artifactId>leveldbjni</artifactId>
+      <version>99-master-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-osx</artifactId>
       <version>1.5</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-linux32</artifactId>
       <version>1.5</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-linux64</artifactId>
       <version>1.5</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-win32</artifactId>
       <version>1.5</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-win64</artifactId>
       <version>1.5</version>
+      <scope>provided</scope>
     </dependency>
     
   </dependencies>
@@ -120,5 +148,39 @@
       </plugin>
     </plugins>
   </build>
-
+  
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-source-plugin</artifactId>
+            <configuration>
+              <skipSource>true</skipSource>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>uber-sources-jar</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>${basedir}/src/main/descriptors/uber-sources.xml</descriptor>
+                  </descriptors>
+                  <appendAssemblyId>true</appendAssemblyId>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
 </project>
