@@ -52,28 +52,6 @@
       <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni</artifactId>
       <version>99-master-SNAPSHOT</version>
-      <classifier>sources</classifier>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.iq80.leveldb</groupId>
-      <artifactId>leveldb-api</artifactId>
-      <version>${leveldb-api-version}</version>
-      <classifier>sources</classifier>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.fusesource.hawtjni</groupId>
-      <artifactId>hawtjni-runtime</artifactId>
-      <version>${hawtjni-version}</version>
-      <classifier>sources</classifier>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni</artifactId>
-      <version>99-master-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -152,6 +130,31 @@
   <profiles>
     <profile>
       <id>release</id>
+      
+      <dependencies>
+        <dependency>
+          <groupId>org.fusesource.leveldbjni</groupId>
+          <artifactId>leveldbjni</artifactId>
+          <version>99-master-SNAPSHOT</version>
+          <classifier>sources</classifier>
+          <optional>true</optional>
+        </dependency>
+        <dependency>
+          <groupId>org.iq80.leveldb</groupId>
+          <artifactId>leveldb-api</artifactId>
+          <version>${leveldb-api-version}</version>
+          <classifier>sources</classifier>
+          <optional>true</optional>
+        </dependency>
+        <dependency>
+          <groupId>org.fusesource.hawtjni</groupId>
+          <artifactId>hawtjni-runtime</artifactId>
+          <version>${hawtjni-version}</version>
+          <classifier>sources</classifier>
+          <optional>true</optional>
+        </dependency>
+      </dependencies>
+          
       <build>
         <plugins>
           <plugin>
