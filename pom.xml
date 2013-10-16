@@ -41,7 +41,7 @@
 
   <groupId>org.fusesource.leveldbjni</groupId>
   <artifactId>leveldbjni-project</artifactId>
-  <version>99-master-SNAPSHOT</version>
+  <version>1.8</version>
   <packaging>pom</packaging>
   
   <name>${project.artifactId}</name>
