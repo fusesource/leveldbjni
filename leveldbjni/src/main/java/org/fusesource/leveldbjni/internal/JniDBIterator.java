@@ -95,7 +95,7 @@ public class JniDBIterator implements DBIterator {
     }
 
     public Map.Entry<byte[], byte[]> next() {
-        Map.Entry<byte[], byte[]> rc = peekNext();
+        Map.Entry<byte[], byte[]> rc = this.peekNext();
         try {
             iterator.next();
         } catch (NativeDB.DBException e) {
@@ -105,8 +105,9 @@ public class JniDBIterator implements DBIterator {
     }
 
     public boolean hasPrev() {
-        if( !iterator.isValid() )
+        if( !iterator.isValid() ) {
             return false;
+        }
         try {
             iterator.prev();
             try {
@@ -125,9 +126,8 @@ public class JniDBIterator implements DBIterator {
 
     public Map.Entry<byte[], byte[]> peekPrev() {
         try {
-            iterator.prev();
             try {
-                return peekNext();
+                return this.prev();
             } finally {
                 if (iterator.isValid()) {
                     iterator.next();
@@ -141,14 +141,14 @@ public class JniDBIterator implements DBIterator {
     }
 
     public Map.Entry<byte[], byte[]> prev() {
-        Map.Entry<byte[], byte[]> rc = peekPrev();
+        if(!iterator.isValid()) {
+            throw new NoSuchElementException();
+        }
         try {
             iterator.prev();
+            return this.peekNext();
         } catch (NativeDB.DBException e) {
             throw new RuntimeException(e);
         }
-        return rc;
     }
-
-
 }

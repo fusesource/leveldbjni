@@ -470,4 +470,376 @@ public class DBTest extends TestCase {
 
     }
 
+    @Test
+    public void testIssue40_1() throws IOException {
+        // incorrect behaviour.., but it shouldn't crash JVM:
+        // test: seekToLast() -> next() -> prev()
+        Options options = new Options().createIfMissing(true);
+
+        File path = getTestDirectory(getName());
+        DB db = factory.open(path, options);
+
+        DBIterator it = db.iterator();
+        it.seekToLast();
+
+        try {
+            it.next();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+        try {
+            it.prev(); // was SIGSEV
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        it.close();
+        db.close();
+    }
+
+    @Test
+    public void testIssue40_2() throws IOException {
+        // incorrect behaviour.., but it shouldn't crash JVM
+        // test: seekToLast() -> next() -> peekPrev()
+        Options options = new Options().createIfMissing(true);
+
+        File path = getTestDirectory(getName());
+        DB db = factory.open(path, options);
+
+        DBIterator it = db.iterator();
+        it.seekToLast();
+        try {
+            it.next();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+        try {
+            it.peekPrev(); // was SIGSEV
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        it.close();
+        db.close();
+    }
+
+    DBComparator byteComparator = new DBComparator() {
+
+        public int compare(byte[] key1, byte[] key2) {
+            return Byte.compare(key1[0], key2[0]);
+        }
+
+        public String name() {
+            return "ByteComparator";
+        }
+
+        public byte[] findShortestSeparator(byte[] start, byte[] limit) {
+            return start;
+        }
+
+        public byte[] findShortSuccessor(byte[] key) {
+            return key;
+        }
+    };
+
+    public byte[] newKey(byte value) {
+        final byte[] result = new byte[1];
+        result[0] = value;
+        return result;
+    }
+
+    public byte[] getData() {
+        final byte[] result = new byte[10];
+        for (int i = 0 ; i<10; i++) {
+            result[i] = (byte) i;
+        }
+        return result;
+    }
+
+    @Test
+    public void testIssue40_3() throws IOException {
+        // test seek(after last record) -> peekPrev()/prev()
+        Options options = new Options().createIfMissing(true);
+        options.comparator(byteComparator);
+
+        File path = getTestDirectory(getName());
+        DB db = factory.open(path, options);
+
+        byte[] key = newKey((byte) 10);
+        byte[] big_key = newKey((byte) 20);
+
+        byte[] data = getData();
+
+        db.put(key, data);
+
+        DBIterator it = db.iterator();
+        it.seek(big_key);
+        try {
+            data = it.peekPrev().getValue();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+        try {
+            data = it.prev().getValue();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        it.close();
+        db.close();
+    }
+
+    @Test
+    public void testSeekAndIterator() throws IOException {
+        final byte[] key_001 = newKey((byte) 1);
+        final byte[] key_025 = newKey((byte) 25);
+        final byte[] key_050 = newKey((byte) 50);
+        final byte[] key_075 = newKey((byte) 75);
+        final byte[] key_100 = newKey((byte) 100);
+        final byte[] value_025 = bytes("25");
+        final byte[] value_050 = bytes("50");
+        final byte[] value_075 = bytes("75");
+
+        Map.Entry<byte[], byte[]> entry;
+
+        Options options = new Options().createIfMissing(true);
+        options.comparator(byteComparator);
+
+        File path = getTestDirectory(getName());
+        DB db = factory.open(path, options);
+
+        db.put(key_025, value_025);
+        db.put(key_050, value_050);
+        db.put(key_075, value_075);
+
+        DBIterator it = db.iterator();
+
+        //
+        // check hasNext:
+        //
+        it.seek(key_001);
+        assertTrue(it.hasNext());
+        it.seek(key_025);
+        assertTrue(it.hasNext());
+        it.seek(key_050);
+        assertTrue(it.hasNext());
+        it.seek(key_075);
+        assertTrue(it.hasNext());
+        it.seek(key_100);
+        assertFalse(it.hasNext());
+
+        //
+        // check next:
+        //
+        it.seek(key_001);
+        entry = it.next();
+        assertEquals(key_025, entry.getKey());
+        assertEquals(value_025, entry.getValue());
+
+        it.seek(key_025);
+        entry = it.next();
+        assertEquals(key_025, entry.getKey());
+        assertEquals(value_025, entry.getValue());
+
+        it.seek(key_050);
+        entry = it.next();
+        assertEquals(key_050, entry.getKey());
+        assertEquals(value_050, entry.getValue());
+
+        it.seek(key_075);
+        entry = it.next();
+        assertEquals(key_075, entry.getKey());
+        assertEquals(value_075, entry.getValue());
+
+        it.seek(key_100);
+        try {
+            it.next();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        //
+        // check peekNext:
+        //
+        it.seek(key_001);
+        entry = it.peekNext();
+        assertEquals(key_025, entry.getKey());
+        assertEquals(value_025, entry.getValue());
+
+        it.seek(key_025);
+        entry = it.peekNext();
+        assertEquals(key_025, entry.getKey());
+        assertEquals(value_025, entry.getValue());
+
+        it.seek(key_050);
+        entry = it.peekNext();
+        assertEquals(key_050, entry.getKey());
+        assertEquals(value_050, entry.getValue());
+
+        it.seek(key_075);
+        entry = it.peekNext();
+        assertEquals(key_075, entry.getKey());
+        assertEquals(value_075, entry.getValue());
+
+        it.seek(key_100);
+        try {
+            it.peekNext();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        //
+        // check hasPrev
+        //
+        it.seek(key_001);
+        assertFalse(it.hasPrev());
+        it.seek(key_025);
+        assertFalse(it.hasPrev());
+        it.seek(key_050);
+        assertTrue(it.hasPrev());
+        it.seek(key_075);
+        assertTrue(it.hasPrev());
+        it.seek(key_100);
+        assertFalse(it.hasPrev()); // TODO: Expected result?
+
+        //
+        // check prev:
+        //
+        it.seek(key_001);
+        try {
+            it.prev();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        it.seek(key_025);
+        try {
+            it.prev();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        it.seek(key_050);
+        entry = it.prev();
+        assertEquals(key_025, entry.getKey());
+        assertEquals(value_025, entry.getValue());
+
+        it.seek(key_075);
+        entry = it.prev();
+        assertEquals(key_050, entry.getKey());
+        assertEquals(value_050, entry.getValue());
+
+        it.seek(key_100);
+        try {
+            it.prev(); // TODO: Expected result?
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        //
+        // check peekPrev:
+        //
+        it.seek(key_001);
+        try {
+            it.peekPrev();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        it.seek(key_025);
+        try {
+            it.peekPrev();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        it.seek(key_050);
+        entry = it.peekPrev();
+        assertEquals(key_025, entry.getKey());
+        assertEquals(value_025, entry.getValue());
+
+        it.seek(key_075);
+        entry = it.peekPrev();
+        assertEquals(key_050, entry.getKey());
+        assertEquals(value_050, entry.getValue());
+
+        it.seek(key_100);
+        try {
+            it.peekPrev(); // TODO: Expected result?
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        it.close();
+        db.close();
+    }
+
+    @Test
+    public void testIteratorNegative() throws IOException {
+        final byte[] key_001 = newKey((byte) 1);
+        final byte[] key_025 = newKey((byte) 25);
+        final byte[] key_050 = newKey((byte) 50);
+        final byte[] key_075 = newKey((byte) 75);
+        final byte[] key_100 = newKey((byte) 100);
+        final byte[] value_025 = bytes("25");
+        final byte[] value_050 = bytes("50");
+        final byte[] value_075 = bytes("75");
+
+        Map.Entry<byte[], byte[]> entry;
+
+        Options options = new Options().createIfMissing(true);
+        options.comparator(byteComparator);
+
+        File path = getTestDirectory(getName());
+        DB db = factory.open(path, options);
+
+        db.put(key_025, value_025);
+        db.put(key_050, value_050);
+        db.put(key_075, value_075);
+
+        DBIterator it = db.iterator();
+
+        //
+        // check next:
+        //
+        it.seekToFirst();
+        entry = it.next();
+        assertEquals(key_025, entry.getKey());
+        assertEquals(value_025, entry.getValue());
+
+        entry = it.next();
+        assertEquals(key_050, entry.getKey());
+        assertEquals(value_050, entry.getValue());
+
+        entry = it.next();
+        assertEquals(key_075, entry.getKey());
+        assertEquals(value_075, entry.getValue());
+
+        try {
+            it.next();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        //
+        // check prev:
+        //
+        it.seekToLast();
+        entry = it.prev();
+        assertEquals(key_050, entry.getKey());
+        assertEquals(value_050, entry.getValue());
+
+        entry = it.prev();
+        assertEquals(key_025, entry.getKey());
+        assertEquals(value_025, entry.getValue());
+
+        try {
+            it.prev();
+            fail("NoSuchElementException is expected");
+        } catch (NoSuchElementException ex) {
+        }
+
+        it.close();
+        db.close();
+    }
 }
