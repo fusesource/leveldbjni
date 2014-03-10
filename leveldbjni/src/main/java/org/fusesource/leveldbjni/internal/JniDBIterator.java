@@ -41,13 +41,16 @@ import java.util.NoSuchElementException;
 
 /**
  * @author <a href="http://hiramchirino.com">Hiram Chirino</a>
+ * @author Jaap-Jan van der Veen <jaap-jan@shockmedia.nl>
  */
 public class JniDBIterator implements DBIterator {
 
     private final NativeIterator iterator;
+    private boolean atEnd;
 
     JniDBIterator(NativeIterator iterator) {
         this.iterator = iterator;
+        seekToFirst();
     }
 
     public void close() {
@@ -72,17 +75,17 @@ public class JniDBIterator implements DBIterator {
 
     public void seekToFirst() {
         iterator.seekToFirst();
+        atEnd = false;
     }
 
     public void seekToLast() {
         iterator.seekToLast();
+        atEnd = true;
     }
 
 
     public Map.Entry<byte[], byte[]> peekNext() {
-        if(!iterator.isValid()) {
-            throw new NoSuchElementException();
-        }
+        checkExists();
         try {
             return new AbstractMap.SimpleImmutableEntry<byte[],byte[]>(iterator.key(), iterator.value());
         } catch (NativeDB.DBException e) {
@@ -91,62 +94,98 @@ public class JniDBIterator implements DBIterator {
     }
 
     public boolean hasNext() {
-        return iterator.isValid();
+        return !atEnd && iterator.isValid();
     }
 
     public Map.Entry<byte[], byte[]> next() {
-        Map.Entry<byte[], byte[]> rc = this.peekNext();
-        try {
-            iterator.next();
-        } catch (NativeDB.DBException e) {
-            throw new RuntimeException(e);
+        if (atEnd) {
+            throw new NoSuchElementException();
+        }
+        Map.Entry<byte[], byte[]> rc = peekNext();
+        moveNext();
+        if (!iterator.isValid()) {
+            seekToLast();
         }
         return rc;
     }
 
     public boolean hasPrev() {
-        if( !iterator.isValid() ) {
+        if (!iterator.isValid()) {
             return false;
         }
+        movePrev();
+
         try {
-            iterator.prev();
-            try {
-                return iterator.isValid();
-            } finally {
-                if (iterator.isValid()) {
-                    iterator.next();
-                } else {
-                    iterator.seekToFirst();
-                }
+            return iterator.isValid();
+        } finally {
+            if (iterator.isValid()) {
+                moveNext();
+            } else {
+                seekToFirst();
             }
-        } catch (NativeDB.DBException e) {
-            throw new RuntimeException(e);
         }
     }
 
     public Map.Entry<byte[], byte[]> peekPrev() {
+        checkExists();
         try {
-            try {
-                return this.prev();
-            } finally {
-                if (iterator.isValid()) {
-                    iterator.next();
-                } else {
-                    iterator.seekToFirst();
-                }
+            return prev();
+        } finally {
+            moveNext();
+            if (!iterator.isValid()) {
+                seekToLast();
             }
+        }
+    }
+
+    public Map.Entry<byte[], byte[]> prev() {
+        if (atEnd) {
+            atEnd = false;
+        } else {
+            movePrev();
+            if (!iterator.isValid()) {
+                seekToFirst();
+                throw new NoSuchElementException();
+            }
+        }
+        return peekNext();
+    }
+
+    /**
+     * Checks if the iterator points to a valid element.
+     * 
+     * @throws NoSuchElementException
+     *             when the iterator doesn't point to a valid element
+     */
+    private void checkExists() {
+        if (!iterator.isValid()) {
+            throw new NoSuchElementException();
+        }
+    }
+
+    /**
+     * Moves iterator to the previous element.
+     * 
+     * @throws RuntimeException
+     *             when an exception occurred in the underlying database
+     */
+    private void movePrev() {
+        try {
+            iterator.prev();
         } catch (NativeDB.DBException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Map.Entry<byte[], byte[]> prev() {
-        if(!iterator.isValid()) {
-            throw new NoSuchElementException();
-        }
+    /**
+     * Moves iterator to the next element.
+     * 
+     * @throws RuntimeException
+     *             when an exception occurred in the underlying database
+     */
+    private void moveNext() {
         try {
-            iterator.prev();
-            return this.peekNext();
+            iterator.next();
         } catch (NativeDB.DBException e) {
             throw new RuntimeException(e);
         }
