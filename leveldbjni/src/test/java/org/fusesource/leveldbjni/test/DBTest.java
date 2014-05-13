@@ -526,7 +526,7 @@ public class DBTest extends TestCase {
     DBComparator byteComparator = new DBComparator() {
 
         public int compare(byte[] key1, byte[] key2) {
-            return Byte.compare(key1[0], key2[0]);
+            return key1[0] - key2[0];
         }
 
         public String name() {
