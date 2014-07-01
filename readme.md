@@ -14,7 +14,7 @@ Just add the following jar to your java project:
 
 ## Using as a Maven Dependency
 
-You just nee to add the following dependency to your Maven pom.
+You just need to add the following dependency to your Maven pom.
 
     <dependencies>
       <dependency>
