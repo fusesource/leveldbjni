@@ -10,7 +10,7 @@ that provides an ordered mapping from string keys to string values..
 # Getting the JAR
 
 Just add the following jar to your java project:
-[leveldbjni-all-1.7.jar](http://repo2.maven.org/maven2/org/fusesource/leveldbjni/leveldbjni-all/1.7/leveldbjni-all-1.7.jar)
+[leveldbjni-all-1.8.jar](http://repo2.maven.org/maven2/org/fusesource/leveldbjni/leveldbjni-all/1.8/leveldbjni-all-1.8.jar)
 
 ## Using as a Maven Dependency
 
@@ -20,7 +20,7 @@ You just need to add the following dependency to your Maven pom.
       <dependency>
         <groupId>org.fusesource.leveldbjni</groupId>
         <artifactId>leveldbjni-all</artifactId>
-        <version>1.7</version>
+        <version>1.8</version>
       </dependency>
     </dependencies>
 
@@ -181,7 +181,7 @@ The following worked for me on:
  * OS X Lion with X Code 4
  * CentOS 5.6 (32 and 64 bit)
  * Ubuntu 12.04 (32 and 64 bit)
-    * apt-get install autoconf libtool
+ * apt-get install autoconf libtool
 
 ### Build Procedure
 
@@ -199,15 +199,15 @@ Then download the snappy, leveldb, and leveldbjni project source code:
     export SNAPPY_HOME=$(cygpath -w `cd snappy-1.0.5; pwd`)
     export LEVELDB_HOME=$(cygpath -w `cd leveldb; pwd`)
     export LEVELDBJNI_HOME=$(cygpath -w `cd leveldbjni; pwd`)
--->  
+-->
 
-Compile the snappy project.  This produces a static library.    
+Compile the snappy project.  This produces a static library.
 
     cd ${SNAPPY_HOME}
     ./configure --disable-shared --with-pic
     make
     
-Patch and Compile the leveldb project.  This produces a static library.    
+Patch and Compile the leveldb project.  This produces a static library. 
     
     cd ${LEVELDB_HOME}
     export LIBRARY_PATH=${SNAPPY_HOME}
@@ -216,7 +216,7 @@ Patch and Compile the leveldb project.  This produces a static library.
     git apply ../leveldbjni/leveldb.patch
     make libleveldb.a
 
-Now use maven to build the leveldbjni project.    
+Now use maven to build the leveldbjni project. 
     
     cd ${LEVELDBJNI_HOME}
     mvn clean install -P download -P ${platform}
