@@ -24,6 +24,17 @@ You just need to add the following dependency to your Maven pom.
       </dependency>
     </dependencies>
 
+By using the `leveldbjni-all` then the Java driver of leveldb is being used. If you want to use the navitive drivers, then use the os specific dependency instead of `leveldbjni-all`. For example to use linux 64 bit, then use this dependency:
+
+    <dependencies>
+      <dependency>
+        <groupId>org.fusesource.leveldbjni</groupId>
+        <artifactId>leveldbjni-linux64</artifactId>
+        <version>1.8</version>
+      </dependency>
+    </dependencies>
+
+
 ## API Usage:
 
 Recommended Package imports:
