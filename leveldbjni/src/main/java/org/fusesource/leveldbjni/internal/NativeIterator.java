@@ -106,10 +106,13 @@ public class NativeIterator extends NativeObject {
         super(self);
     }
 
-    public void delete() {
+    // Idempotent and thread-safe
+    public synchronized void delete() {
         assertAllocated();
-        IteratorJNI.delete(self);
-        self = 0;
+        if (self != 0) {
+            IteratorJNI.delete(self);
+            self = 0;
+        }
     }
 
     public boolean isValid() {
