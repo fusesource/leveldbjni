@@ -299,5 +299,26 @@
       </modules>
     </profile>
 
+    <profile>
+      <id>sunos32-x86</id>
+      <modules>
+        <module>leveldbjni-sunos32-x86</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>sunos64-amd64</id>
+      <modules>
+        <module>leveldbjni-sunos64-amd64</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>sunos64-sparcv9</id>
+      <modules>
+        <module>leveldbjni-sunos64-sparcv9</module>
+      </modules>
+    </profile>
+
   </profiles>
 </project>
