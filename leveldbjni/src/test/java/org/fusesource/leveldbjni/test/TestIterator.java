@@ -344,8 +344,7 @@ public class TestIterator {
         assertEquals("4 4 4 ", sb.toString());
     }
 
-    @Ignore // seems to be wrong
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void testSeekNotFound() {
         setUp();
         fillDatabase();
@@ -353,7 +352,6 @@ public class TestIterator {
         it.seek(toByteArray((byte) 5));
     }
 
-    @Ignore // is wrong
     @Test
     public void testSeekFound() {
         setUp();
@@ -361,7 +359,89 @@ public class TestIterator {
         DBIterator it = db.iterator();
         it.seek(toByteArray((byte) 2));
     
+        assertEquals(2, it.peekNext().getKey()[0]);
+    }
+
+    @Test
+    public void testSeekInBetween() {
+        setUp();
+        fillDatabase();
+        DBIterator it = db.iterator();
+        it.seek(toByteArray((byte)2, (byte)0x80));
+
+        assertEquals(2, it.peekPrev().getKey()[0]);
         assertEquals(3, it.peekNext().getKey()[0]);
+    }
+
+    @Test
+    public void testSeekBeforeStart() {
+        setUp();
+        fillDatabase();
+        DBIterator it = db.iterator();
+        it.seek(toByteArray((byte) 0));
+
+        assertTrue(it.hasNext());
+        assertFalse(it.hasPrev());
+        assertEquals(1, it.peekNext().getKey()[0]);
+    }
+
+    @Test
+    public void testSeekPastEnd() {
+        setUp();
+        fillDatabase();
+        DBIterator it = db.iterator();
+        it.seek(toByteArray((byte) 5));
+
+        assertFalse(it.hasNext());
+        assertTrue(it.hasPrev());
+        assertEquals(4, it.peekPrev().getKey()[0]);
+    }
+
+    @Test
+    public void testFallOffEndForwards() {
+        setUp();
+        fillDatabase();
+        DBIterator it = db.iterator();
+
+        assertEquals(1, it.next().getKey()[0]);
+        assertEquals(2, it.next().getKey()[0]);
+        assertEquals(3, it.next().getKey()[0]);
+        assertEquals(4, it.next().getKey()[0]);
+
+        assertFalse(it.hasNext());
+        try {
+            it.next();
+            assert false;
+        } catch (NoSuchElementException e) {
+            // expected
+        }
+        assertFalse(it.hasNext());
+        assertTrue(it.hasPrev());
+        assertEquals(4, it.prev().getKey()[0]);
+    }
+
+    @Test
+    public void testFallOffEndBackwards() {
+        setUp();
+        fillDatabase();
+        DBIterator it = db.iterator();
+        it.seekToLast();
+
+        assertEquals(4, it.prev().getKey()[0]);
+        assertEquals(3, it.prev().getKey()[0]);
+        assertEquals(2, it.prev().getKey()[0]);
+        assertEquals(1, it.prev().getKey()[0]);
+
+        assertFalse(it.hasPrev());
+        try {
+            it.prev();
+            assert false;
+        } catch (NoSuchElementException e) {
+            // expected
+        }
+        assertFalse(it.hasPrev());
+        assertTrue(it.hasNext());
+        assertEquals(1, it.next().getKey()[0]);
     }
 
     @Test

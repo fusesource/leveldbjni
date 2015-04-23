@@ -45,47 +45,154 @@ import java.util.NoSuchElementException;
  */
 public class JniDBIterator implements DBIterator {
 
+/*
+    This class performs a somewhat tricky mapping of semantics.
+
+    The NativeIterator is always either "valid" and pointing at specific
+    key/value pair, or it is invalid. That's it.
+
+    In contrast, the DBIterator is more like a bi-directional cursor that only
+    takes positions *between* key/value pairs (including before the first and
+    after the last key/value pair).
+
+    Therefore, we must keep track of whether the NativeIterator, if valid,
+    points to the key/value pair before or after our current cursor position.
+    This is done via this.position.
+
+    INVARIANTS:
+
+        - The iterator is invalid IFF the iteration is empty
+        - If the iterator is valid:
+            - If position == RIGHT, we are to the right of the key/value pair
+            - If position == LEFT, we are to the left of the key/value pair
+
+*/
+
+    private static final boolean LEFT = false;
+    private static final boolean RIGHT = true;
+
     private final NativeIterator iterator;
-    private boolean atEnd;
+    private boolean position;
 
     JniDBIterator(NativeIterator iterator) {
         this.iterator = iterator;
-        seekToFirst();
+        this.seekToFirst();
     }
 
+// Public methods
+
+    @Override
     public void close() {
-        iterator.delete();
+        this.iterator.delete();
     }
 
+    @Override
     public void remove() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public void seekToFirst() {
+        this.iterator.seekToFirst();
+        this.position = LEFT;
+    }
+
+    @Override
+    public void seekToLast() {
+        this.iterator.seekToLast();
+        this.position = RIGHT;
+    }
+
+    @Override
     public void seek(byte[] key) {
         try {
-            iterator.seek(key);
+            this.iterator.seek(key);
         } catch (NativeDB.DBException e) {
-            if( e.isNotFound() ) {
-                throw new NoSuchElementException();
-            } else {
-                throw new RuntimeException(e);
-            }
+            throw new RuntimeException(e);
         }
+        if (!this.iterator.isValid()) {
+            this.seekToLast();
+            return;
+        }
+        this.position = LEFT;
     }
 
-    public void seekToFirst() {
-        iterator.seekToFirst();
-        atEnd = false;
+    @Override
+    public boolean hasNext() {
+        if (!this.iterator.isValid())
+            return false;
+        if (this.position == LEFT)
+            return true;
+        if (!this.forward())
+            return false;
+        assert this.iterator.isValid();
+        this.position = LEFT;
+        return true;
     }
 
-    public void seekToLast() {
-        iterator.seekToLast();
-        atEnd = true;
+    @Override
+    public boolean hasPrev() {
+        if (!this.iterator.isValid())
+            return false;
+        if (this.position == RIGHT)
+            return true;
+        if (!this.backward())
+            return false;
+        assert this.iterator.isValid();
+        this.position = RIGHT;
+        return true;
     }
 
-
+    @Override
     public Map.Entry<byte[], byte[]> peekNext() {
-        checkExists();
+        if (!this.hasNext())
+            throw new NoSuchElementException();
+        assert this.position == LEFT;
+        assert this.iterator.isValid();
+        return this.readCursor();
+    }
+
+    @Override
+    public Map.Entry<byte[], byte[]> peekPrev() {
+        if (!this.hasPrev())
+            throw new NoSuchElementException();
+        assert this.position == RIGHT;
+        assert this.iterator.isValid();
+        return this.readCursor();
+    }
+
+    @Override
+    public Map.Entry<byte[], byte[]> next() {
+        if (!this.hasNext())
+            throw new NoSuchElementException();
+        assert this.iterator.isValid();
+        assert this.position == LEFT;
+        final Map.Entry<byte[], byte[]> entry = this.readCursor();
+        this.forward();
+        return entry;
+    }
+
+    @Override
+    public Map.Entry<byte[], byte[]> prev() {
+        if (!this.hasPrev())
+            throw new NoSuchElementException();
+        assert this.iterator.isValid();
+        assert this.position == RIGHT;
+        final Map.Entry<byte[], byte[]> entry = this.readCursor();
+        this.backward();
+        return entry;
+    }
+
+// Internal methods
+
+    /**
+     * Read current iterator key/value pair.
+     *
+     * <p>
+     * This method assumes that the iterator is valid on entry.
+     */
+    private Map.Entry<byte[], byte[]> readCursor() {
+        assert this.iterator.isValid();
         try {
             return new AbstractMap.SimpleImmutableEntry<byte[],byte[]>(iterator.key(), iterator.value());
         } catch (NativeDB.DBException e) {
@@ -93,101 +200,57 @@ public class JniDBIterator implements DBIterator {
         }
     }
 
-    public boolean hasNext() {
-        return !atEnd && iterator.isValid();
-    }
-
-    public Map.Entry<byte[], byte[]> next() {
-        if (atEnd) {
-            throw new NoSuchElementException();
-        }
-        Map.Entry<byte[], byte[]> rc = peekNext();
-        moveNext();
-        if (!iterator.isValid()) {
-            seekToLast();
-        }
-        return rc;
-    }
-
-    public boolean hasPrev() {
-        if (!iterator.isValid()) {
-            return false;
-        }
-        movePrev();
-
-        try {
-            return iterator.isValid();
-        } finally {
-            if (iterator.isValid()) {
-                moveNext();
-            } else {
-                seekToFirst();
-            }
-        }
-    }
-
-    public Map.Entry<byte[], byte[]> peekPrev() {
-        checkExists();
-        try {
-            return prev();
-        } finally {
-            moveNext();
-            if (!iterator.isValid()) {
-                seekToLast();
-            }
-        }
-    }
-
-    public Map.Entry<byte[], byte[]> prev() {
-        if (atEnd) {
-            atEnd = false;
-        } else {
-            movePrev();
-            if (!iterator.isValid()) {
-                seekToFirst();
-                throw new NoSuchElementException();
-            }
-        }
-        return peekNext();
-    }
-
     /**
-     * Checks if the iterator points to a valid element.
-     * 
-     * @throws NoSuchElementException
-     *             when the iterator doesn't point to a valid element
+     * Try to move the iterator backward.
+     *
+     * <p>
+     * This method assumes that the iterator is valid on entry.
+     *
+     * <p>
+     * On return, either the iterator is valid and has been successfully
+     * moved backward, or there are no key/value pairs below the current value,
+     * in which case the iterator will point to the very first entry, if any.
+     *
+     * @return true if iterator was successfully moved backward (and is therefore valid)
      */
-    private void checkExists() {
-        if (!iterator.isValid()) {
-            throw new NoSuchElementException();
-        }
-    }
-
-    /**
-     * Moves iterator to the previous element.
-     * 
-     * @throws RuntimeException
-     *             when an exception occurred in the underlying database
-     */
-    private void movePrev() {
+    private boolean backward() {
+        assert iterator.isValid();
         try {
             iterator.prev();
         } catch (NativeDB.DBException e) {
             throw new RuntimeException(e);
         }
+        if (!iterator.isValid()) {
+            seekToFirst();
+            return false;
+        }
+        return true;
     }
 
     /**
-     * Moves iterator to the next element.
-     * 
-     * @throws RuntimeException
-     *             when an exception occurred in the underlying database
+     * Try to move the iterator forward.
+     *
+     * <p>
+     * This method assumes that the iterator is valid on entry.
+     *
+     * <p>
+     * On return, either the iterator is valid and has been successfully
+     * moved forward, or there are no key/value pairs above the current value,
+     * in which case the iterator will point to the very last entry, if any.
+     *
+     * @return true if iterator was successfully moved forward (and is therefore valid)
      */
-    private void moveNext() {
+    private boolean forward() {
+        assert iterator.isValid();
         try {
             iterator.next();
         } catch (NativeDB.DBException e) {
             throw new RuntimeException(e);
         }
+        if (!iterator.isValid()) {
+            seekToLast();
+            return false;
+        }
+        return true;
     }
 }
