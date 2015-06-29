@@ -14775,6 +14775,7 @@ fi
         mingw*) __JNI_INCLUDE_EXTRAS="win32";;
        cygwin*) __JNI_INCLUDE_EXTRAS="win32";;
        darwin*) __JNI_INCLUDE_EXTRAS="darwin";;
+      freebsd*) __JNI_INCLUDE_EXTRAS="freebsd";;
              *) __JNI_INCLUDE_EXTRAS="genunix";;
     esac
 

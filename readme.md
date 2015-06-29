@@ -239,6 +239,7 @@ Replace ${platform} with one of the following platform identifiers (depending on
 * linux64
 * win32
 * win64
+* freebsd64
 
 If your platform does not have the right auto-tools levels available
 just copy the `leveldbjni-${version}-SNAPSHOT-native-src.zip` artifact
