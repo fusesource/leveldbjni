@@ -86,12 +86,6 @@
     </dependency>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni-sunos32-x86</artifactId>
-      <version>99-master-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-sunos64-amd64</artifactId>
       <version>99-master-SNAPSHOT</version>
       <scope>provided</scope>
@@ -138,7 +132,6 @@
               META-INF/native/osx/libleveldbjni.jnilib;osname=macosx;processor=x86-64,
               META-INF/native/linux32/libleveldbjni.so;osname=Linux;processor=x86,
               META-INF/native/linux64/libleveldbjni.so;osname=Linux;processor=x86-64,
-	      META-INF/native/sunos32/x86/libleveldbjni.so;osname=SunOS;processor=x86,
 	      META-INF/native/sunos64/amd64/libleveldbjni.so;osname=SunOS;processor=x86-64,
 	      META-INF/native/sunos64/sparcv9/libleveldbjni.so;osname=SunOS;processor=sparcv9
             </Bundle-NativeCode>
