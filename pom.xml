@@ -250,6 +250,7 @@
         <module>leveldbjni-win64</module>
         <module>leveldbjni-sunos64-amd64</module>
         <module>leveldbjni-sunos64-sparcv9</module>
+        <module>leveldbjni-linux64-ppc64le</module>
         <module>leveldbjni-all</module>
       </modules>
     </profile>    
@@ -312,6 +313,13 @@
       <id>sunos64-sparcv9</id>
       <modules>
         <module>leveldbjni-sunos64-sparcv9</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>linux64-ppc64le</id>
+      <modules>
+        <module>leveldbjni-linux64-ppc64le</module>
       </modules>
     </profile>
 
