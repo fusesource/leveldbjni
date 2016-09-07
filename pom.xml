@@ -246,6 +246,7 @@
         <module>leveldbjni-osx</module>
         <module>leveldbjni-linux32</module>
         <module>leveldbjni-linux64</module>
+        <module>leveldbjni-freebsd64</module>
         <module>leveldbjni-win32</module>
         <module>leveldbjni-win64</module>
         <module>leveldbjni-sunos64-amd64</module>
@@ -278,6 +279,13 @@
       <id>linux64</id>
       <modules>
         <module>leveldbjni-linux64</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>freebsd64</id>
+      <modules>
+        <module>leveldbjni-freebsd64</module>
       </modules>
     </profile>
 

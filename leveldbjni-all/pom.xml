@@ -74,6 +74,12 @@
     </dependency>
     <dependency>
       <groupId>org.fusesource.leveldbjni</groupId>
+      <artifactId>leveldbjni-freebsd64</artifactId>
+      <version>99-master-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.fusesource.leveldbjni</groupId>
       <artifactId>leveldbjni-win32</artifactId>
       <version>1.8</version>
       <scope>provided</scope>
@@ -134,6 +140,7 @@
               META-INF/native/linux64/libleveldbjni.so;osname=Linux;processor=x86-64,
 	      META-INF/native/sunos64/amd64/libleveldbjni.so;osname=SunOS;processor=x86-64,
 	      META-INF/native/sunos64/sparcv9/libleveldbjni.so;osname=SunOS;processor=sparcv9
+              META-INF/native/freebsd64/libleveldbjni.so;osname=FreeBSD;processor=x86-64
             </Bundle-NativeCode>
          </instructions>
         </configuration>
