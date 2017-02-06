@@ -180,6 +180,8 @@ Using a memory pool to make native memory allocations more efficient:
     
 ## Building
 
+See also [releasing.md](releasing.md):
+
 ### Prerequisites 
 
 * GNU compiler toolchain
