@@ -57,6 +57,8 @@
   
   <modules>
     <module>leveldbjni</module>
+    <!-- More modules for platform specific binaries within <profiles> below -->
+    <module>leveldbjni-tests</module>
   </modules>
   
   <url>http://${forge-project-id}.fusesource.org</url>
@@ -239,6 +241,9 @@
         </pluginRepository>
       </pluginRepositories>
     </profile>
+    
+    <!-- If making changes below, please also update similar struture
+         (with dependency instead of module) in leveldbjni-tests/pom.xml -->
     
     <profile>
       <id>full</id>
