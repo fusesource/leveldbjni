@@ -184,6 +184,8 @@ Using a memory pool to make native memory allocations more efficient:
 
 ### Prerequisites
 
+See also [releasing.md](releasing.md):
+
 * GNU compiler toolchain
 * [Maven 3](http://maven.apache.org/download.html)
 
