@@ -14,7 +14,7 @@ Just add the following jar to your java project:
 
 ## Using as a Maven Dependency
 
-You just need to add the following dependency to your Maven pom.
+You just need to add the following dependency to your Maven POM:
 
     <dependencies>
       <dependency>
@@ -24,7 +24,9 @@ You just need to add the following dependency to your Maven pom.
       </dependency>
     </dependencies>
 
-By using the `leveldbjni-all` then the Java driver of leveldb is being used. If you want to use the native drivers, then use the os specific dependency instead of `leveldbjni-all`. For example to use linux 64 bit, then use this dependency:
+By using the `leveldbjni-all` dependency, you get the OS specific native drivers for all supported platforms.
+
+If you want to use only one or some but not all native drivers, then directly use the OS specific dependency instead of `leveldbjni-all`. For example to use Linux 64 bit, use this dependency:
 
     <dependencies>
       <dependency>
@@ -33,6 +35,16 @@ By using the `leveldbjni-all` then the Java driver of leveldb is being used. If 
         <version>1.8</version>
       </dependency>
     </dependencies>
+
+If you have the leveljni native driver DLL/SO library already separately installed e.g. by a package manager (see [issue 90](https://github.com/fusesource/leveldbjni/issues/90)), then you could depend on the Java "launcher" without the JAR containing the OS specific native driver like this:
+
+      <dependency>
+        <groupId>org.fusesource.leveldbjni</groupId>
+        <artifactId>leveldbjni</artifactId>
+        <version>1.8</version>
+      </dependency>
+
+Lastly, another project unrelated to this project separately provides a (less mature) pure Java implementation of LevelDB, see [dain/leveldb](https://github.com/dain/leveldb).  Note that both that and this project share the same Maven artefact for the Level DB API interface (org.iq80.leveldb:leveldb-api).
 
 
 ## API Usage:
@@ -248,7 +260,7 @@ just copy the `leveldbjni-${version}-SNAPSHOT-native-src.zip` artifact
 from a platform the does have the tools available then add the
 following argument to your maven build:
 
-   -Dnative-src-url=file:leveldbjni-${verision}-SNAPSHOT-native-src.zip
+    -Dnative-src-url=file:leveldbjni-${verision}-SNAPSHOT-native-src.zip
 
 ### Build Results
 
