@@ -2,10 +2,10 @@
 
 ## Description
 
-LevelDB JNI gives you a Java interface to the 
+LevelDB JNI gives you a Java interface to the
 [LevelDB](http://code.google.com/p/leveldb/) C++ library
-which is a fast key-value storage library written at Google 
-that provides an ordered mapping from string keys to string values.. 
+which is a fast key-value storage library written at Google
+that provides an ordered mapping from string keys to string values..
 
 # Getting the JAR
 
@@ -49,6 +49,8 @@ Lastly, another project unrelated to this project separately provides a (less ma
 
 ## API Usage:
 
+See also [LevelDBTest](org.fusesource.leveldbjni.leveldbjni-tests/src/test/java/org/fusesource/leveldbjni/tests/LevelDBTest.java).
+
 Recommended Package imports:
 
     import org.iq80.leveldb.*;
@@ -63,7 +65,7 @@ Opening and closing the database.
     try {
       // Use the db in here....
     } finally {
-      // Make sure you close the db to shutdown the 
+      // Make sure you close the db to shutdown the
       // database and avoid resource leaks.
       db.close();
     }
@@ -107,8 +109,8 @@ Working against a Snapshot view of the Database.
     ReadOptions ro = new ReadOptions();
     ro.snapshot(db.getSnapshot());
     try {
-      
-      // All read operations will now use the same 
+
+      // All read operations will now use the same
       // consistent view of the data.
       ... = db.iterator(ro);
       ... = db.get(bytes("Tampa"), ro);
@@ -137,7 +139,7 @@ Using a custom Comparator.
     Options options = new Options();
     options.comparator(comparator);
     DB db = factory.open(new File("example"), options);
-    
+
 Disabling Compression
 
     Options options = new Options();
@@ -145,7 +147,7 @@ Disabling Compression
     DB db = factory.open(new File("example"), options);
 
 Configuring the Cache
-    
+
     Options options = new Options();
     options.cacheSize(100 * 1048576); // 100MB cache
     DB db = factory.open(new File("example"), options);
@@ -154,7 +156,7 @@ Getting approximate sizes.
 
     long[] sizes = db.getApproximateSizes(new Range(bytes("a"), bytes("k")), new Range(bytes("k"), bytes("z")));
     System.out.println("Size: "+sizes[0]+", "+sizes[1]);
-    
+
 Getting database status.
 
     String stats = db.getProperty("leveldb.stats");
@@ -172,12 +174,12 @@ Getting informational log messages.
     DB db = factory.open(new File("example"), options);
 
 Destroying a database.
-    
+
     Options options = new Options();
     factory.destroy(new File("example"), options);
 
 Repairing a database.
-    
+
     Options options = new Options();
     factory.repair(new File("example"), options);
 
@@ -185,16 +187,16 @@ Using a memory pool to make native memory allocations more efficient:
 
     JniDBFactory.pushMemoryPool(1024 * 512);
     try {
-        // .. work with the DB in here, 
+        // .. work with the DB in here,
     } finally {
         JniDBFactory.popMemoryPool();
     }
-    
+
 ## Building
 
-See also [releasing.md](releasing.md):
+### Prerequisites
 
-### Prerequisites 
+See also [releasing.md](releasing.md):
 
 * GNU compiler toolchain
 * [Maven 3](http://maven.apache.org/download.html)
@@ -231,9 +233,9 @@ Compile the snappy project.  This produces a static library.
     cd ${SNAPPY_HOME}
     ./configure --disable-shared --with-pic
     make
-    
-Patch and Compile the leveldb project.  This produces a static library. 
-    
+
+Patch and Compile the leveldb project.  This produces a static library.
+
     cd ${LEVELDB_HOME}
     export LIBRARY_PATH=${SNAPPY_HOME}
     export C_INCLUDE_PATH=${LIBRARY_PATH}
@@ -241,8 +243,8 @@ Patch and Compile the leveldb project.  This produces a static library.
     git apply ../leveldbjni/leveldb.patch
     make libleveldb.a
 
-Now use maven to build the leveldbjni project. 
-    
+Now use maven to build the leveldbjni project.
+
     cd ${LEVELDBJNI_HOME}
     mvn clean install -P download -P ${platform}
 
@@ -267,4 +269,4 @@ following argument to your maven build:
 * `leveldbjni/target/leveldbjni-${version}.jar` : The java class file to the library.
 * `leveldbjni/target/leveldbjni-${version}-native-src.zip` : A GNU style source project which you can use to build the native library on other systems.
 * `leveldbjni-${platform}/target/leveldbjni-${platform}-${version}.jar` : A jar file containing the built native library using your currently platform.
-    
+
