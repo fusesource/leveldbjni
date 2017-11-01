@@ -6271,6 +6271,9 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  sparc64-*linux*)
 	    LD="${LD-ld} -m elf32_sparc"
 	    ;;
+          aarch64-*linux*)
+            LD="${LD-ld} -m aarch64elf"
+            ;;
 	esac
 	;;
       *64-bit*)
@@ -6293,6 +6296,9 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  sparc*-*linux*)
 	    LD="${LD-ld} -m elf64_sparc"
 	    ;;
+          aarch64-*linux*)
+            LD="${LD-ld} -m aarch64elf"
+            ;;
 	esac
 	;;
     esac
