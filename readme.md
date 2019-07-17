@@ -241,6 +241,8 @@ Patch and Compile the leveldb project.  This produces a static library.
     git apply ../leveldbjni/leveldb.patch
     make libleveldb.a
 
+Notes: Apply ../leveldbjni/leveldb_aarch64.patch instead on linux64-aarch64 platform.
+
 Now use maven to build the leveldbjni project. 
     
     cd ${LEVELDBJNI_HOME}
@@ -254,6 +256,7 @@ Replace ${platform} with one of the following platform identifiers (depending on
 * win32
 * win64
 * freebsd64
+* linux64-aarch64
 
 If your platform does not have the right auto-tools levels available
 just copy the `leveldbjni-${version}-SNAPSHOT-native-src.zip` artifact
