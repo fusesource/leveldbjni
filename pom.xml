@@ -39,9 +39,9 @@
     <version>1.9</version>
   </parent>
 
-  <groupId>org.fusesource.leveldbjni</groupId>
+  <groupId>org.openlabtesting.leveldbjni</groupId>
   <artifactId>leveldbjni-project</artifactId>
-  <version>99-master-SNAPSHOT</version>
+  <version>1.8</version>
   <packaging>pom</packaging>
   
   <name>${project.artifactId}</name>
@@ -89,17 +89,20 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:git://github.com/fusesource/leveldbjni.git</connection>
-    <developerConnection>scm:git:git@github.com:fusesource/leveldbjni.git</developerConnection>
-    <url>https://github.com/fusesource/leveldbjni</url>
+    <connection>scm:git:git://github.com/theopenlab/leveldbjni.git</connection>
+    <developerConnection>scm:git:git@github.com:theopenlab/leveldbjni.git</developerConnection>
+    <url>https://github.com/theopenlab/leveldbjni</url>
   </scm>
 
   <distributionManagement>
-    <site>
-      <id>website.fusesource.org</id>
-      <name>website</name>
-      <url>dav:http://fusesource.com/forge/dav/${forge-project-id}/maven/${project.version}</url>
-    </site>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
   </distributionManagement> 
   
   <developers>
@@ -109,6 +112,11 @@
       <email>hiram@hiramchirino.com</email>
       <url>http://hiramchirino.com</url>
       <timezone>GMT-5</timezone>
+    </developer>
+    <developer>
+      <id>huangtianhua</id>
+      <name>Tianhua Huang</name>
+      <email>huangtianhua223@gmail.com</email>
     </developer>
   </developers>
   
@@ -237,6 +245,10 @@
           <name>FuseSource Community Snapshot Repository</name>
           <url>http://repo.fusesource.com/nexus/content/groups/public-snapshots</url>
         </pluginRepository>
+        <pluginRepository>
+          <id>sonatype-nexus</id>
+          <url>https://oss.sonatype.org/content/repositories/public</url>
+        </pluginRepository>
       </pluginRepositories>
     </profile>
     
@@ -246,12 +258,12 @@
         <module>leveldbjni-osx</module>
         <module>leveldbjni-linux32</module>
         <module>leveldbjni-linux64</module>
-        <module>leveldbjni-freebsd64</module>
+        <!--module>leveldbjni-freebsd64</module-->
         <module>leveldbjni-win32</module>
         <module>leveldbjni-win64</module>
-        <module>leveldbjni-sunos64-amd64</module>
+        <!--module>leveldbjni-sunos64-amd64</module>
         <module>leveldbjni-sunos64-sparcv9</module>
-        <module>leveldbjni-linux64-ppc64le</module>
+        <module>leveldbjni-linux64-ppc64le</module-->
         <module>leveldbjni-linux64-aarch64</module>
         <module>leveldbjni-all</module>
       </modules>
@@ -284,12 +296,12 @@
       </modules>
     </profile>
 
-    <profile>
+    <!--profile>
       <id>freebsd64</id>
       <modules>
         <module>leveldbjni-freebsd64</module>
       </modules>
-    </profile>
+    </profile-->
 
     <profile>
       <id>win32</id>
@@ -311,7 +323,7 @@
       </modules>
     </profile>
 
-    <profile>
+    <!--profile>
       <id>sunos64-amd64</id>
       <modules>
         <module>leveldbjni-sunos64-amd64</module>
@@ -330,7 +342,7 @@
       <modules>
         <module>leveldbjni-linux64-ppc64le</module>
       </modules>
-    </profile>
+    </profile-->
     <profile>
       <id>linux64-aarch64</id>
       <modules>

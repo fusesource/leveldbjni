@@ -30,23 +30,23 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.fusesource.leveldbjni</groupId>
+    <groupId>org.openlabtesting.leveldbjni</groupId>
     <artifactId>leveldbjni-project</artifactId>
-    <version>99-master-SNAPSHOT</version>
+    <version>1.8</version>
   </parent>
 
-  <groupId>org.fusesource.leveldbjni</groupId>
+  <groupId>org.openlabtesting.leveldbjni</groupId>
   <artifactId>leveldbjni-linux64-aarch64</artifactId>
-  <version>99-master-SNAPSHOT</version>
+  <version>1.8</version>
   
   <name>${project.artifactId}</name>
   <description>The leveldbjni linux 64 native libraries on aarch64 machines</description>
       
   <dependencies>
     <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
+      <groupId>org.openlabtesting.leveldbjni</groupId>
       <artifactId>leveldbjni</artifactId>
-      <version>99-master-SNAPSHOT</version>
+      <version>1.8</version>
     </dependency>
   </dependencies>
 
@@ -78,7 +78,7 @@
           <name>leveldbjni</name>
           <classified>false</classified>
           <nativeSrcDependency>
-            <groupId>org.fusesource.leveldbjni</groupId>
+            <groupId>org.openlabtesting.leveldbjni</groupId>
             <artifactId>leveldbjni</artifactId>
             <version>${project.version}</version>
             <classifier>native-src</classifier>
