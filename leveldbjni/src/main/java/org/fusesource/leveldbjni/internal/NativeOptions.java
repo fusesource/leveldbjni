@@ -31,15 +31,15 @@
  */
 package org.fusesource.leveldbjni.internal;
 
-import org.fusesource.hawtjni.runtime.JniClass;
-import org.fusesource.hawtjni.runtime.JniField;
-import org.fusesource.hawtjni.runtime.JniMethod;
-
 import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
 import static org.fusesource.hawtjni.runtime.ClassFlag.STRUCT;
 import static org.fusesource.hawtjni.runtime.FieldFlag.CONSTANT;
 import static org.fusesource.hawtjni.runtime.FieldFlag.FIELD_SKIP;
 import static org.fusesource.hawtjni.runtime.MethodFlag.CONSTANT_INITIALIZER;
+
+import org.fusesource.hawtjni.runtime.JniClass;
+import org.fusesource.hawtjni.runtime.JniField;
+import org.fusesource.hawtjni.runtime.JniMethod;
 
 /**
  * Provides a java interface to the C++ leveldb::Options class.

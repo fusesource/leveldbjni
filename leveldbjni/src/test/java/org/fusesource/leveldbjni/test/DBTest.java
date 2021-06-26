@@ -31,19 +31,34 @@
  */
 package org.fusesource.leveldbjni.test;
 
-import junit.framework.TestCase;
-import org.fusesource.leveldbjni.JniDBFactory;
-import org.fusesource.leveldbjni.internal.JniDB;
-import org.iq80.leveldb.*;
-import org.junit.Test;
+import static org.fusesource.leveldbjni.JniDBFactory.asString;
+import static org.fusesource.leveldbjni.JniDBFactory.bytes;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.*;
-
-import static org.fusesource.leveldbjni.JniDBFactory.asString;
-import static org.fusesource.leveldbjni.JniDBFactory.bytes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Random;
+import junit.framework.TestCase;
+import org.fusesource.leveldbjni.JniDBFactory;
+import org.fusesource.leveldbjni.internal.JniDB;
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.DBComparator;
+import org.iq80.leveldb.DBException;
+import org.iq80.leveldb.DBFactory;
+import org.iq80.leveldb.DBIterator;
+import org.iq80.leveldb.Logger;
+import org.iq80.leveldb.Options;
+import org.iq80.leveldb.Range;
+import org.iq80.leveldb.ReadOptions;
+import org.iq80.leveldb.WriteBatch;
+import org.iq80.leveldb.WriteOptions;
+import org.junit.Test;
 
 /**
  * A Unit test for the DB class implementation.
@@ -414,16 +429,6 @@ public class DBTest extends TestCase {
             assertTrue(stats.contains("2        0        0         0"));
 
         }
-        db.close();
-    }
-
-    @Test
-    public void testSuspendAndResumeCompactions() throws Exception {
-        Options options = new Options().createIfMissing(true);
-        File path = getTestDirectory(getName());
-        DB db = factory.open(path, options);
-        db.suspendCompactions();
-        db.resumeCompactions();
         db.close();
     }
 

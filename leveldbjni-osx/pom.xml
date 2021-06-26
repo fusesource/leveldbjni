@@ -100,7 +100,8 @@
           <configureArgs>
             <arg>--with-leveldb=${env.LEVELDB_HOME}</arg>
             <arg>--with-snappy=${env.SNAPPY_HOME}</arg>
-            <arg>--with-universal</arg>
+            <arg>--with-universal=x86_64</arg>
+            <arg>--with-osxsdk=11.3</arg>
           </configureArgs>
         </configuration>
       </plugin>

@@ -31,17 +31,21 @@
  */
 package org.fusesource.leveldbjni.internal;
 
+import static org.fusesource.hawtjni.runtime.ArgFlag.BY_VALUE;
+import static org.fusesource.hawtjni.runtime.ArgFlag.NO_OUT;
+import static org.fusesource.hawtjni.runtime.ArgFlag.POINTER_ARG;
+import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
+import static org.fusesource.hawtjni.runtime.MethodFlag.CPP_DELETE;
+import static org.fusesource.hawtjni.runtime.MethodFlag.CPP_METHOD;
+import static org.fusesource.hawtjni.runtime.MethodFlag.JNI;
+import static org.fusesource.hawtjni.runtime.MethodFlag.POINTER_RETURN;
+
+import java.io.File;
+import java.io.IOException;
 import org.fusesource.hawtjni.runtime.JniArg;
 import org.fusesource.hawtjni.runtime.JniClass;
 import org.fusesource.hawtjni.runtime.JniMethod;
 import org.fusesource.hawtjni.runtime.Library;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.fusesource.hawtjni.runtime.ArgFlag.*;
-import static org.fusesource.hawtjni.runtime.ClassFlag.CPP;
-import static org.fusesource.hawtjni.runtime.MethodFlag.*;
 
 /**
  * The DB object provides the main interface to acessing LevelDB
@@ -162,12 +166,6 @@ public class NativeDB extends NativeObject {
                 @JniArg(flags={NO_OUT}) NativeSlice begin,
                 @JniArg(flags={NO_OUT}) NativeSlice end
                 );
-
-        @JniMethod(flags={CPP_METHOD})
-        static final native void SuspendCompactions(long self);
-
-        @JniMethod(flags={CPP_METHOD})
-        static final native void ResumeCompactions(long self);
     }
 
     public void delete() {
@@ -223,14 +221,6 @@ public class NativeDB extends NativeObject {
             throw e;
         }
         return new NativeDB(rc[0]);
-    }
-
-    public void suspendCompactions() {
-        DBJNI.SuspendCompactions(self);
-    }
-
-    public void resumeCompactions() {
-        DBJNI.ResumeCompactions(self);
     }
 
     public void put(NativeWriteOptions options, byte[] key, byte[] value) throws DBException {

@@ -6,7 +6,7 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
- * 
+ *
  *    * Redistributions of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
  *    * Redistributions in binary form must reproduce the above
@@ -16,7 +16,7 @@
  *    * Neither the name of FuseSource Corp. nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -179,6 +179,16 @@ public class JniDB implements DB {
         return db.getProperty(name);
     }
 
+    @Override
+    public void suspendCompactions() throws InterruptedException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public void resumeCompactions() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
     private NativeReadOptions convert(ReadOptions options) {
         if(options==null) {
             return null;
@@ -210,68 +220,4 @@ public class JniDB implements DB {
         }
         db.compactRange(begin, end);
     }
-
-//
-//  Using a fork of leveldb with db Suspend / Resume methods to avoid
-//  having to callback into java.
-//
-    public void suspendCompactions() throws InterruptedException {
-        if( db==null ) {
-            throw new DBException("Closed");
-        }
-        db.suspendCompactions();
-    }
-    public void resumeCompactions() {
-        if( db==null ) {
-            throw new DBException("Closed");
-        }
-        db.resumeCompactions();
-    }
-
-//    private static class Suspension {
-//        static long env = Util.EnvJNI.Default();
-//
-//        CountDownLatch suspended = new CountDownLatch(1);
-//        CountDownLatch resumed = new CountDownLatch(1);
-//        Callback callback = new Callback(this, "suspended", 1);
-//
-//        public Suspension() {
-//            Util.EnvJNI.Schedule(env, callback.getAddress(), 0);
-//        }
-//
-//        private long suspended(long arg) {
-//            suspended.countDown();
-//            try {
-//                resumed.await();
-//            } catch (InterruptedException e) {
-//            } finally {
-//                callback.dispose();
-//            }
-//            return 0;
-//        }
-//    }
-//
-//    int suspendCounter = 0;
-//    Suspension suspension = null;
-//
-//    public void suspendCompactions() throws InterruptedException {
-//        Suspension s = null;
-//        synchronized (this) {
-//            suspendCounter++;
-//            if( suspendCounter==1 ) {
-//                suspension = new Suspension();
-//            }
-//            s = suspension;
-//        }
-//        // Don't return until the compactions have suspended.
-//        s.suspended.await();
-//    }
-//
-//    synchronized public void resumeCompactions() {
-//        suspendCounter--;
-//        if( suspendCounter==0 ) {
-//            suspension.resumed.countDown();
-//            suspension = null;
-//        }
-//    }
 }
