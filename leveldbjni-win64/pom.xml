@@ -68,7 +68,7 @@
       </plugin>
       <plugin>
         <groupId>org.fusesource.hawtjni</groupId>
-        <artifactId>maven-hawtjni-plugin</artifactId>
+        <artifactId>hawtjni-maven-plugin</artifactId>
         <version>${hawtjni-version}</version>
         <executions>
           <execution>
