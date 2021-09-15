@@ -34,13 +34,13 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.fusesource.leveldbjni</groupId>
-    <artifactId>leveldbjni-project</artifactId>
+    <groupId>com.ltonetwork</groupId>
+    <artifactId>leveldbjni.leveldbjni-project</artifactId>
     <version>99-master-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.fusesource.leveldbjni</groupId>
-  <artifactId>leveldbjni-osx</artifactId>
+  <groupId>com.ltonetwork</groupId>
+  <artifactId>leveldbjni.leveldbjni-osx</artifactId>
   <version>99-master-SNAPSHOT</version>
   
   <name>${project.artifactId}</name>
@@ -48,17 +48,23 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni</artifactId>
+      <groupId>com.ltonetwork</groupId>
+      <artifactId>leveldbjni.leveldbjni</artifactId>
       <version>99-master-SNAPSHOT</version>
     </dependency>
 
     <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni</artifactId>
+      <groupId>com.ltonetwork</groupId>
+      <artifactId>leveldbjni.leveldbjni</artifactId>
       <version>99-master-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.fusesource.hawtjni</groupId>
+      <artifactId>hawtjni-maven-plugin</artifactId>
+      <version>${hawtjni-version}</version>
     </dependency>
   </dependencies>
 
@@ -74,36 +80,37 @@
           <classesDirectory>${basedir}/target/generated-sources/hawtjni/lib</classesDirectory>
         </configuration>
       </plugin>
-      
-      <plugin>
-        <groupId>org.fusesource.hawtjni</groupId>
-        <artifactId>maven-hawtjni-plugin</artifactId>
-        <version>${hawtjni-version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>build</goal>
-            </goals>
-          </execution>
-        </executions>        
-        <configuration>
-          <name>leveldbjni</name>
-          <classified>false</classified>
-          <nativeSrcDependency>
-            <groupId>org.fusesource.leveldbjni</groupId>
-            <artifactId>leveldbjni</artifactId>
-            <version>${project.version}</version>
-            <classifier>native-src</classifier>
-            <type>zip</type>
-          </nativeSrcDependency>
-          <platform>osx</platform>
-          <configureArgs>
-            <arg>--with-leveldb=${env.LEVELDB_HOME}</arg>
-            <arg>--with-snappy=${env.SNAPPY_HOME}</arg>
-            <arg>--with-universal</arg>
-          </configureArgs>
-        </configuration>
-      </plugin>
+
+<!--      <plugin>-->
+<!--        <groupId>org.fusesource.hawtjni</groupId>-->
+<!--        <artifactId>hawtjni-maven-plugin</artifactId>-->
+<!--        <version>${hawtjni-version}</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <goals>-->
+<!--              <goal>build</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <configuration>-->
+<!--          <name>leveldbjni</name>-->
+<!--          <classified>false</classified>-->
+<!--          <nativeSrcDependency>-->
+<!--            <groupId>org.fusesource.leveldbjni</groupId>-->
+<!--            <artifactId>leveldbjni</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--            <classifier>native-src</classifier>-->
+<!--            <type>zip</type>-->
+<!--          </nativeSrcDependency>-->
+<!--          <platform>osx</platform>-->
+<!--          <configureArgs>-->
+<!--            <arg>&#45;&#45;with-leveldb=${env.LEVELDB_HOME}</arg>-->
+<!--            <arg>&#45;&#45;with-snappy=${env.SNAPPY_HOME}</arg>-->
+<!--            <arg>&#45;&#45;with-universal=x86_64</arg>-->
+<!--            <arg>&#45;&#45;with-osxsdk=11.3</arg>-->
+<!--          </configureArgs>-->
+<!--        </configuration>-->
+<!--      </plugin>-->
     </plugins>
   </build>
 

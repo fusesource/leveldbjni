@@ -34,13 +34,13 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.fusesource.leveldbjni</groupId>
-    <artifactId>leveldbjni-project</artifactId>
+    <groupId>com.ltonetwork</groupId>
+    <artifactId>leveldbjni.leveldbjni-project</artifactId>
     <version>99-master-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.fusesource.leveldbjni</groupId>
-  <artifactId>leveldbjni</artifactId>
+  <groupId>com.ltonetwork</groupId>
+  <artifactId>leveldbjni.leveldbjni</artifactId>
   <version>99-master-SNAPSHOT</version>
   <packaging>jar</packaging>
   
@@ -90,7 +90,7 @@
 
       <plugin>
         <groupId>org.fusesource.hawtjni</groupId>
-        <artifactId>maven-hawtjni-plugin</artifactId>
+        <artifactId>hawtjni-maven-plugin</artifactId>
         <version>${hawtjni-version}</version>
         <executions>
           <execution>
@@ -141,8 +141,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
       </plugin>
       
@@ -201,7 +201,7 @@
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.fusesource.hawtjni</groupId>
-                    <artifactId>maven-hawtjni-plugin</artifactId>
+                    <artifactId>hawtjni-maven-plugin</artifactId>
                     <versionRange>[1.11,)</versionRange>
                     <goals>
                       <goal>generate</goal>

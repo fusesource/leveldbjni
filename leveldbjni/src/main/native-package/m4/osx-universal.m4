@@ -53,7 +53,7 @@ AC_DEFUN([WITH_OSX_UNIVERSAL],
     ],[
       OSX_SDKS_DIR=""
       OSX_VERSION=""
-      for v in 10.0 10.1 10.2 10.3 10.4 10.5 10.6 10.7 10.8 10.9 10.10 10.11 10.12; do
+      for v in 10.0 10.1 10.2 10.3 10.4 10.5 10.6 10.7 10.8 10.9 10.10 10.11 10.12 11.13; do
         for location in "/Developer/SDKs" "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs" ; do
           if test -z "${OSX_VERSION}" && test -d "${location}/MacOSX${v}.sdk" ; then 
             OSX_SDKS_DIR="${location}"
