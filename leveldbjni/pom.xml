@@ -34,13 +34,13 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.ltonetwork.leveldbjni</groupId>
-    <artifactId>leveldbjni-project</artifactId>
+    <groupId>com.ltonetwork</groupId>
+    <artifactId>leveldbjni.leveldbjni-project</artifactId>
     <version>99-master-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.ltonetwork.leveldbjni</groupId>
-  <artifactId>leveldbjni</artifactId>
+  <groupId>com.ltonetwork</groupId>
+  <artifactId>leveldbjni.leveldbjni</artifactId>
   <version>99-master-SNAPSHOT</version>
   <packaging>jar</packaging>
   

@@ -34,13 +34,13 @@
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.ltonetwork.leveldbjni</groupId>
-    <artifactId>leveldbjni-project</artifactId>
+    <groupId>com.ltonetwork</groupId>
+    <artifactId>leveldbjni.leveldbjni-project</artifactId>
     <version>99-master-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.ltonetwork.leveldbjni</groupId>
-  <artifactId>leveldbjni-osx</artifactId>
+  <groupId>com.ltonetwork</groupId>
+  <artifactId>leveldbjni.leveldbjni-osx</artifactId>
   <version>99-master-SNAPSHOT</version>
   
   <name>${project.artifactId}</name>
@@ -48,14 +48,14 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni</artifactId>
+      <groupId>com.ltonetwork</groupId>
+      <artifactId>leveldbjni.leveldbjni</artifactId>
       <version>99-master-SNAPSHOT</version>
     </dependency>
 
     <dependency>
-      <groupId>org.fusesource.leveldbjni</groupId>
-      <artifactId>leveldbjni</artifactId>
+      <groupId>com.ltonetwork</groupId>
+      <artifactId>leveldbjni.leveldbjni</artifactId>
       <version>99-master-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
