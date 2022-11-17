@@ -212,16 +212,16 @@ The following worked for me on:
 
 Then download the snappy, leveldb, and leveldbjni project source code:
 
-    wget http://snappy.googlecode.com/files/snappy-1.0.5.tar.gz
-    tar -zxvf snappy-1.0.5.tar.gz
+    git clone git@github.com:google/snappy.git
+    git checkout 1.1.3
     git clone git://github.com/chirino/leveldb.git
     git clone git://github.com/fusesource/leveldbjni.git
-    export SNAPPY_HOME=`cd snappy-1.0.5; pwd`
+    export SNAPPY_HOME=`cd snappy; pwd`
     export LEVELDB_HOME=`cd leveldb; pwd`
     export LEVELDBJNI_HOME=`cd leveldbjni; pwd`
 
 <!-- In cygwin that would be
-    export SNAPPY_HOME=$(cygpath -w `cd snappy-1.0.5; pwd`)
+    export SNAPPY_HOME=$(cygpath -w `cd snappy; pwd`)
     export LEVELDB_HOME=$(cygpath -w `cd leveldb; pwd`)
     export LEVELDBJNI_HOME=$(cygpath -w `cd leveldbjni; pwd`)
 -->
@@ -229,6 +229,7 @@ Then download the snappy, leveldb, and leveldbjni project source code:
 Compile the snappy project.  This produces a static library.
 
     cd ${SNAPPY_HOME}
+    ./autogen.sh
     ./configure --disable-shared --with-pic
     make
     
@@ -238,8 +239,9 @@ Patch and Compile the leveldb project.  This produces a static library.
     export LIBRARY_PATH=${SNAPPY_HOME}
     export C_INCLUDE_PATH=${LIBRARY_PATH}
     export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
-    git apply ../leveldbjni/leveldb.patch
-    make libleveldb.a
+    patch -Np1 -i ../leveldbjni/leveldb.patch
+    cmake . -DLEVELDB_BUILD_TESTS=OFF -DLEVELDB_BUILD_BENCHMARKS=OFF
+    make
 
 Now use maven to build the leveldbjni project. 
     

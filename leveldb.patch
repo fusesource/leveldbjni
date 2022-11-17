@@ -1,29 +1,144 @@
-diff --git a/build_detect_platform b/build_detect_platform
-index 5801d20..517db04 100755
---- a/build_detect_platform
-+++ b/build_detect_platform
-@@ -195,9 +195,9 @@ echo "CXX=$CXX" >> $OUTPUT
- echo "PLATFORM=$PLATFORM" >> $OUTPUT
- echo "PLATFORM_LDFLAGS=$PLATFORM_LDFLAGS" >> $OUTPUT
- echo "PLATFORM_LIBS=$PLATFORM_LIBS" >> $OUTPUT
--echo "PLATFORM_CCFLAGS=$PLATFORM_CCFLAGS" >> $OUTPUT
--echo "PLATFORM_CXXFLAGS=$PLATFORM_CXXFLAGS" >> $OUTPUT
--echo "PLATFORM_SHARED_CFLAGS=$PLATFORM_SHARED_CFLAGS" >> $OUTPUT
-+echo "PLATFORM_CCFLAGS=$PLATFORM_CCFLAGS $PLATFORM_SHARED_CFLAGS" >> $OUTPUT
-+echo "PLATFORM_CXXFLAGS=$PLATFORM_CXXFLAGS $PLATFORM_SHARED_CFLAGS" >> $OUTPUT
-+echo "PLATFORM_SHARED_CFLAGS=" >> $OUTPUT
- echo "PLATFORM_SHARED_EXT=$PLATFORM_SHARED_EXT" >> $OUTPUT
- echo "PLATFORM_SHARED_LDFLAGS=$PLATFORM_SHARED_LDFLAGS" >> $OUTPUT
- echo "PLATFORM_SHARED_VERSIONED=$PLATFORM_SHARED_VERSIONED" >> $OUTPUT
+From 0e03c27696c3651f785cceafc8ef147667231c48 Mon Sep 17 00:00:00 2001
+From: zhaixiang <zhaixiang@loongson.cn>
+Date: Thu, 17 Nov 2022 18:47:46 +0800
+Subject: [PATCH] Implement DB:SuspendCompations/ResumeCompactions and make
+ Slice private members to public for supporting leveldbjni
+
+Co-Authored-By: xingweidong <xingweidong@redoop.com>
+---
+ db/db_impl.cc           | 35 +++++++++++++++++++++++++++++++++++
+ db/db_impl.h            | 10 ++++++++++
+ db/db_test.cc           |  5 +++++
+ include/leveldb/db.h    |  6 ++++++
+ include/leveldb/slice.h |  1 -
+ 5 files changed, 56 insertions(+), 1 deletion(-)
+
+diff --git a/db/db_impl.cc b/db/db_impl.cc
+index 1a4e459..7098c9b 100644
+--- a/db/db_impl.cc
++++ b/db/db_impl.cc
+@@ -135,6 +135,9 @@ DBImpl::DBImpl(const Options& raw_options, const std::string& dbname)
+       table_cache_(new TableCache(dbname_, options_, TableCacheSize(options_))),
+       db_lock_(nullptr),
+       shutting_down_(false),
++      suspend_cv(&suspend_mutex),
++      suspend_count(0),
++      suspended(false),
+       background_work_finished_signal_(&mutex_),
+       mem_(nullptr),
+       imm_(nullptr),
+@@ -1464,6 +1467,38 @@ void DBImpl::GetApproximateSizes(const Range* range, int n, uint64_t* sizes) {
+   v->Unref();
+ }
+ 
++void DBImpl::SuspendCompactions() {
++  MutexLock l(& suspend_mutex);
++  env_->Schedule(&SuspendWork, this);
++  suspend_count++;
++  while( !suspended ) {
++    suspend_cv.Wait();
++  }  
++}
++void DBImpl::SuspendWork(void* db) {
++  reinterpret_cast<DBImpl*>(db)->SuspendCallback();
++}
++void DBImpl::SuspendCallback() {
++    MutexLock l(&suspend_mutex);
++    Log(options_.info_log, "Compactions suspended");
++    suspended = true;
++    suspend_cv.SignalAll();
++    while( suspend_count > 0 ) {
++        suspend_cv.Wait();
++    }
++    suspended = false;
++    suspend_cv.SignalAll();
++    Log(options_.info_log, "Compactions resumed");
++}
++void DBImpl::ResumeCompactions() {
++    MutexLock l(&suspend_mutex);
++    suspend_count--;
++    suspend_cv.SignalAll();
++    while( suspended ) {
++      suspend_cv.Wait();
++    }  
++}
++
+ // Default implementations of convenience methods that subclasses of DB
+ // can call if they wish
+ Status DB::Put(const WriteOptions& opt, const Slice& key, const Slice& value) {
+diff --git a/db/db_impl.h b/db/db_impl.h
+index c7b0172..2587e1d 100644
+--- a/db/db_impl.h
++++ b/db/db_impl.h
+@@ -49,6 +49,9 @@ class DBImpl : public DB {
+   void GetApproximateSizes(const Range* range, int n, uint64_t* sizes) override;
+   void CompactRange(const Slice* begin, const Slice* end) override;
+ 
++  void SuspendCompactions() override;
++  void ResumeCompactions() override;
++
+   // Extra methods (for testing) that are not in the public DB interface
+ 
+   // Compact any files in the named level that overlap [*begin,*end]
+@@ -170,6 +173,13 @@ class DBImpl : public DB {
+   // Lock over the persistent DB state.  Non-null iff successfully acquired.
+   FileLock* db_lock_;
+ 
++  port::Mutex suspend_mutex;
++  port::CondVar suspend_cv;
++  int suspend_count;
++  bool suspended;
++  static void SuspendWork(void* db);
++  void SuspendCallback();
++
+   // State below is protected by mutex_
+   port::Mutex mutex_;
+   std::atomic<bool> shutting_down_;
+diff --git a/db/db_test.cc b/db/db_test.cc
+index 9bd6e14..2b218fc 100644
+--- a/db/db_test.cc
++++ b/db/db_test.cc
+@@ -2051,6 +2051,11 @@ class ModelDB : public DB {
+ 
+   explicit ModelDB(const Options& options) : options_(options) {}
+   ~ModelDB() override = default;
++
++  virtual void SuspendCompactions() {}
++  virtual void ResumeCompactions() {}
++
++  virtual Status Put(const WriteOptions& o, const Slice& k, const Slice& v) {
+   Status Put(const WriteOptions& o, const Slice& k, const Slice& v) override {
+     return DB::Put(o, k, v);
+   }
+diff --git a/include/leveldb/db.h b/include/leveldb/db.h
+index a13d147..61c29c0 100644
+--- a/include/leveldb/db.h
++++ b/include/leveldb/db.h
+@@ -145,6 +145,12 @@ class LEVELDB_EXPORT DB {
+   // Therefore the following call will compact the entire database:
+   //    db->CompactRange(nullptr, nullptr);
+   virtual void CompactRange(const Slice* begin, const Slice* end) = 0;
++
++  // Suspends the background compaction thread.  This methods
++  // returns once suspended.
++  virtual void SuspendCompactions() = 0;
++  // Resumes a suspended background compation thread.
++  virtual void ResumeCompactions() = 0;
+ };
+ 
+ // Destroy the contents of the specified database.
 diff --git a/include/leveldb/slice.h b/include/leveldb/slice.h
-index 74ea8fa..135bbd7 100644
+index 37cb821..341ca39 100644
 --- a/include/leveldb/slice.h
 +++ b/include/leveldb/slice.h
-@@ -77,7 +77,6 @@ class Slice {
-             (memcmp(data_, x.data_, x.size_) == 0));
+@@ -85,7 +85,6 @@ class LEVELDB_EXPORT Slice {
+     return ((size_ >= x.size_) && (memcmp(data_, x.data_, x.size_) == 0));
    }
  
 - private:
    const char* data_;
    size_t size_;
- 
+ };
+-- 
+2.20.1
+
