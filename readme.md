@@ -10,7 +10,7 @@ that provides an ordered mapping from string keys to string values..
 # Getting the JAR
 
 Just add the following jar to your java project:
-[leveldbjni-all-1.8.jar](http://repo2.maven.org/maven2/org/fusesource/leveldbjni/leveldbjni-all/1.8/leveldbjni-all-1.8.jar)
+[leveldbjni-all-1.8.jar.zip](http://www.java2s.com/ref/jar/leveldbjni-all-1.8.jar.zip)
 
 ## Using as a Maven Dependency
 
@@ -214,7 +214,10 @@ Then download the snappy, leveldb, and leveldbjni project source code:
 
     git clone git@github.com:google/snappy.git
     git checkout 1.1.3
+
     git clone git://github.com/chirino/leveldb.git
+    loongarch64 support: https://github.com/chirino/leveldb/pull/6
+
     git clone git://github.com/fusesource/leveldbjni.git
     export SNAPPY_HOME=`cd snappy; pwd`
     export LEVELDB_HOME=`cd leveldb; pwd`
@@ -239,9 +242,8 @@ Patch and Compile the leveldb project.  This produces a static library.
     export LIBRARY_PATH=${SNAPPY_HOME}
     export C_INCLUDE_PATH=${LIBRARY_PATH}
     export CPLUS_INCLUDE_PATH=${LIBRARY_PATH}
-    patch -Np1 -i ../leveldbjni/leveldb.patch
-    cmake . -DLEVELDB_BUILD_TESTS=OFF -DLEVELDB_BUILD_BENCHMARKS=OFF
-    make
+    git apply ../leveldbjni/leveldb.patch
+    make libleveldb.a
 
 Now use maven to build the leveldbjni project. 
     
@@ -253,6 +255,7 @@ Replace ${platform} with one of the following platform identifiers (depending on
 * osx
 * linux32
 * linux64
+* linux64-loongarch64
 * win32
 * win64
 * freebsd64
