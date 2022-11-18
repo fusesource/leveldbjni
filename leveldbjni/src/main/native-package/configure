@@ -6274,6 +6274,9 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
           aarch64-*linux*)
             LD="${LD-ld} -m aarch64elf"
             ;;
+          loongarch64-*linux*)
+            LD="${LD-ld} -m elf64loongarch"
+            ;;
 	esac
 	;;
       *64-bit*)
@@ -6298,6 +6301,9 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	    ;;
           aarch64-*linux*)
             LD="${LD-ld} -m aarch64elf"
+            ;;
+          loongarch64-*linux*)
+            LD="${LD-ld} -m elf64loongarch"
             ;;
 	esac
 	;;
@@ -15289,7 +15295,7 @@ LDFLAGS="$LDFLAGS $JNI_EXTRA_LDFLAGS -release 99-master-SNAPSHOT"
 ## -----------------------------------------------------
 ## Generate the files
 ## -----------------------------------------------------
-am__api_version='1.14'
+am__api_version='1.16'
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether build environment is sane" >&5
 $as_echo_n "checking whether build environment is sane... " >&6; }

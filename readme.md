@@ -10,7 +10,7 @@ that provides an ordered mapping from string keys to string values..
 # Getting the JAR
 
 Just add the following jar to your java project:
-[leveldbjni-all-1.8.jar](http://repo2.maven.org/maven2/org/fusesource/leveldbjni/leveldbjni-all/1.8/leveldbjni-all-1.8.jar)
+[leveldbjni-all-1.8.jar.zip](http://www.java2s.com/ref/jar/leveldbjni-all-1.8.jar.zip)
 
 ## Using as a Maven Dependency
 
@@ -212,16 +212,19 @@ The following worked for me on:
 
 Then download the snappy, leveldb, and leveldbjni project source code:
 
-    wget http://snappy.googlecode.com/files/snappy-1.0.5.tar.gz
-    tar -zxvf snappy-1.0.5.tar.gz
+    git clone git@github.com:google/snappy.git
+    git checkout 1.1.3
+
     git clone git://github.com/chirino/leveldb.git
+    loongarch64 support: https://github.com/chirino/leveldb/pull/6
+
     git clone git://github.com/fusesource/leveldbjni.git
-    export SNAPPY_HOME=`cd snappy-1.0.5; pwd`
+    export SNAPPY_HOME=`cd snappy; pwd`
     export LEVELDB_HOME=`cd leveldb; pwd`
     export LEVELDBJNI_HOME=`cd leveldbjni; pwd`
 
 <!-- In cygwin that would be
-    export SNAPPY_HOME=$(cygpath -w `cd snappy-1.0.5; pwd`)
+    export SNAPPY_HOME=$(cygpath -w `cd snappy; pwd`)
     export LEVELDB_HOME=$(cygpath -w `cd leveldb; pwd`)
     export LEVELDBJNI_HOME=$(cygpath -w `cd leveldbjni; pwd`)
 -->
@@ -229,6 +232,7 @@ Then download the snappy, leveldb, and leveldbjni project source code:
 Compile the snappy project.  This produces a static library.
 
     cd ${SNAPPY_HOME}
+    ./autogen.sh
     ./configure --disable-shared --with-pic
     make
     
@@ -251,6 +255,7 @@ Replace ${platform} with one of the following platform identifiers (depending on
 * osx
 * linux32
 * linux64
+* linux64-loongarch64
 * win32
 * win64
 * freebsd64
