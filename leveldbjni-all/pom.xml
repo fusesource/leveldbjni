@@ -114,7 +114,12 @@
       <version>99-master-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.fusesource.leveldbjni</groupId>
+      <artifactId>leveldbjni-linux64-loongarch64</artifactId>
+      <version>99-master-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
 
   </dependencies>
 
@@ -156,6 +161,7 @@
               META-INF/native/freebsd64/libleveldbjni.so;osname=FreeBSD;processor=x86-64,
               META-INF/native/linux64/ppc64le/libleveldbjni.so;osname=Linux;processor=ppc64le,
               META-INF/native/linux64/aarch64/libleveldbjni.so;osname=Linux;processor=aarch64
+              META-INF/native/linux64/loongarch64/libleveldbjni.so;osname=Linux;processor=loongarch64
             </Bundle-NativeCode>
          </instructions>
         </configuration>
